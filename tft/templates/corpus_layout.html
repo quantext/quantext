@@ -1,0 +1,44 @@
+{% from 'keyword_macro.html' import keywordlist, keypairlist %}
+<div class = "row">
+    {% include 'readability.html' %}
+    <div class = "col-xs-6 col-md-6 pl-4 pr-4">
+        <div class = "row mt-4">
+            <div class = "col-xs-12 col-md-12">
+                <h4>Analysis of teaching corpus ({{ an.tcorpus }})</h4>
+                <div class="card">
+                    <h5 class="card-header card-header-2">Readability indices</h5>
+                    <div class="card-block">
+                        <div class="row">
+                            <div class = "col-xs-6 col-md-6">
+                                <h5>Size of teaching corpus (words)</h5>
+                                <h5>Total sentences</h5>
+                                <h5>Lexical diversity (TTR)</h5>
+                                <h5>Lexical density (LD)</h5>
+                                <h5>SMOG index</h5>
+                            </div>
+                            <div class = "col-xs-6 col-md-6">
+                                <h5>{{meant.twords}}</h5>
+                                <h5>{{meant.tsents}}</h5>
+                                <h5>{{meant.tttr}}</h5>
+                                <h5>{{meant.tld}}</h5>
+                                <h5>{{meant.tsmog}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class = "row mt-4">
+            <div class = "col-xs-6 col-md-6">
+                {{ keywordlist(t_kwords, "card-header card-header-2", q.qSettings) }}
+            </div>
+            <div class = "col-xs-6 col-md-6">
+                {{ keypairlist(t_bgs, "card-header card-header-2", q.qSettings) }}
+            </div>
+        </div> <!-- end row -->
+    </div>
+</div>
+<div class = "row">
+    {% include 'worksheet.html' %}
+</div>

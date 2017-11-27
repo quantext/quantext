@@ -1,0 +1,65 @@
+{% macro keywordlist(top_kwords,headerclass,setting) -%}
+<div class="card">
+    <h5 class="{{headerclass}}" style="display:flex;">
+        <div style="width:100%">Top keywords ({{ top_kwords|length }})</div>
+        <div title="List is being filtered. Check the settings panel for more information." class="iris-star" style="
+                {% if setting['kblack'] or setting['punct'] %}
+                display:block;
+                {% else %}
+                display:none;
+                {% endif %}
+                margin-bottom: -15px;margin-top: 2px;"></div>
+    </h5>
+    <div class="card-block">
+        <div class="row">
+            <div class = "col-xs-6 col-md-6"><b>Keyword</b></div>
+            <div class = "col-xs-6 col-md-6"><b>Count</b></div>
+        </div>
+        {% set biggest = top_kwords[0][1] %}
+        {% for i in top_kwords %}
+        {% set ngic=i[0] %}
+        {% set word_count = i[1] %}
+        <div class="row">
+            <div class = "col-xs-6 col-md-6"><span class="keyword">{{ngic}}</span></div>
+            <div class = "col-xs-1 col-md-1">{{word_count}}</div>
+            <div class = "col-xs-5 col-md-5" style="position:relative">
+                {% set percent = word_count/biggest * 100 %}
+                <div class="barchart" style="border-bottom:1px solid white;height:100%;width:{{percent}}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro keypairlist(top_bgs,headerclass,setting) -%}
+<div class="card">
+    <h5 class="{{headerclass}}" style="display:flex">
+        <div style="width:100%">Top key pairs ({{ top_bgs|length }})</div>
+        <div title="List is being filtered. Check the settings panel for more information." class="iris-star" style="
+                {% if setting['bblack'] or setting['punct'] %}
+                display:block;
+                {% else %}
+                display:none;
+                {% endif %}
+                margin-bottom: -15px;margin-top: 2px;"></div>
+    </h5>
+    <div class="card-block">
+        <div class="row">
+            <div class = "col-xs-6 col-md-6"><b>Key pair</b></div>
+            <div class = "col-xs-6 col-md-6"><b>Count</b></div>
+        </div>
+        {% set (obj,biggest) = top_bgs[0] %}
+        {% for (bg,c) in top_bgs %}
+        <div class="row">
+            <div class = "col-xs-6 col-md-6"><span class="keyword">{{bg[0]}} {{bg[1]}}</span></div>
+            <div class = "col-xs-1 col-md-1">{{c}}</div>
+            <div class = "col-xs-5 col-md-5" style="position:relative">
+                {% set percent = c/biggest * 100 %}
+                <div class="barchart" style="border-bottom:1px solid white;height:100%;width:{{percent}}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{%- endmacro %}

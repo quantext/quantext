@@ -1,0 +1,104 @@
+body{ font-family: 'Quicksand' }
+
+.iris { font-size:2rem!important;cursor:pointer; }
+.iris::after { clear:right }
+.toolt{ color:#f3565d;cursor:help;font-size:.9rem; }
+
+nav.navbar { z-index:5 }
+
+.display-5 { font-size: 2.5rem;font-weight: 300;line-height: 1.5; }
+
+.fixed-table-container .bs-checkbox { display:none }
+
+.fixed-table-container thead th:nth-child(2) { border-left:none }
+.fixed-table-container tbody td:nth-child(2) { border-left:none }
+
+
+.pull-left { float:left; }
+.pull-right { float:right; }
+
+.fixed-table-container tbody .selected td { background-color: #d9edf7!important}
+
+#menu { background:#eee; box-shadow: inset 8px 0px 24px -12px #444; }
+
+.form-control, .card{ border-radius:0; }
+.card { border:none; }
+.card-header{ background: #57b0c2;border-radius: 0!important;border: 1px solid #57b0c2;color: white;padding:.75rem!important; }
+.card-header-2{ background:#333645;border: 1px solid #333645; }
+.barchart{ background:#8297a8; }
+.barchart2{ background:#333645; }
+
+.keyword { text-decoration: underline;color: #37acbe;cursor:pointer }
+
+/* new styles */
+
+#wstable td { cursor:pointer }
+
+.highlight {font-weight:bold; border-bottom:2px solid #57b0c2}
+.editable-empty, .editable-empty:hover, .editable-empty:focus { color:#f3565d!important }
+
+/* The switch - the box around the slider */
+
+.switchLabel{
+  display:inline-block;
+  vertical-align: text-bottom;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width:40px;  
+  height: 28px;
+  vertical-align: bottom;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #57b0c2;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #57b0c2;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(12px);
+  -ms-transform: translateX(12px);
+  transform: translateX(12px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 20px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

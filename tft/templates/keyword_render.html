@@ -1,0 +1,11 @@
+{% from 'keyword_macro.html' import keywordlist, keypairlist %}
+{% set top_kwords = anaq.top_kwords %}
+{% set top_bgs = anaq.top_bgs %}
+<div class = "row mt-4">
+    <div class = "col-xs-6 col-md-6">
+        {{ keywordlist(top_kwords, "card-header", q.qSettings) }}
+    </div>
+    <div class = "col-xs-6 col-md-6">
+        {{ keypairlist(top_bgs, "card-header", q.qSettings) }}
+    </div>
+</div>

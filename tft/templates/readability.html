@@ -1,0 +1,85 @@
+<div class = "col-xs-6 col-md-6 pl-4 pr-4">
+    <div class = "row mt-4">
+        <div class = "col-xs-12 col-md-12">
+            <h4>Analysis of {{qcount}} student responses</h4>
+            <div class="card">
+                <h5 class="card-header">Readability indices</h5>
+                <div class="card-block">
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>Measure</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>Mean</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <h5>Histogram</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>Response length (words)</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>{{mean.meanwords}}</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <div id="wordsChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>Sentences/response</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>{{mean.meansents}}</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <div id="sentenceChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>Lexical diversity (TTR)<sup class="toolt iris-info" title="An number between 0-1 which gives the type to token ratio (TTR) - the number of unique words divided by the total number of words. For example, ‘The cat sat on the mat’ has a TTR of 5/6 = 0.83"></sup></h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>{{mean.meanttr}}</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <div id="ttrChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>Lexical density (LD)<sup class="toolt iris-info" title="A number between 0-1 which indicates the ratio of content words to the total number of words. Content words are nouns, verbs, adjectives and adverbs. "></sup></h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>{{mean.meanld}}</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <div id="ldChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-xs-6 col-md-6">
+                            <h5>SMOG index<sup class="toolt iris-info" title="One of many readability indices which roughly correlate with the level of educational attainment. It is commonly used to assess the readability of important health information materials. SMOG stands for ‘Simple Measure of Gobbledygook’ and the range of values is typically between 5 - 18. Like many indices, it is only valid where responses are a reasonable length - at least 30 words."></sup></h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h5>{{mean.meansmog}}</h5>
+                        </div>
+                        <div class="col-md-4" style="padding:0">
+                            <div id="smogChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class = "col-xs-12 col-md-12 pl-4 pr-4">
+            <div id="keyword_render">
+                {% include 'keyword_render.html' %}
+            </div>
+        </div> <!-- end class .col-xs-6 col-md-6 -->
+    </div>
+</div>
