@@ -19,13 +19,13 @@ Tertiary educators and academic developers.
 Quantext is in the early stages of development. It is currently being trialled by teachers at several tertiary institutions in NZ and their feedback and input is informing ongoing development. If you would like to contribute to early trials please get in touch - we’d love to hear from you. If you’d just like to see how Quantext works, login to the demo site at <a href="https://quantext.org" target="_blank">https://quantext.org</a>using your Google or Twitter account. You can use the demonstration data set supplied or upload your own data. We have prepared some basic documentation to help get you started. We plan to release Quantext as a cloud-based service in 2018.
 
 ## End user documentation
-Some basic documents and screencasts to get you started are available at <a href="https://quantext.org/documentation" target="_blank">https://quantext.org/documentation</a>
+Some basic guides and screencasts to get you started are available at <a href="https://quantext.org/documentation" target="_blank">https://quantext.org/documentation</a>
 
 ## Installation & System Requirements
-Quantext has been installed and tested on Mac OSX Sierra 10.12.6 and Ubuntu 16.04
-Source code is released under a GPL 3.0 licence 
-The version on GitHub will not necessarily be the same as the latest production version running on <a href="https://quantext.org" target="_blank">https://quantext.org</a>
-Please contact us if you would like to get involved in the development effort. <a href="https://quantext.org/contact" target="_blank">https://quantext.org/contact</a>
+* Quantext has been installed and tested on Mac OSX Sierra 10.12.6 and Ubuntu 16.04
+* Quantext source code is released under a GPL 3.0 licence. See<a href="http://www.gnu.org/licenses/" target="_blank">http://www.gnu.org/licenses/</a>.
+* The Quantext version on GitHub will not necessarily be the same as the latest production version running on <a href="https://quantext.org" target="_blank">https://quantext.org</a>.
+* Please contact us if you would like to get involved in the development effort. <a href="https://quantext.org/contact" target="_blank">https://quantext.org/contact</a>.
 
 ### OSX System Requirements
 
