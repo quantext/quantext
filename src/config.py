@@ -28,11 +28,17 @@ ALLOWED_Q_EXTENSIONS = set(['xls', 'xlsx'])
 ALLOWED_T_EXTENSIONS = set(['pdf', 'txt'])
 MAX_CONTENT_LENGTH = 1 * 1024 * 1024
 
+#Twitter credentials
+TWITTER_ID = "your-twitter-id"
+TWITTER_SECRET = "your-twitter-secret"
+
+#Google credentials
+GOOGLE_CLIENT_ID ="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
 #Mongo
-#NEED TO CHANGE THESE EACH TIME FOR LOCALHOST
 MONGODB_SETTINGS = {
     'db': 'tft'
-    #'host': 'mongodb://tft:tft@ds123361.mlab.com:23361/tft'
 }
 
 #Basic default settings
@@ -59,20 +65,20 @@ SIM_ALGORITHM = "word2vec"
 
 OAUTH_CREDENTIALS = {
     'twitter': {
-        'id': 'H1qEC1ZzBLixBOjz9sZXfknxu',
-        'secret': 'RLTvVNiGig9TXbraoVe8IFNg9q6uZCL4Da7IVzXGbbfrQN6nhN'
+        'id': TWITTER_ID,
+        'secret': TWITTER_SECRET
     },
     'google':{
         "web":
             {
-                "client_id":"361087200465-8mlufddta1so0aoosktih0c7cfqda5q8.apps.googleusercontent.com",
-                "project_id":"text-analytics-for-teachers",
+                "client_id":GOOGLE_CLIENT_ID,
+                "project_id":"Quantext",
                 "auth_uri":"https://accounts.google.com/o/oauth2/auth",
                 "token_uri":"https://accounts.google.com/o/oauth2/token",
                 "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-                "client_secret":"GRtwpo6bjYvnYrdnBm0qA41S",
-                "redirect_uris":["http://localhost:5000","http://localhost:5000/google_callback"],
-                "javascript_origins":["http://localhost:5000"]
+                "client_secret":GOOGLE_CLIENT_SECRET,
+                "redirect_uris":["http://localhost:8000","http://localhost:8000/google_callback"],
+                "javascript_origins":["http://localhost:8000"]
             }
     }
 }

@@ -1,3 +1,20 @@
+###    Quantext Text Analysis Software
+###    Copyright (C) 2017  McDonald & Moskal Ltd., Dunedin, New Zealand
+
+###    This program is free software: you can redistribute it and/or modify
+###    it under the terms of the GNU General Public License as published by
+###    the Free Software Foundation, either version 3 of the License, or
+###    (at your option) any later version.
+
+###    This program is distributed in the hope that it will be useful,
+###    but WITHOUT ANY WARRANTY; without even the implied warranty of
+###    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+###    GNU General Public License for more details.
+
+###    You should have received a copy of the GNU General Public License
+###    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 from flask import render_template, flash, url_for, redirect, request, jsonify, session
 from tft import app, db
 from werkzeug import secure_filename
@@ -143,35 +160,38 @@ def oauth_authorize(provider):
 
 @app.route('/google_callback')
 def google_callback():
+    url = request.url_root
     flow = OAuth2WebServerFlow(
         client_id=app.config['OAUTH_CREDENTIALS']['google']['web']['client_id'],
         client_secret=app.config['OAUTH_CREDENTIALS']['google']['web']['client_secret'],
-        scope='profile',
-        redirect_uri='http://localhost:5000/google_callback'
+        scope=['profile','email'],
+        redirect_uri=url+'google_callback'
     )
     if 'code' not in request.args:
-        print("well I'm here")
         auth_uri = flow.step1_get_authorize_url()
         return redirect(auth_uri)
     else:
-        print('and now here?')
         auth_code = request.args.get('code')
         credentials = flow.step2_exchange(auth_code).to_json()
         credentials = json.loads(credentials)
-        print('here?')
-        print(credentials)
         id_token = credentials["id_token"]
         name = id_token["name"]
+        email = id_token["email"]
 
         try:
-            user = User.objects.get(social_id=name)
-        except:
-            User(social_id=name, nickname=name, email=None).save()
-            user = User.objects.get(social_id=name)
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(social_id=name)
+                user["email"] = email
+                user.save()
+            except User.DoesNotExist:
+                User(social_id=name, nickname=name, email=email).save()
+                user = User.objects.get(social_id=name)
+                create_demo_files(user)
 
         login_user(user, True)
         return redirect(url_for('index'))
-
 
 @app.route('/callback/<provider>')
 def oauth_callback(provider):
