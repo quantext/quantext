@@ -16,7 +16,7 @@ Quantext has been designed by teachers for teachers working across a wide range 
 
 Tertiary educators and academic developers. 
 
-Quantext is in the early stages of development. It is currently being trialled by teachers at several tertiary institutions in NZ and their feedback and input is informing ongoing development. If you would like to contribute to early trials please get in touch - we’d love to hear from you. If you’d just like to see how Quantext works, login to the demo site at <a href="https://quantext.org" target="_blank">https://quantext.org</a>using your Google or Twitter account. You can use the demonstration data set supplied or upload your own data. We have prepared some basic documentation to help get you started. We plan to release Quantext as a cloud-based service in 2018.
+Quantext is in the early stages of development. It is currently being trialled by teachers at several tertiary institutions in NZ and their feedback and input is informing ongoing development. If you would like to contribute to early trials please get in touch - we’d love to hear from you. If you’d just like to see how Quantext works, login to the demo site at <a href="https://quantext.org" target="_blank">https://quantext.org</a> using your Google or Twitter account. You can use the demonstration data set supplied or upload your own data. We have prepared some basic documentation to help get you started. We plan to release Quantext as a cloud-based service in 2018.
 
 ## End user documentation
 Some basic guides and screencasts to get you started are available at <a href="https://quantext.org/documentation" target="_blank">https://quantext.org/documentation</a>
@@ -35,12 +35,12 @@ Some basic guides and screencasts to get you started are available at <a href="h
 * We recommend the Anaconda python distribution. Anaconda comes with many of the libraries used and is compatible with pip. See <a href="https://www.anaconda.com/download" target="_blank">https://www.anaconda.com/download</a>
 
 #### Installation
-* Install Python 3.5+ (Anaconda distribution easiest)s
+* Install Python 3.5+ (Anaconda distribution is easiest)
 * Install git - follow instructions <a href="https://gist.github.com/derhuerst/1b15ff4652a867391f03#file-mac-md" target="_blank">here</a> to install Homebrew then use: 
 ```Shell
 brew install git
 ```
-* Install Mongdb as per <a href="https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x" target="_blank">https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x</a>
+* Install Mongodb as per <a href="https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x" target="_blank">https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x</a>
 
 * Install libraries and Spacy word vector model
 ```Shell
@@ -49,10 +49,16 @@ sudo python3 -m spacy download en
 ```
 * Run mongo daemon as per <a href="https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/#run-mongodb" target="_blank">https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/#run-mongodb</a>
 * Edit config.py to enter your own authentication details (Google or Twitter)
-* Pull Quantext source code
+* Pull Quantext source code from the directory you want to install it into
 ```Shell
 git remote add quantext https://<user>@github.com/quantext/quantext
 git pull quantext
+cd src
+mkdir tmp
+cd tmp
+touch tft.log
+mkdir corpus
+mkdir uploads
 ```
 * Launch app - we recommend gunicorn. cd to src directory and run
 
@@ -84,12 +90,18 @@ sudo pip3 install textract
 sudo python3 -m spacy download en
 
 ```
-* Run mongo daemon as per <a href="https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#run-mongodb-community-edition" target="_blank">hhttps://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#run-mongodb-community-edition</a>
+* Run mongo daemon as per <a href="https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#run-mongodb-community-edition" target="_blank">https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#run-mongodb-community-edition</a>
 * Edit config.py to enter your own authentication details (Google or Twitter)
 * Pull Quantext source code
 ```Shell
 git remote add quantext https://<user>@github.com/quantext/quantext
 git pull quantext
+cd src
+mkdir tmp
+cd tmp
+touch tft.log
+mkdir corpus
+mkdir uploads
 ```
 * Launch app - we recommend gunicorn. cd to src directory and run
 
