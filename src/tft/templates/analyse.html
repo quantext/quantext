@@ -1,206 +1,241 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Modal -->
-<div class="modal fade" id="modelAnswer" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Reference answer</h5>
-                <div class="close iris iris-delete" data-dismiss="modal" style="margin-top: 5px;margin-bottom: -5px;"></div>
-            </div>
-            <div class="modal-body">
-                <h5>Enter reference answer for this question</h5>
-                <form>
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="modelanswer" placeholder=""
-                            {% if modelanswer %}
-                               value="{{modelanswer}}"
-                            {% endif %}
-                        >
-                        <span class="input-group-btn">
-                            <button id="process_model_answer" class="btn btn-secondary" type="button">Submit</button>
-                        </span>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer"></div>
-        </div><!--end modal content -->
+<script type="text/javascript" src="/static/js/jquery.mark.js"></script>
+<script type="text/javascript" src="/static/js/datatables.mark.js"></script>
+<script type="text/javascript" src="/static/js/wordtree.js"></script>
 
-    </div><!-- end modal dialog -->
-</div><!-- end modal -->
+<script type="text/javascript" src="/static/js/waypoints/lib/jquery.waypoints.min.js"></script>
+<script type="text/javascript" src="/static/js/waypoints/lib/shortcuts/sticky.js"></script>
 
-<div id="panel" class="pt-4">
-    <div class="row">
-        <div class="col-md-6 pl-4 pr-4">
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/select/1.2.2/js/dataTables.select.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/dataRender/ellipsis.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.print.min.js"></script>
+
+<link rel="stylesheet" href="/static/css/dataTables_custom.css"/>
+
+<div id="themeDiv">
+<!-- theme css -->
+{% if user.theme %}
+<link rel="stylesheet" href="/static/css/themes/{{ user.theme }}.css"/>
+{% else %}
+<link rel="stylesheet" href="/static/css/themes/original.css"/>
+{% endif %}
+</div>
+
+<style>
+    .advanced{ display:none }
+</style>
+
+<script type="text/javascript">
+
+    function drawBarChart(data,divId, parent) {
+        var barMargin = {top: 0, right: 20, bottom: 0, left: 0},
+                w = $(".histogramChart").width() - barMargin.left - barMargin.right,
+                h = 30 - barMargin.top - barMargin.bottom;
+
+        var x = d3.scaleBand().rangeRound([0, w]);
+
+        // Scales. Note the inverted domain fo y-scale: bigger is up!
+        var y = d3.scaleLinear().range([h, 0]);
+
+        var pr = d3.precisionRound(0.1, 1.1),
+                ft = d3.format("." + pr + "r");
+
+        if($(divId,parent).length > 0) {
+            var arr = [];
+            var keys = [];
+            $.each(data, function (i, e) {
+                var fl = parseFloat(i);
+                keys.push(fl);
+            });
+            keys.sort(function (a, b) { return a - b; });
+
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var obj = {key: k, value: data[k]};
+                arr.push(obj);
+            }
+
+            var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return "<strong>" + ft(d.key) + "</strong><br/><span style='color:#fff'>" + d.value + "</span>";
+                    });
+
+            var maxVal = d3.max(arr, function (d) { return +d.value; });
+
+            var el = d3.select(parent).select(divId);
+            var svg = el.html(null).append("svg")
+                    .attr("width", w + barMargin.left + barMargin.right)
+                    .attr("height", h + barMargin.top + barMargin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + barMargin.left + "," + barMargin.top + ")");
+
+            svg.selectAll(".bar")
+                    .data(arr)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar")
+                    .attr("x", function (d, i) { return w / arr.length * i; })
+                    .attr("width", ((1 / arr.length ) * w) - 5)
+                    .attr("y", function (d) {
+                        if(d.value) {
+                            var p = d.value / maxVal;
+                            return y(p);
+                        }
+                        else return 0;
+                    })
+                    .attr("height", function (d) {
+                        if(d.value) {
+                            var p = d.value / maxVal;
+                            return h - y(p);
+                        }
+                        else return 0;
+                    })
+                    .attr("fill", function (d) { return "#000" })
+                    .attr("fill-opacity", function(){ return ".59" })
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+
+            svg.call(tip);
+        }
+    }
+</script>
+
+<div id="panel" class="pt-3">
+    <div class="row pb-4">
+        <div class="col-md-6 pl-4">
+            <h1 class="top_title">{{ an.name }}</h1>
+            <h4 class="top_title">created {{ an.created.strftime('%d/%m/%Y') }}</h4>
+            <h4 class="top_title">{{ an.files|length}} response files | {{ an.refcorpus|length }} reference materials</h4>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3 pr-4">
             <div class="row">
-                <div class="col-md-9" style="display:flex;align-items: center">
-                    <h5 style="margin:0">Q{{question}} {{q.qText}}</h5>
-                </div>
-                <div class="col-md-3">
-                    <select id="changeQuestion" class="form-control">
-                        <option value="0">Change question</option>
-                        {% for ques in an.questions %}
-                        <option value="{{ loop.index }}">{{ loop.index }} {{ ques.qText }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="col-md-12">
+                    <h6>Theme</h6>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle theme_button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {% if user.theme %}
+                                {% if user.theme == "original" %} Quantext Original {% endif %}
+                                {% if user.theme == "drakemallard" %} Drake Mallard {% endif %}
+                                {% if user.theme == "mandarin" %} Mandarin {% endif %}
+                                {% if user.theme == "torrent" %} Torrent {% endif %}
+                                {% if user.theme == "greenwingedteal" %} Green Winged Teal {% endif %}
+                                {% if user.theme == "harlequin" %} Harlequin {% endif %}
+                            {% else %}
+                                Quantext Original
+                            {% endif %}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item theme_item" href="#" data-theme="original">Quantext Original
+                                <div class="theme_box" style="background:#6496b4"></div>
+                                <div class="theme_box" style="background:#52b9a9"></div>
+                                <div class="theme_box" style="background:#ef8928"></div>
+                                <div class="theme_box" style="background:#307583"></div>
+                                <div class="theme_box" style="background:#57b0c2"></div>
+                            </a>
+                            <a class="dropdown-item theme_item" href="#" data-theme="drakemallard">Drake Mallard
+                                <div class="theme_box" style="background:#9f8e70"></div>
+                                <div class="theme_box" style="background:#f66723"></div>
+                                <div class="theme_box" style="background:#f9b234"></div>
+                                <div class="theme_box" style="background:#04865d"></div>
+                                <div class="theme_box" style="background:#126ba8"></div>
+                            </a>
+                            <a class="dropdown-item theme_item" href="#" data-theme="mandarin">Mandarin
+                                <div class="theme_box" style="background:#e99e4d"></div>
+                                <div class="theme_box" style="background:#4d7ee7"></div>
+                                <div class="theme_box" style="background:#ef1047"></div>
+                                <div class="theme_box" style="background:#fd722d"></div>
+                                <div class="theme_box" style="background:#953272"></div>
+                            </a>
+                            <a class="dropdown-item theme_item" href="#" data-theme="torrent">Torrent
+                                <div class="theme_box" style="background:#758199"></div>
+                                <div class="theme_box" style="background:#575f72"></div>
+                                <div class="theme_box" style="background:#da5a2b"></div>
+                                <div class="theme_box" style="background:#ce893e"></div>
+                                <div class="theme_box" style="background:#6f7a84"></div>
+                            </a>
+                            <a class="dropdown-item theme_item" href="#" data-theme="greenwingedteal">Green Winged Teal
+                                <div class="theme_box" style="background:#00d67a"></div>
+                                <div class="theme_box" style="background:#b5917b"></div>
+                                <div class="theme_box" style="background:#06cada"></div>
+                                <div class="theme_box" style="background:#e1723d"></div>
+                                <div class="theme_box" style="background:#20a949"></div>
+                            </a>
+                            <a class="dropdown-item theme_item" href="#" data-theme="harlequin">Harlequin
+                                <div class="theme_box" style="background:#65625f"></div>
+                                <div class="theme_box" style="background:#92786c"></div>
+                                <div class="theme_box" style="background:#4e4f53"></div>
+                                <div class="theme_box" style="background:#848483"></div>
+                                <div class="theme_box" style="background:#c52d05"></div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-2">
-                <div data-toggle="modal" data-target="#modelAnswer" style="display:flex;align-items: center;cursor:pointer">
-                    <div style="width:100%">
-                        <strong>Reference answer:</strong> <span id="result">{{modelanswer}}</span>
-                    </div>
-                    <span class="iris iris-edit"></span>
+            <div class="row mt-3">
+                <div class="col-md-12 centerFlex" style="justify-content: flex-end">
+                    <div class="simple-view pr-4" style="font-weight:bold">Simple view</div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <div class="advanced-view pl-4">Advanced view</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 pl-4 pr-4">
-            <div id="chart1" style="display:none;float:left"></div>
-            <div id="chart2" style="display:none;float:left"></div>
+     <!--   <div class="col-md-6 centerFlex pr-4" style="justify-content: flex-end;align-items:baseline">
+            <button type="button" class="panelTag btn btn-quantext dark centerFlex">
+                <div class="index-font quantext-book mr-1"></div>
+                <div>Reference corpora</div>
+            </button>
+        </div>-->
+    </div>
+    <div class="row">
+        {% set student_file = student_files[0] %}
+        {% include 'studentFile.html' %}
+        {% if student_files|length > 1 %}
+            {% set student_file = student_files[1] %}
+            {% include 'studentFile.html' %}
+        {% endif %}
+    </div>
+
+    <div class="row below m-0 corpora_footer">
+        <div class="scroll_inside" data-simplebar>
+            <div class="index-font close_corpora_panel"></div>
+            <div class="inner_corpora w-100">
+                {% include 'kwic.html' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="visibility: hidden">
+        <div class="col-md-12">
             <div id="ttr-chart-gauge" style="float:left"></div>
             <div id="ld-chart-gauge" style="float:left"></div>
-        </div>
-    </div>
-    {% if an.tcorpus %}
-        {% include 'corpus_layout.html' %}
-    {% else %}
-        {% include 'fullscreen_layout.html' %}
-    {% endif %}
-</div>
-
-<nav id="menu">
-    {% include 'settings.html' %}
-</nav>
-
-
-{% if ngic %} <!--we've selected a keyword or bigram-->
-    {% if not '+' in ngic  %}
-    <!-- Modal -->
-        <div class="modal fade" role="dialog" id="kwic">
-            <div class="modal-dialog modal-lg">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Keyword <a href={{ url_for('visualise', question=question, ngic=ngic)}} target="_self">{{ngic}}</a> in context</h4>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-condensed">
-                            {%for line in get_kwic(question, ngic)[0] %}
-                            <tr>
-                                <td align="left">{{line[0]}}</td>
-                                <td align="right">{{line[1]}}</td>
-                                <td class="text-success">{{line[2]}}</td>
-                                <td>{{line[3]}}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                    <div class="modal-footer"></div>
-                </div><!--end modal content -->
-            </div><!-- end modal dialog -->
-        </div><!-- end modal -->
- 
-    {% elif '+' in ngic %}
-    <!-- Modal -->
-        <div class="modal fade" role="dialog" id="bgic">
-            <div class="modal-dialog modal-lg">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Key pair <span class = "text-success">{{' '.join(ngic.split('+'))}}</span> in context</h4>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-condensed">
-                            {%for line in get_bgic(ana_q(question)[2], ngic) %}
-                            <tr>
-                                <td align="left">{{line[0]}}</td>
-                                <td align="right">{{line[1]}}</td>
-                                <td class="text-success">{{line[2]}}</td>
-                                <td>{{line[3]}}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                    <div class="modal-footer"></div>
-                </div><!--end modal content -->
-            </div><!-- end modal dialog -->
-        </div><!-- end modal -->
-    {% endif %}
-{% endif %}
-
-<!-- Modal -->
-<div class="modal fade" id="blackList" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Blacklist</h5>
-                <div class="close iris iris-delete" data-dismiss="modal" style="margin-top: 5px;margin-bottom: -5px;"></div>
-            </div>
-            <div class="modal-body">
-                <p>Standard blacklist words with option to add, remove and restore default</p>
-                <textarea id="bListText" class="form-control" style="min-height:300px">
-{%- if q.qSettings['blist'] != [] -%}
-{% for item in q.qSettings['blist'] %}
-{{- item }}
-{% endfor %}
-{%- endif -%}
-                </textarea>
-            </div>
-            <div class="modal-footer" style="border-top:none!important">
-                <button id="saveBList" type="button" class="btn btn-default" data-dismiss="modal">Save</button>
-            </div>
+            <div id="smog-chart-gauge" style="float:left"></div>
         </div>
     </div>
 </div>
-<!-- Edit whitelist -->
 
-<!-- Modal -->
-<div class="modal fade" id="whiteList" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Whitelist</h5>
-                <div class="close iris iris-delete" data-dismiss="modal" style="margin-top: 5px;margin-bottom: -5px;"></div>
-            </div>
-            <div class="modal-body">
-                <p>Empty whitelist with option to add, remove and restore default/clear</p>
-                <textarea id="wListText" class="form-control" style="min-height:300px">
-{%- if q.qSettings['wlist'] != [] -%}
-{% for item in q.qSettings['wlist'] %}
-{{- item }}
-{% endfor %}
-{%- endif -%}
-                </textarea>
-            </div>
-            <div class="modal-footer">
-                <button id="saveWList" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<ul class="notifications"></ul>
 
 <style type="text/css">
 
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #000;
-        shape-rendering: crispEdges;
-    }
-
-    .bar:hover {
-        fill: #bcbcbc ;
-    }
-
-    .x.axis path {
-        display: none;
-    }
+    .axis path, .axis line { fill: none;stroke: #000;shape-rendering: crispEdges; }
+    .bar:hover { fill: #bcbcbc ; }
+    .x.axis path { display: none; }
 
     .d3-tip {
         line-height: 1;
@@ -209,7 +244,7 @@
         background: rgba(0, 0, 0, 0.8);
         color: #efefef;
         border-radius: 2px;
-        z-index: 2;
+        z-index: 2000;
     }
 
     /* Creates a small triangle extender for the tooltip */
@@ -226,219 +261,94 @@
     }
 
     /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
+    .d3-tip.n:after{ margin: -1px 0 0 0;top: 100%;left: 0; }
 
-    .chart-gauge
-    {
-        width: 200px;
-        margin: 0;
-        float:left;
-    }
-    .chart-filled
-    {
-        fill: #57b0c2;
-    }
-
-    .chart-filled2{
-        fill:#333645;
-    }
-    .chart-empty, .chart-empty2
-    {
-        fill: #dedede;
-    }
+    /* d3 wordtree */
+    .node circle { fill: #fff;stroke-width: 3px; }
+    .node text {font: 12px sans-serif; }
+    .link { fill: none;stroke: #ccc;stroke-width: 2px; }
+    g.node { cursor: pointer; }
 
 </style>
 
 <script type="text/javascript">
-    $("#changeQuestion").on("change", function(){
+    var $notifications = $(".notifications");
+
+    function notify(text) {
+        var $notification = $('<li />').text(text).css({left: 320});
+        $notifications.append($notification);
+        $notification.animate({left: 0}, 300,function(){});
+        return $notification;
+    }
+
+    function getPageInfo(self){
+        var id = self.data("id");
+        var analysis_id = "{{ analysis_id }}";
+        var question = self.data("question");
+        var parent = self.parents(".file_"+id).attr("id");
+        var $parent = $("#"+parent);
+        var left_or_right = $parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
+        var index = $parent.data("index");
+        var total = $parent.data("total");
+        return { id:id,analysis_id:analysis_id,question:question,parent:parent,left_or_right:left_or_right,index:index,total:total };
+    }
+
+    $(document).on("change", ".setting-control", function(){
         var self = $(this);
-        var val = $("option:selected",self).val();
-        if(val != 0)
-            window.location = "{{ url_for('analyse',analysisId=analysisId) }}" + "/" + val;
+        var which = self.data("which");
+        var val = self.val();
+
+        if(self.is(":checkbox"))
+            val = self.is(":checked") ? "True" : "False";
+
+        var pageInfo = getPageInfo(self);
+        pageInfo['key'] = self.attr("name");
+        pageInfo['val'] = val;
+        var $notification = notify("Getting your ducks in a row...");
+
+        $.post("{{ url_for('settings') }}",pageInfo,function(response){
+            $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
+            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+        });
     });
 
-    //chart stuff here -------------------------------------------------------------
-
-    function drawGraph(dataset, chartId, displayText, midText, colorRange) {
-        $(chartId).empty();
-        var width = 100, height = 100, radius = 75 / 2;
-        var length = dataset.length;
-        var color = d3.scaleLinear().domain([1,length])
-                .interpolate(d3.interpolateHcl)
-                .range(colorRange);
-
-        var pie = d3.pie().sort(null);
-
-        var arc = d3.arc()
-                .innerRadius(radius - 10)
-                .outerRadius(radius);
-
-        var svg = d3.select(chartId).append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .append("g")
-                .attr("transform", "translate(" + width / 2 + ",40)");
-
-        //Draw the Circle
-        svg.append("circle")
-                .attr("cx", 0)
-                .attr("cy", 0)
-                .attr("r", 37)
-                .attr("fill", "#ffffff");
-
-        var path = svg.selectAll("path")
-                .data(pie(dataset))
-                .enter().append("path")
-                .attr("class", "arc")
-                .attr("fill", function (d, i) { return color(i); })
-                .attr("d", arc);
-
-        svg.append("text")
-                .attr("dy", ".4em")
-                .style("text-anchor", "middle")
-                .style("font-weight", "bold")
-                .attr("class", "inside")
-                .attr("fill", function (d, i) { return color(i); })
-                .text(midText);
-
-        svg.append("text")
-                .attr("dy", "3.5em")
-                .style("text-anchor", "middle")
-                .style("font-weight", "bold")
-                .attr("class", "inside")
-                .attr("fill", function (d, i) { return "#8297a8"; })
-                .text(displayText);
-    }
-
-    var resp = "{{ qcount }}";
-    var dataset = [parseInt(resp)];
-    var dataset2 = JSON.parse("{{ sents }}");
-
-    drawGraph(dataset, "#chart1", "Responses",dataset[0], ["#57b0c2","#8297a8"]);
-    drawGraph(dataset2, "#chart2", "Sentences","", ["#f3565d","#f89a98"]);
-
-    //MINI GRAPH HERE!!
-    var margin = {top: 0, right: 0, bottom: 0, left: 0},
-            w = 300 - margin.left - margin.right,
-            h = 30 - margin.top - margin.bottom;
-
-    var x = d3.scaleBand()
-            .rangeRound([0, w]);
-
-    // Scales. Note the inverted domain fo y-scale: bigger is up!
-    var y = d3.scaleLinear()
-            .range([h, 0]);
-
-    var pr = d3.precisionRound(0.1, 1.1),
-            ft = d3.format("." + pr + "r");
-
-    function drawBarChart(data,divId) {
-        var arr = [];
-        var keys = [];
-        $.each(data, function (i, e) {
-            var fl = parseFloat(i);
-            keys.push(fl);
-        });
-        keys.sort(function(a,b) { return a - b;});
-
-        for(var i=0;i<keys.length;i++)
-        {
-            var k = keys[i];
-            var obj = {key:k,value:data[k]};
-            arr.push(obj);
-        }
-
-        var tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d) {
-                    return "<strong>" + ft(d.key) + "</strong><br/><span style='color:#fff'>" + d.value + "</span>";
-                });
-
-        var maxVal = d3.max(arr, function(d) { return +d.value;} );
-        var svg = d3.select(divId).append("svg")
-                .attr("width", w + margin.left + margin.right)
-                .attr("height", h + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        svg.selectAll(".bar")
-                .data(arr)
-                .enter()
-                .append("rect")
-                .attr("class", "bar")
-                .attr("x", function(d,i) { return w/arr.length * i; })
-                .attr("width", ((1/arr.length ) * w) - 5)
-                .attr("y", function(d) { var p = d.value / maxVal; return y(p); })
-                .attr("height", function(d) { var p = d.value / maxVal; return h - y(p); })
-                .attr("fill", function(d) {return "#8297a8"})
-                .on('mouseover', tip.show)
-                .on('mouseout', tip.hide);
-
-        svg.call(tip);
-    }
-
-    var wordData = {{chartdata['n_Words'] | safe}};
-    var sentData = {{chartdata['n_Sents'] | safe}};
-    var ttrData = {{chartdata['TTR'] | safe}};
-    var ldData = {{chartdata['Lex_Density'] | safe}};
-    var smogData = {{chartdata['Smog_index'] | safe}};
-
-    drawBarChart(wordData,"#wordsChart");
-    drawBarChart(sentData,"#sentenceChart");
-    drawBarChart(ttrData,"#ttrChart");
-    drawBarChart(ldData,"#ldChart");
-    drawBarChart(smogData,"#smogChart");
-
-    //gauge chart
-    var barWidth, chart, chartInset, degToRad,
-            height, padRad, percToDeg, percToRad,
-            radius, svg, totalPercent, width;
-
-    padRad = 0.025;
-    chartInset = 10;
-
-    // Orientation of gauge:
-    totalPercent = .75;
-    margin = { top: 10, right: 10, bottom: 10, left: 10 };
-
-    width = 200;
-    height = 80;
-    radius = (Math.min(width, height) / 2) + 20;
-    barWidth = 10;
-
-    /*
-     Utility methods
-     */
-    percToDeg = function(perc) { return perc * 360; };
-    percToRad = function(perc) { return degToRad(percToDeg(perc)); };
-    degToRad = function(deg) { return deg * Math.PI / 180; };
-
-    var repaintGauge = function (perc, perc2,selector,displayText)
+    function repaintGauge(perc, perc2,indx2,indx1,selector,displayText)
     {
-        var el = d3.select(selector);
-        // Create SVG element
-        svg = el.append('svg').attr('width', width).attr('height', height + margin.top + margin.bottom);
+        var barWidth, chart, chartInset, degToRad,
+                height, padRad, percToDeg, percToRad,
+                radius, svg, totalPercent, width, margin;
 
-        // Add layer for the panel
+        padRad = 0.025;
+        chartInset = 10;
+        totalPercent = .75;
+        margin = { top: 10, right: 10, bottom: 10, left: 10 };
+
+        width = 200;
+        height = 80;
+        radius = (Math.min(width, height) / 2) + 20;
+        barWidth = 10;
+
+        percToDeg = function(perc) { return perc * 360; };
+        percToRad = function(perc) { return degToRad(percToDeg(perc)); };
+        degToRad = function(deg) { return deg * Math.PI / 180; };
+
+        var el = d3.select(selector);
+        svg = el.html(null).append('svg').attr('width', width).attr('height', height + margin.top + margin.bottom);
+
         chart = svg.append('g').attr('transform', "translate(100,75)");
-        chart.append('path').attr('class', "arc chart-filled");
+        chart.append('path').attr('class', "arc chart-filled-"+indx1);
         chart.append('path').attr('class', "arc chart-empty");
         chart.append('path').attr('class', "arc chart-empty2");
-        chart.append('path').attr('class', "arc chart-filled2");
+        chart.append('path').attr('class', "arc chart-filled-"+indx2);
 
-        arc2 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
-        arc1 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
-        arc4 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
-        arc3 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
+        var arc2 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
+        var arc1 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
+        var arc4 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
+        var arc3 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
 
         var next_start = totalPercent;
-        arcStartRad = percToRad(next_start);
-        arcEndRad = arcStartRad + percToRad(perc / 2);
+        var arcStartRad = percToRad(next_start);
+        var arcEndRad = arcStartRad + percToRad(perc / 2);
         next_start += perc / 2;
 
         arc1.startAngle(arcStartRad).endAngle(arcEndRad);
@@ -467,12 +377,12 @@
                     return "<span style='color:#fff'>" + d + "</span>";
                 });
 
-        chart.select(".chart-filled").attr('d', arc3)
+        chart.select(".chart-filled-"+indx1).attr('d', arc3)
                 .data([perc2])
                 .on('mouseover', tip_arc.show)
                 .on('mouseout', tip_arc.hide);
         chart.select(".chart-empty").attr('d', arc4);
-        chart.select(".chart-filled2").attr('d', arc1)
+        chart.select(".chart-filled-"+indx2).attr('d', arc1)
                 .data([perc])
                 .on('mouseover', tip_arc.show)
                 .on('mouseout', tip_arc.hide);
@@ -488,149 +398,361 @@
                 .text(displayText);
 
         svg.call(tip_arc);
-    };
+    }
 
-    repaintGauge({{meant.tttr}}, {{mean.meanttr}}, "#ttr-chart-gauge", "TTR");
-    repaintGauge({{meant.tld}}, {{mean.meanld}}, "#ld-chart-gauge", "LD");
-
-</script>
-
-
-<script type="text/javascript">
-    $(function() {
-
-        var fixed = document.querySelector('nav.navbar');
-
-        var slideout = new Slideout({
-            'panel': document.getElementById('panel'),
-            'menu': document.getElementById('menu'),
-            'padding': 400,
-            'tolerance': 70,
-            'side':'right'
-        });
-
-        document.getElementById('settings').addEventListener('click', function() {
-            if(slideout.isOpen())
-            {
-                slideout.close();
-                fixed.style.transition = 'transform 300ms ease';
-                fixed.style.transform = 'translateX(0px)';
+    function iterateCategories(selectedRows, wrapper){
+        console.log(selectedRows);
+        var optionList = [];
+        var catList = wrapper.find('.categories').data("categories");
+        catList = (catList) ? catList.split(",") : [];
+        $.each(catList, function(i,e){
+            var obj = {};
+            obj["name"] = e;
+            obj["value"] = e;
+            obj["special"] = false;
+            var found = 0;
+            selectedRows.every( function () {
+                var cats = this.data()["Category"];
+                if(cats)
+                    found += cats.split(",").indexOf(e) != -1 ? 1 : 0;
+            });
+            if(found == 0)
+                obj["checked"] = false;
+            else if(found == selectedRows.count())
+                obj["checked"] = true;
+            else {
+                //do something here for special case
+                obj["checked"] = false;
+                obj["special"] = true;
             }
-            else
-            {
-                slideout.open();
-                fixed.style.transition = 'transform 300ms ease';
-                fixed.style.transform = 'translateX(-400px)';
+            optionList.push(obj);
+        });
+        wrapper.find('select[multiple]').multiselect('loadOptions',optionList);
+    }
+
+    function format (d, file_id, question_number) {
+        // `d` is the original data object for the row
+        var response = "";
+        if(Array.isArray(d.Response)){
+            var array = d.Response[0];
+            var word = array[1];
+            response = d.Full_response;
+            var span = "<span class='full-response-highlight'>" + word + "</span>";
+            response = response.replace(new RegExp(word, 'g'), span);
+        }
+        else
+            response = d.Full_response;
+
+        return '<div class="ws-card">'+
+                '<div class="row m-0">' +
+                '<div class="col-md-12 p-0">' +
+                '<h5 class="m-0" style="float:right">Card view (' +
+                d.StudentID +
+                ')</h5></div>' +
+                '<div class="col-md-12 p-0" style="box-sizing:border-box">' +
+                '<div>' +
+                '<h6>Full response</h6>' +
+                    response +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-12 p-0 mt-4" style="box-sizing:border-box">' +
+                '<div>' +
+                '<h6>Notes</h6>' +
+                '<textarea data-response="' + d.StudentID + '" data-id="' + file_id + '" data-question="' + question_number + '" class="notes w-100 form-control" style="border:none;resize:none;min-height:10rem">' + d.Notes + '</textarea>' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-12 p-0 mt-4">' +
+                '<h6>Categories</h6>' +
+                d.Category +
+                '</div>' +
+                '<div class="col-md-6 p-0 mt-4">' +
+                '<h6>Readability indices</h6>' +
+                "<table style='width:100%;'>" +
+                "<tr style='background:none'>" +
+                '<td>TTR</td><td>LD</td><td>SMOG</td>' +
+                '</tr>' +
+                "<tr style='background:none'>" +
+                "<td style='width:33%;border-right:1px solid transparent;padding:0;position:relative;border-top:0'>" +
+                "<div class='mini-chart' style='width:" + (d["TTR"]*100) + "%'></div>" +
+                "<div style='z-index:3;position:relative;'>" +
+                d["TTR"] +
+                "</div>" +
+                "</td>" +
+                "<td style='width:33%;padding:0;border-right:1px solid transparent;position:relative;border-top:0'>" +
+                "<div class='mini-chart' style='width:" + (d["LD"]*100) + "%'></div>" +
+                "<div style='z-index:3;position:relative;'>" +
+                d["LD"] +
+                "</div>" +
+                "</td>" +
+                "<td style='width:34%;padding:0;position:relative;border-top:0'>" +
+                "<div class='mini-chart' style='width:" + (d["SMOG"]/18*100) + "%'></div>" +
+                "<div style='z-index:3;position:relative;'>" +
+                d["SMOG"] +
+                "</div>" +
+                "</td>" +
+                "</tr>" +
+                "</table>" +
+                '</div>' +
+                '<div class="col-md-12 p-0 mt-4">' +
+                '<button data-id="' + file_id + '" data-question="' + question_number + '" data-response="' + d.Full_response + '" type="button" class="saveRefAnswer btn btn-quantext dark centerFlex"><span class="quantext-star index-font mr-1"></span> Save as a reference answer</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+    }
+
+    function openHiddenRow(row, tr, file_id, question_number){
+        if (!row.child.isShown()) {
+            // Open this row
+            console.log(row);
+            console.log(row.data());
+            row.child(format(row.data(),file_id,question_number)).show();
+            tr.addClass('shown');
+            tr.next().find('td').addClass("card-cell");
+            row.select();
+        }
+    }
+
+    var timeout = null;
+
+    $(document).on('keyup','.notes', function(){
+        var self = $(this);
+        var id = self.data('id');
+        var question = self.data('question');
+        var notes = self.val();
+        var response = self.data('response');
+        if(timeout != null)
+            clearTimeout(timeout);
+        timeout = setTimeout(function(){
+            $.post("{{ url_for('save_notes') }}",{id:id,question:question,notes:notes,response:response}, function(){
+
+            });
+        },1000)
+    });
+
+    $(document).on("click",".saveRefAnswer", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        var reference_answer = self.data("response");
+
+        $.post('/reference_answer/'+pageInfo['id']+"/"+pageInfo['question'],
+                { reference_answer:reference_answer }, function() {
+                    var opt = $("<option></option>");
+                    opt.text(reference_answer).attr("value",reference_answer);
+                    $("select#reference_answer_"+pageInfo['id']+"_"+pageInfo["question"]).append(opt);
+                });
+        return false;
+    });
+
+    $(document).on("change", ".changeQuestion", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        pageInfo['question'] = $("option:selected",self).val();
+        if(parseInt(pageInfo['question']) != 0)
+        {
+            var other = pageInfo['left_or_right'] == 'sLeft' ? 'sRight' : 'sLeft';
+            var $other = $('.'+other);
+            var sameQuestion = false;
+            if($other.data('fileid') == pageInfo['id'] && $other.data('question') == pageInfo['question'])
+                sameQuestion = true;
+
+            if(!sameQuestion) {
+                $.post("{{ url_for('change_question') }}", pageInfo, function (response) {
+                    $("."+pageInfo['left_or_right']).replaceWith(response);
+                });
             }
-        });
-
-        $("#settings_close").on("click", function(){
-            slideout.close();
-            fixed.style.transition = 'transform 300ms ease';
-            fixed.style.transform = 'translateX(0px)';
-        });
-
-        var $table = $('#wstable');
-        $("#responsecount").text($table.bootstrapTable('getOptions').totalRows);
-
-        $table.highlight = function(pat) {
-            function innerHighlight(node, pat) {
-                var skip = 0;
-                if (node.nodeType == 3) {
-                    var pos = node.data.toUpperCase().indexOf(pat);
-                    pos -= (node.data.substr(0, pos).toUpperCase().length - node.data.substr(0, pos).length);
-                    if (pos >= 0) {
-                        var spannode = document.createElement('span');
-                        spannode.className = 'highlight';
-                        var middlebit = node.splitText(pos);
-                        var endbit = middlebit.splitText(pat.length);
-                        var middleclone = middlebit.cloneNode(true);
-                        spannode.appendChild(middleclone);
-                        middlebit.parentNode.replaceChild(spannode, middlebit);
-                        skip = 1;
-                    }
-                }
-                else if (node.nodeType == 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
-                    for (var i = 0; i < node.childNodes.length; ++i) {
-                        i += innerHighlight(node.childNodes[i], pat);
-                    }
-                }
-                return skip;
+            else {
+                alert("Sorry, you cannot load the same question in the side-by-side comparison.");
+                self.val(0);
             }
-            return this.length && pat && pat.length ? this.each(function() {
-                innerHighlight(this, pat.toUpperCase());
-            }) : this;
-        };
+        }
+    });
 
-        $table.on('search.bs.table', function (e, text){
-            $table.highlight(text);
-            var totalRows = $table.bootstrapTable('getOptions').totalRows;
-            $("#responsecount").text(totalRows);
-            var ds = [totalRows,(resp-totalRows)];
-            drawGraph(ds, "#chart1", "Responses", ["#57b0c2","#8297a8"]);
-        });
+    $(document).on("change", ".changeFile", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        pageInfo['file_id'] = $("option:selected",self).val();
 
-        $(document).on("click",".keyword", function(){
-            var self = $(this);
-            var val = self.text();
-            var e = jQuery.Event( 'keyup', { which: 13, keyCode: 13 } );
-            $(".search input").val(val).trigger(e);
-        });
+        if(pageInfo['left_or_right']=='sLeft')
+            studentFilesForGet[0] = pageInfo['file_id'];
+        else
+            studentFilesForGet[1] = pageInfo['file_id'];
 
-        $("form").on('submit',function(e){
-            var self = $(this);
-            console.log(self);
-            if(self.attr("name") != "settings")
-                e.preventDefault();
-        });
-
-        $('#process_model_answer').on('click', function() {
-            updateModelAnswer();
-            return false;
-        });
-
-        var updateModelAnswer = function(){
-            $.getJSON('/_process_model_answer', {
-                modelanswer: $('input[name="modelanswer"]').val(),
-                id : "{{ analysisId }}",
-                question : "{{ question }}"
-            }, function(data) {
-                $("#result").text(data.result);
-                $("#modelAnswer").modal('hide');
+        $.post("{{ url_for('load_student_file') }}", pageInfo, function (response) {
+            $.get("{{ url_for('get_chart_data') }}", {analysis_id:"{{ analysis_id }}",f1:studentFilesForGet[0],f2:studentFilesForGet[1],q1:1,q2:1}, function(response){
+                var $response = JSON.parse(response);
+                repaintGauge($response[1]["means"]["TTR"], $response[0]["means"]["TTR"],$response[1].index,$response[0].index, "#ttr-chart-gauge", "TTR");
+                repaintGauge($response[1]["means"]["LD"], $response[0]["means"]["LD"],$response[1].index,$response[0].index, "#ld-chart-gauge", "LD");
+                repaintGauge($response[1]["means"]["SMOG"] / 18, $response[0]["means"]["SMOG"] / 18,$response[1].index,$response[0].index, "#smog-chart-gauge", "SMOG");
             });
-        };
-
-        $("input[name='modelanswer']").on('keydown',function(e){
-            if(e.keyCode == 13)
-                updateModelAnswer();
-        });
-
-        $('#toolbar').find('select').change(function () {
-            $table.bootstrapTable('destroy').bootstrapTable({
-                exportDataType: $(this).val()
-            });
-        });
-
-        $("#saveBList").on("click", function(e){
-            var text = $("#bListText").val();
-            var arr = text.split(/\r\n|\r|\n/g);
-            var url = "{{url_for('settings')}}";
-            $.post(url,{id:"{{ analysisId }}",question:"{{ question }}",key:'blist',val:JSON.stringify(arr)},function(response){
-                $("#keyword_render").html(response);
-            });
-        });
-
-        $("#saveWList").on("click", function(e){
-            var text = $("#wListText").val();
-            var arr = text.split(/\r\n|\r|\n/g);
-            var url = "{{url_for('settings')}}";
-            $.post(url,{id:"{{ analysisId }}",question:"{{ question }}",key:'wlist',val:JSON.stringify(arr)},function(response){
-                $("#keyword_render").html(response);
-            });
+            $("."+pageInfo['left_or_right']).replaceWith(response);
         });
     });
 
-</script>
+        var height, svg, width;
+        var studentFilesForGet = [];
+    </script>
 
+    {% for student_file in student_files %}
+        <script type="text/javascript">
+            studentFilesForGet.push("{{ student_file.file.id }}");
+        </script>
+    {% endfor %}
+
+<script type="text/javascript">
+
+    $.get("{{ url_for('get_chart_data') }}", {analysis_id:"{{ analysis_id }}",f1:studentFilesForGet[0],f2:studentFilesForGet[1],q1:1,q2:1}, function(response){
+        var $response = JSON.parse(response);
+        repaintGauge($response[1]["means"]["TTR"], $response[0]["means"]["TTR"],$response[1].index,$response[0].index, "#ttr-chart-gauge", "TTR");
+        repaintGauge($response[1]["means"]["LD"], $response[0]["means"]["LD"],$response[1].index,$response[0].index, "#ld-chart-gauge", "LD");
+        repaintGauge($response[1]["means"]["SMOG"] / 18, $response[0]["means"]["SMOG"] / 18,$response[1].index,$response[0].index, "#smog-chart-gauge", "SMOG");
+    });
+
+    $(document).on('click', ".process_model_answer", function(e) {
+        e.preventDefault();
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        var reference_answer = $('input[name="modelanswer"]',"#referenceAnswers_"+pageInfo['id']).val();
+        $("#referenceAnswers_"+pageInfo['id']).modal('hide');
+
+        $.post('/reference_answer/'+pageInfo['id']+"/"+pageInfo['question'],
+                { reference_answer:reference_answer }, function() {
+                    var opt = $("<option></option>");
+                    opt.text(reference_answer).attr("value",reference_answer);
+                    $("select#reference_answer_"+pageInfo['id']+"_"+pageInfo["question"]).append(opt);
+                });
+        return false;
+    });
+
+    $(document).on('click','.keyword', function(){
+        var self = $(this);
+        var $notification = notify("Getting your ducks in a row...");
+        var parent = self.parents('.parentContainer');
+        var left_or_right = parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
+        var id = parent.data("fileid");
+        var question = parent.data("question");
+        var $table = $("#table_" + id+"_"+left_or_right+"_"+question).DataTable();
+        var $corpora_footer = $(".corpora_footer");
+        if(self.hasClass("highlight")){
+            $corpora_footer.removeClass("shown");
+            self.removeClass("highlight");
+            $table.ajax.url("/datatables/" + id + "/" + question).load(function(data){
+                $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text("Responses (" + data.data.length + ")");
+                $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
+                Waypoint.refreshAll();
+                $notification.animate({left: 320}, 300,function(){$notification.remove()});
+            });
+            $("#wordtree_"+id+"_"+left_or_right).html('<span class="vis_text">Please select a word or phrase from the responses to see the visualisation.</span>');
+        }else{
+            parent.find(".highlight").removeClass("highlight");
+            self.addClass("highlight");
+            var word = self.text();
+            $.post("{{ url_for('get_kwic') }}", {analysis_id:"{{ analysis_id }}",myword:word}, function(response){
+                if(left_or_right == "sLeft") {
+                    $.when($corpora_footer.removeClass("panel_left").addClass("panel_right")).then(function(){
+                        $corpora_footer.addClass("shown");
+                    });
+                }
+                else {
+                    $.when($corpora_footer.removeClass("panel_right").addClass("panel_left")).then(function(){
+                        $corpora_footer.addClass("shown");
+                    });
+                }
+
+                $corpora_footer.find(".inner_corpora").empty().append(response).show();
+
+                $table.ajax.url("/datatables/" + id + "/" + question + "/" + word).load(function(data){
+                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text(word + " (" + data.data.length + ")");
+                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
+                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title").append("<div title='Reset filter' class='reset_filter index-font quantext-delete'></div>");
+                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
+                    Waypoint.refreshAll();
+                });
+
+                $.post("{{ url_for('get_wordtree') }}", {file_id:id, question_number:question,myword:word}, function(response){
+                    var $response = JSON.parse(response);
+                    var index = parseInt(parent.data("index")) + 1;
+                    createTree($response,"#wordtree_"+id+"_"+left_or_right,index);
+                    Waypoint.refreshAll();
+                });
+            });
+        }
+    });
+
+    function createTree(data,div,index) {
+        var rights = [];
+        $.each(data, function(i,e){
+            var arr = e[2].split(" ");
+            arr.splice(arr.indexOf(""),1);
+            rights.push(arr);
+        });
+
+        var context = data[0][1];
+        makeWordTree(rights, context, 100, div, index);
+    }
+
+    $("input[name='modelanswer']").on('keyup',function(e){
+        if(e.keyCode == 13)
+            $(".process_model_answer").click();
+    });
+
+    $(document).on("click",".addBList", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        pageInfo['word'] = $("#bListText_"+pageInfo['id']).val();
+        $.post("{{ url_for('add_blist') }}",pageInfo,function(response){
+            $(".emptyBList").remove();
+            $("#blist_"+pageInfo['id']+"_"+pageInfo['left_or_right']).append(response);
+            $("#bListText_"+pageInfo['id']).val("");
+        });
+    });
+
+    $(document).on("click",".saveBList", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        var $notification = notify("Getting your ducks in a row...");
+        $.post("{{ url_for('settings') }}",pageInfo,function(response){
+            $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
+            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+        });
+    });
+
+    $(document).on("click", ".deleteBlistWord", function(){
+        var self = $(this);
+        var pageInfo = getPageInfo(self);
+        pageInfo['word'] = self.data('word');
+        $.post("{{ url_for('delete_blist') }}",pageInfo,function(){
+            self.parents('.blist_col').remove();
+        });
+    });
+
+    $(".panelTag, .close_panel").on("click", function(){
+        var panel = $(".hiddenPanel");
+        if(panel.hasClass("showme"))
+            panel.removeClass("showme");
+        else
+            panel.addClass("showme");
+    });
+
+    $(document).on("click",".quantext-settings", function(){
+        $(this).removeClass("quantext-settings").addClass("quantext-chevron-up");
+    }).on("click",".quantext-chevron-up", function(){
+        $(this).removeClass("quantext-chevron-up").addClass("quantext-settings");
+    });
+
+    $(".theme_item").on("click", function(){
+        var self = $(this);
+        var theme = self.data("theme");
+        var fullname = self.text();
+        $.post("{{ url_for('save_theme') }}", {theme:theme}, function(){
+            $(".theme_button").text(fullname);
+            $('#themeDiv').append('<link rel="stylesheet" href="/static/css/themes/' + theme + '.css" type="text/css" />');
+        });
+    });
+
+    $(".close_corpora_panel").on("click", function(){
+        $(".corpora_footer").removeClass("shown");
+    });
+
+</script>
 
 {% endblock %}

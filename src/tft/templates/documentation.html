@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{%block content %}
+<div class="pt-4">
+  <div class="row">
+    <div class = "col-xs-6 col-md-6 pl-4 pr-4">
+      <div class="row">
+        <div class = "col-xs-12 col-md-12 mb-4">
+          <h3 class="centerFlex"><span class="quantext-info" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Quantext help</h3>
+          <div class="mt-3 pt-3" style="border-top:2px solid #EF8928">
+            Quantext has been designed to be intuitive and easy to use but to help you get started try the short videos, screencasts and guides on this page.
+          </div>
+          <h3 class="mt-4 centerFlex"><span class="quantext-video" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Videos and screencasts</h3>
+          <div class="mt-3 pt-3" style="border-top:2px solid #2B47A2">
+            <div class="videoWrapper">
+              <iframe src="https://www.youtube.com/embed/l_8qJUsDlFg" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="videoWrapper">
+              <iframe src="https://www.youtube.com/embed/qBVis77TRBw" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="videoWrapper">
+              <iframe src="https://www.youtube.com/embed/i7JBfd2H650" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="videoWrapper">
+              <iframe src="https://www.youtube.com/embed/v0ZzCrmofXo" frameborder="0" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class = "col-xs-6 col-md-6 pl-4 pr-4">
+      <div class="row">
+        <div class = "col-xs-12 col-md-12 mb-4">
+          <h3 class="centerFlex"><span class="quantext-book" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Reference guides</h3>
+          <div class="mt-3 pt-3" style="border-top: 2px solid #1EB53F">
+            <a href="static/files/Quantext Quick Reference v0.5.pdf">Quantext Quick Reference v0.5.pdf</a><br/>
+            <a href="static/files/Quantext Data File Format Guide v0.5.pdf">Quantext Data File Format Guide v0.5.pdf</a>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class = "col-xs-12 col-md-12">
+          <h3 class="centerFlex"><span class="quantext-faq" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> FAQs</h3>
+          <div class="mt-3 pt-3" style="border-top:2px solid #EFB128">
+            <a href="https://github.com/quantext/quantext#faqs" target="_blank">https://github.com/quantext/quantext#faqs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'footer.html' %}
+
+</div>
+{% endblock %}

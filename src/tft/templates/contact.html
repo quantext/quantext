@@ -1,6 +1,44 @@
 {% extends "base.html" %}
 {%block content %}
-<div>
-  <h3>Contact Details</h3>
+<div class="pt-4">
+  <div class="row">
+    <div class = "col-xs-6 col-md-6 pl-4 pr-4">
+      <div class="row">
+        <div class = "col-xs-12 col-md-12">
+          <h3 class="centerFlex"><span class="quantext-user" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Dr Jenny McDonald</h3>
+          <div class="row m-0 mt-3 pt-3" style="border-top:2px solid #EF8928">
+            <div class="col-md-4 mb-4">
+              <img src="/static/img/jenny-1.jpg" style="width:100%"/>
+            </div>
+            <div class="col-md-8">
+            Jenny is an independent researcher and a Research Associate at the Centre for Learning and Research (CLeaR), University of Auckland. She is an experienced educational technologist and academic developer and for 10 years was a lecturer in the Higher Education Development Centre at the University of Otago. For her PhD in computer science/higher education she designed and built a tutorial dialogue system and evaluated it with a large undergraduate class. Jenny’s research interests include natural language processing techniques for formative feedback and learning analytics. She was co-PI with A/Prof. Cathy Gunn on the recently completed Ako Aotearoa NZ national funded project, <i>Building an evidence-base for teaching and learning design using learning analytics data</i>.
+              <br/><br/>
+              Email <a href="mailto:jenny@quantext.co.nz">jenny@quantext.co.nz</a>.
+            </div>
+          </div>
+          <h3 class="mt-4 centerFlex"><span class="quantext-user" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Adon Christian Michael Moskal</h3>
+          <div class="row m-0 mt-3 pt-3 mb-4" style="border-top:2px solid #2B47A2">
+            <div class="col-md-12">
+              Adon is a lecturer in Information Technology at Otago Polytechnic. From 2011-2016, Adon was a Professional Practice Fellow at the University of Otago where he developed software and researched educational technology. His research interests include student evaluation, academic development and learning analytics. Recently, Adon was a co-investigator and co-developer of the Student Relationship Engagement System v2 with researchers from the University of Auckland and the University of Sydney.
+              <br/><br/>
+              Email <a href="mailto:adon@quantext.co.nz">adon@quantext.co.nz</a>.
+            </div>
+            <div class="col-md-12 mt-4">
+              <img src="/static/img/adon-1.jpg" style="width:100%"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 pl-4 pr-4">
+      <h3 class="centerFlex"><span class="quantext-email" style="margin-right:10px;font-size:2rem;margin-bottom:-6px"></span> Contact</h3>
+      <div class="mt-3 pt-3" style="border-top: 2px solid #1EB53F">
+        To register your interest in Quantext or to find out more, please email <a href="mailto:info@quantext.co.nz">info@quantext.co.nz</a>.
+      </div>
+    </div>
+  </div>
+
+  {% include 'footer.html' %}
+
 </div>
 {% endblock %}

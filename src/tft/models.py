@@ -1,5 +1,5 @@
 ###    Quantext Text Analysis Software
-###    Copyright (C) 2017  McDonald & Moskal Ltd., Dunedin, New Zealand
+###    Copyright (C) 2017,2018  McDonald & Moskal Ltd., Dunedin, New Zealand
 
 ###    This program is free software: you can redistribute it and/or modify
 ###    it under the terms of the GNU General Public License as published by
@@ -14,16 +14,20 @@
 ###    You should have received a copy of the GNU General Public License
 ###    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from flask_login import UserMixin
 from tft import db, lm
 import datetime
 
 class User(db.Document, UserMixin):
-    social_id = db.StringField(unique=True)
+    social_id = db.StringField()
     nickname = db.StringField()
     email = db.StringField()
-    #email should be unique later
+    theme = db.StringField(default="original")
+
+    def save(self, *args, **kwargs):
+        if not self.theme:
+            self.theme = "original"
+        return super(User,self).save(*args, **kwargs)
 
 @lm.user_loader
 def load_user(id):
@@ -33,27 +37,32 @@ def load_user(id):
         user = None
 
     return user
-'''
-class Response(db.EmbeddedDocument):
-    ID = db.IntField()
-    rText = db.StringField()
-    length = db.IntField()
-    sentences = db.IntField()
-    lexicalDiversity = db.StringField()
-    lexicalDensity = db.StringField()
-'''
 
 class Question(db.EmbeddedDocument):
     qNum = db.IntField()
     qTitle = db.StringField()
     qText = db.StringField()
     numResponses = db.IntField()
-    modelAnswer = db.StringField()
+    referenceAnswers = db.ListField(db.StringField())
+    categories = db.ListField(db.StringField())
+    blist = db.ListField(db.StringField())
+    wlist = db.ListField(db.StringField())
     qSettings = db.DictField()
 
+class File(db.Document):
+    owner = db.ReferenceField(User)
+    filename = db.StringField(unique=False)
+    questions = db.ListField(db.EmbeddedDocumentField(Question))
+    created = db.DateTimeField(default=datetime.datetime.now)
+
+class RefCorpus(db.Document):
+    owner = db.ReferenceField(User)
+    filename = db.StringField(unique=False)
+    created = db.DateTimeField(default=datetime.datetime.now)
+
 class Analysis(db.Document):
-    filename = db.StringField(unique=True)
     owner = db.ReferenceField(User)
     created = db.DateTimeField(default=datetime.datetime.now)
-    questions = db.ListField(db.EmbeddedDocumentField(Question))
-    tcorpus = db.StringField()
+    files = db.ListField(db.ReferenceField(File))
+    refcorpus = db.ListField(db.ReferenceField(RefCorpus))
+    name = db.StringField()

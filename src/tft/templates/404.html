@@ -2,6 +2,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>File Not Found</h1>
-  <p><a href="{{ url_for('index') }}">Back</a></p>
+  <h1 style="text-align:center">Dead duck...</h1>
+  <div style="text-align:center">
+    <div class="p-4">Whatever you were looking for, it isn't here...</div>
+    <img class="mb-4" src="/static/img/dead_duck.svg" style="height:200px;max-width:100%" /><br/>
+    <a href="{{ url_for('index') }}">Take me home</a>
+  </div>
 {% endblock %}

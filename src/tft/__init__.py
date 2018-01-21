@@ -1,5 +1,5 @@
 ###    Quantext Text Analysis Software
-###    Copyright (C) 2017  McDonald & Moskal Ltd., Dunedin, New Zealand
+###    Copyright (C) 2017,2018  McDonald & Moskal Ltd., Dunedin, New Zealand
 
 ###    This program is free software: you can redistribute it and/or modify
 ###    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@
 
 ###    You should have received a copy of the GNU General Public License
 ###    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 
 from flask import Flask
 from flask_mongoengine import MongoEngine
@@ -37,4 +36,4 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.info('text processing app startup')
-    
+

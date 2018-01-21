@@ -1,0 +1,51 @@
+<div class="col-md-12 p-0">
+    {% for r in an.refcorpus %}
+        <div class="w-100 p-4" style="border-bottom:2px solid white">
+            <div class="card" style="background:#193e45;color:white">
+                <div class="card-block p-0">
+                    <div class="row">
+                        <div class="col-md-12"><h5 class="m-0 p-0">{{ r.filename }}</h5></div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class = "col-md-2">Total words</div>
+                        <div class = "col-md-2">Unique words</div>
+                        <div class = "col-md-2">Total sentences</div>
+                        <div class = "col-md-2">TTR<sup class="toolt quantext-info" title="Tooltip." style="color:white"></sup></div>
+                        <div class = "col-md-2">LD<sup class="toolt quantext-info" title="Tooltip." style="color:white"></sup></div>
+                        <div class = "col-md-2">SMOG<sup class="toolt quantext-info" title="Tooltip." style="color:white"></sup></div>
+                    </div>
+                    <div class="row" style="font-weight:600">
+                        <div class = "col-md-2">{{ r["means"]["Words"] }}</div>
+                        <div class = "col-md-2">{{ r["means"]["Unique"] }}</div>
+                        <div class = "col-md-2">{{ r["means"]["Sentences"] }}</div>
+                        <div class = "col-md-2">{{ r["means"]["TTR"] }}</div>
+                        <div class = "col-md-2">{{ r["means"]["LD"] }}</div>
+                        <div class = "col-md-2">{{ r["means"]["SMOG"] }}</div>
+                    </div>
+                </div>
+            </div>
+            {% set range_len = r.kwic|length if r.kwic|length <= 5 else 5 %}
+            <div class="row m-0 mt-4 corpus_box">
+                <div class="col-md-12 p-0">
+                    {% if r.kwic|length > 0 %}
+                        <h6 style="font-size:1.1rem">Keyword in context (KWIC)</h6>
+                        {% for i in range(0,range_len) %}
+                            <div class='centerFlex' style="background:white;border-bottom:1px solid #ddd;padding:4px 0">
+                                <div class='left-kwic'>{{ r.kwic[i][0] }}</div>
+                                <div class='mid-kwic'>{{ r.kwic[i][1] }}</div>
+                                <div class='right-kwic'>{{ r.kwic[i][2] }}</div>
+                            </div>
+                        {% endfor %}
+                        <div class="centerFlex mt-4" style="justify-content: flex-end">Showing {{ range_len }}/{{ r.kwic|length }}
+                            {% if range_len < r.kwic|length %}
+                                <span class="ml-1 quantext-options index-font"></span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <i>Keyword not found in reference materials.</i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

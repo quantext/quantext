@@ -1,0 +1,42 @@
+<div class="col-xs-6 col-md-6 p-0">
+    <div class="card card-header-{{ (student_file.index+1)|string }}">
+        <div class="card-block p-4">
+            {% set biggest = student_file.anaq.top_kwords[0][1] %}
+            {% for i in student_file.anaq.top_kwords %}
+            {% set ngic=i[0] %}
+            {% set word_count = i[1] %}
+            <div class="row">
+                <div class = "col-md-6"><div class="keyword">{{ ngic }}</div></div>
+                <div class = "col-md-1 centerFlex">{{ word_count }}</div>
+                <div class = "col-md-5" style="position:relative">
+                    {% set percent = word_count/biggest * 100 %}
+                    <div class="barchart barchart-{{ (student_file.index+1)|string }}" style="width:{{ percent }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="col-xs-6 col-md-6 p-0">
+    <div class="card card-header-{{ (student_file.index+1)|string }}">
+        <div class="card-block p-4">
+            {% if student_file.anaq.top_bgs[0] %}
+                {% set (obj,biggest) = student_file.anaq.top_bgs[0] %}
+                {% for (bg,c) in student_file.anaq.top_bgs %}
+                <div class="row">
+                    {% if student_file.q.qSettings["trigram"] == "Bigram" %}
+                        <div class = "col-md-6"><div class="keyword">{{ bg[0] }} {{ bg[1] }}</div></div>
+                    {% else %}
+                        <div class = "col-md-6"><div class="keyword">{{ bg[0] }} {{ bg[1] }} {{ bg[2] }}</div></div>
+                    {% endif %}
+                    <div class = "col-md-1 centerFlex">{{ c }}</div>
+                    <div class = "col-md-5" style="position:relative">
+                        {% set percent = c/biggest * 100 %}
+                        <div class="barchart barchart-{{ (student_file.index+1)|string }}" style="width:{{ percent }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>

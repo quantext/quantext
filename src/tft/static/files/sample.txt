@@ -1,0 +1,238 @@
+Boiling
+From Wikipedia, the free encyclopedia
+Boiling water in a sealed cooking pot
+Boiling is the rapid vaporization of a liquid, which occurs when a
+liquid is heated to its boiling point, the temperature at which the
+vapour pressure of the liquid is equal to the pressure exerted on
+the liquid by the surrounding atmosphere. The higher the pressure
+the higher the boiling point. There are two main types of boiling;
+nucleate boiling where small bubbles of vapour form at discrete
+points, and critical heat flux boiling where the boiling surface is
+heated above a certain critical temperature and a film of vapor
+forms on the surface. Transition boiling is an intermediate,
+unstable form of boiling with elements of both types. The boiling
+point of water is 100 °C or 212 °F, but is lower with the decreased
+atmospheric pressure found at higher altitudes.
+Boiling water is used as a method of making it potable by killing
+microbes that may be present. The sensitivity of different microorganisms to heat varies, but if water is held at 70 °C (158 °F) for
+ten minutes, many organisms are killed, but some are more resistant
+to heat and require one minute at the boiling point of water.
+Clostridium spores can survive this treatment, but as the infection
+caused by this microbe is not water-borne, this is not a problem.
+Boiling is also used in cooking. Foods suitable for boiling include
+vegetables, starchy foods such as rice, noodles and potatoes, eggs,
+meats, sauces, stocks and soups. As a cooking method it is simple
+and suitable for large scale cookery. Tough meats or poultry can be
+given a long, slow cooking and a nutritious stock is produced.
+Disadvantages include loss of water-soluble vitamins and minerals.
+Commercially prepared foodstuffs are sometimes packed in polythene
+sachets and sold as "boil-in-the-bag" products.
+Contents [hide]
+1
+Types
+1.1
+Nucleate
+1.2
+Critical heat flux
+1.3
+Transition
+1.4
+Film
+2
+Uses
+2.1
+For making water potable
+2.2
+In cooking
+2.3
+Boil-in-the-bag
+3
+Contrast with evaporation
+4
+See also
+5
+References
+Types[edit]
+Nucleate[edit]
+Nucleate boiling of water over a kitchen stove burner
+Nucleate boiling is characterized by the growth of bubbles or pops
+on a heated surface, which rise from discrete points on a surface,
+whose temperature is only slightly above the liquid’s. In general,
+
+the number of nucleation sites are increased by an increasing
+surface temperature.
+An irregular surface of the boiling vessel (i.e., increased surface
+roughness) or additives to the fluid (i.e., surfactants and/or
+nanoparticles[1]) can create additional nucleation sites,[2] while
+an exceptionally smooth surface, such as plastic, lends itself to
+superheating. Under these conditions, a heated liquid may show
+boiling delay and the temperature may go somewhat above the boiling
+point without boiling.
+Critical heat flux[edit]
+As the boiling surface is heated above a critical temperature, a
+film of vapor forms on the surface. Since this vapor film is much
+less capable of carrying heat away from the surface, the temperature
+rises very rapidly beyond this point into the transition boiling
+regime. The point at which this occurs is dependent on the
+characteristics of boiling fluid and the heating surface in
+question.[1]
+Transition[edit]
+Transition boiling may be defined as the unstable boiling, which
+occurs at surface temperatures between the maximum attainable in
+nucleate and the minimum attainable in film boiling.
+The formation of bubbles in a heated liquid is a complex physical
+process which often involves cavitation and acoustic effects, such
+as the broad-spectrum hiss one hears in a kettle not yet heated to
+the point where bubbles boil to the surface.
+Film[edit]
+Main article: Leidenfrost effect
+If a surface heating the liquid is significantly hotter than the
+liquid then film boiling will occur, where a thin layer of vapor,
+which has low thermal conductivity, insulates the surface. This
+condition of a vapor film insulating the surface from the liquid
+characterizes film boiling.
+In distillation, boiling is used in separating mixtures. This is
+possible because the vapor rising from a boiling fluid generally has
+a ratio of components different from that in the liquid.
+Uses[edit]
+For making water potable[edit]
+As a method of disinfecting water, bringing it to its boiling point
+at 100 °C (212 °F), is the oldest and most effective way since it
+does not affect the taste, it is effective despite contaminants or
+particles present in it, and is a single step process which
+eliminates most microbes responsible for causing intestine related
+diseases.[3] In places having a proper water purification system, it
+is recommended only as an emergency treatment method or for
+obtaining potable water in the wilderness or in rural areas,[4] as
+it cannot remove chemical toxins or impurities.[5]
+
+The elimination of micro-organisms by boiling follows first-order
+kinetics—at high temperatures it is achieved in less time and at
+lower temperatures, in more time. The heat sensitivity of microorganisms varies, at 70 °C (158 °F), Giardia species (causes
+Giardiasis) can take ten minutes for complete inactivation, most
+intestine affecting microbes and E. coli (gastroenteritis) take less
+than a minute; at boiling point, Vibrio cholerae (cholera) takes ten
+seconds and hepatitis A virus (causes the symptom of jaundice), one
+minute. Boiling does not ensure the elimination of all microorganisms; the bacterial spores Clostridium can survive at 100 °C
+(212 °F) but are not water-borne or intestine affecting. Thus for
+human health, complete sterilization of water is not required.[3]
+The traditional advice of boiling water for ten minutes is mainly
+for additional safety, since microbes start getting eliminated at
+temperatures greater than 60 °C (140 °F) and bringing it to its
+boiling point is also a useful indication that can be seen without
+the help of a thermometer, and by this time, the water is
+disinfected. Though the boiling point decreases with increasing
+altitude, it is not enough to affect the disinfecting process.[3][6]
+In cooking[edit]
+This section needs additional citations for verification. Please
+help improve this article by adding citations to reliable sources.
+Unsourced material may be challenged and removed. (June 2017) (Learn
+how and when to remove this template message)
+Boiling pasta
+Boiling is the method of cooking food in boiling water, or other
+water-based liquids such as stock or milk.[7] Simmering is gentle
+boiling, while in poaching the cooking liquid moves but scarcely
+bubbles.
+The boiling point of water is typically considered to be 100 °C or
+212 °F. Pressure and a change in composition of the liquid may alter
+the boiling point of the liquid. For this reason, high elevation
+cooking generally takes longer since boiling point is a function of
+atmospheric pressure. In Denver, Colorado, USA, which is at an
+elevation of about one mile, water boils at approximately 95 °C or
+203 °F.[8] Depending on the type of food and the elevation, the
+boiling water may not be hot enough to cook the food properly.
+Similarly, increasing the pressure as in a pressure cooker raises
+the temperature of the contents above the open air boiling point.
+Adding a water soluble substance, such as salt or sugar also
+increases the boiling point. This is called boiling-point elevation.
+At palatable concentrations of salt, the effect is very small, and
+the boiling point elevation is difficult to notice. However, while
+making thick sugar syrup, such as for Gulab Jamun, one will notice
+boiling point elevation. Due to variations in composition and
+pressure, the boiling point of water is almost never exactly 100 °C,
+but rather close enough for cooking.
+
+Boiling milk
+Foods suitable for boiling include vegetables, starchy foods such as
+rice, noodles and potatoes, eggs, meats, sauces, stocks and soups.
+Boiling has several advantages. It is safe and simple, and it is
+appropriate for large-scale cookery. Older, tougher, cheaper cuts of
+meat and poultry can be made digestible. Nutritious, well flavored
+stock is produced. Also, maximum color and nutritive value is
+retained when cooking green vegetables, provided boiling time is
+kept to the minimum.
+Boiling food over a fireplace
+On the other hand, there are several disadvantages. There is a loss
+of soluble vitamins from foods to the water (if the water is
+discarded). Boiling can also be a slow method of cooking food.
+Boiling can be done in several ways: The food can be placed into
+already rapidly boiling water and left to cook, the heat can be
+turned down and the food can be simmered; or the food can also be
+placed into the pot, and cold water may be added to the pot. This
+may then be boiled until the food is satisfactory.
+Water on the outside of a pot, i.e., a wet pot, increases the time
+it takes the pot of water to boil. The pot will heat at a normal
+rate once all excess water on the outside of the pot evaporates.
+Boiling is also often used to remove salt from certain foodstuffs,
+such as bacon, if a less saline product is required.
+Boil-in-the-bag[edit]
+Main article: Boil-in-bag
+See also: Sous-vide
+Also known as "boil-in-bag", this involves heating or cooking readymade foods sealed in a thick plastic bag. The bag containing the
+food, often frozen, is submerged in boiling water for a prescribed
+time.[9] The resulting dishes can be prepared with greater
+convenience as no pots or pans are dirtied in the process. Such
+meals are available for camping as well as home dining.
+Contrast with evaporation[edit]
+At any given temperature, all the molecules in a liquid do not have
+the same kinetic energy. Some high energy particles on the liquid
+surface may have enough energy to escape the intermolecular forces
+of attraction of the liquid and become a gas. This is called
+evaporation.
+Evaporation only happens on the surface while boiling happens
+throughout the liquid. When a liquid reaches its boiling point
+bubbles of gas form in it which rise into the surface and burst into
+the air. This process is called boiling. If the boiling liquid is
+heated more strongly the temperature does not rise but it boils more
+quickly.
+
+See also[edit]
+Phase diagram
+Phase transition
+Explosive boiling or phase explosion
+Recovery time (culinary)
+Broiling
+References[edit]
+Wikimedia Commons has media related to Boiling.
+Look up boiling in Wiktionary, the free dictionary.
+Wikibooks Cookbook has a recipe/module on
+Boiling
+^ Jump up to: a b Taylor, R.A., Phelan, P.E., Pool boiling of
+nanofluids: Comprehensive review of existing data and limited new
+data, International Journal of Heat and Mass Transfer, Volume 52,
+Issues 23–24, November 2009, Pages 5339–5347
+Jump up ^ Robert A Taylor, Patrick E Phelan, Todd Otanicar, Ronald J
+Adrian, Ravi S Prasher, Vapor generation in a nanoparticle liquid
+suspension using a focused, continuous laser, Applied Physics
+Letters, Volume:95 , Issue: 16, 2009
+^ Jump up to: a b c Howard Backer (2002). "Water Disinfection for
+International and Wilderness Travelers". Oxford journals. pp. 355–
+364. doi:10.1086/324747. Retrieved 20 July 2013.
+Jump up ^ "Emergency Disinfection of Drinking Water". EPA. Retrieved
+20 July 2013.
+Jump up ^ "OA Guide to Water Purification, The Backpacker's Field
+Manual, by Rick Curtis, first edition published by Random House
+March, 1998".
+Jump up ^ "Is it true that you can't make a decent cup of tea up a
+mountain?". physics.org. Retrieved 2 November 2012.
+Jump up ^ Rickus, Alexis; Saunder, Bev; Mackey, Yvonne (2016-08-22).
+AQA GCSE Food Preparation and Nutrition. Hodder Education. ISBN
+9781471863653.
+Jump up ^ IAPWS. "What is the effect of pressure on the boiling of
+water? Why does water boil at a lower temperature at high
+altitudes?". FAQs About Water and Steam. Archived from the original
+on 2009-08-06. Retrieved 2009-12-05.
+Jump up ^ "Boil-in-bag - Define Boil-in-bag at Dictionary.com".
+Dictionary.com.
+
+
