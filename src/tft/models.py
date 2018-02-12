@@ -23,6 +23,8 @@ class User(db.Document, UserMixin):
     nickname = db.StringField()
     email = db.StringField()
     theme = db.StringField(default="original")
+    plan = db.StringField(default="free")
+    isAdmin = db.StringField(default="false")
 
     def save(self, *args, **kwargs):
         if not self.theme:
@@ -54,15 +56,20 @@ class File(db.Document):
     filename = db.StringField(unique=False)
     questions = db.ListField(db.EmbeddedDocumentField(Question))
     created = db.DateTimeField(default=datetime.datetime.now)
+    status = db.StringField()
 
 class RefCorpus(db.Document):
     owner = db.ReferenceField(User)
     filename = db.StringField(unique=False)
     created = db.DateTimeField(default=datetime.datetime.now)
+    status = db.StringField()
 
 class Analysis(db.Document):
     owner = db.ReferenceField(User)
     created = db.DateTimeField(default=datetime.datetime.now)
+    lastrun = db.DateTimeField(default=datetime.datetime.now)
     files = db.ListField(db.ReferenceField(File))
     refcorpus = db.ListField(db.ReferenceField(RefCorpus))
     name = db.StringField()
+    status = db.StringField()
+    laststate = db.StringField()

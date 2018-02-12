@@ -1,6 +1,6 @@
 {% macro checkbox(name, text, tipText,student_file,size,which,padLR,disabled) -%}
 
-    <div class="col-md-{{size}} centerFlex p-0 {{padLR}}">
+    <div class="col-md-{{size}} centerFlex p-0 {{ padLR }}">
         <input id="settings_{{ name }}_{{ student_file.file.id }}_{{ student_file.q.qNum }}" class="form-check-input setting-control" type="checkbox" name="{{ name }}" data-id="{{ student_file.file.id }}" data-which="{{ which }}" data-question="{{ student_file.q.qNum }}"
             {% if student_file.q.qSettings[name] %}
                 checked="checked"
@@ -9,8 +9,8 @@
                 disabled="disabled"
             {% endif %}
         />
-        <label for="settings_{{ name }}_{{ student_file.file.id }}_{{ student_file.q.qNum }}">
-            <span class="file_checkbox mr-1"></span> {{ text }}
+        <label for="settings_{{ name }}_{{ student_file.file.id }}_{{ student_file.q.qNum }}" class="centerFlex">
+            <span class="setting_checkbox mr-1"></span> {{ text }}
         </label><sup class="toolt quantext-info" title="{{ tipText }}"></sup>
     </div>
 
@@ -18,35 +18,44 @@
 
 {% macro select(name, title, array, tipText,student_file,size,which,padLR) -%}
 
-    <div class="col-md-{{ size }} p-0 {{padLR}}">
+    <div class="col-md-{{ size }} p-0 {{ padLR }}">
         <h6 style="display:inline-block">{{ title }}</h6><sup class="toolt quantext-info" title="{{ tipText }}"></sup>
         <select id="settings_{{ name }}_{{ student_file['file']['id'] }}_{{ student_file['q']['qNum'] }}" class="form-control setting-control" name="{{ name }}" data-id="{{ student_file.file.id }}" data-question="{{ student_file.q.qNum }}" data-which="{{ which }}">
             {% for k in array %}
-            <option value="{{k}}"
-                    {% if student_file.q.qSettings[name] == k %}
+            <option value="{{ k }}"
+                    {% if student_file['q']['qSettings'][name] == k %}
                     selected="selected"
                     {% endif %}
-            >{{k}}</option>
+            >{{ k }}</option>
             {% endfor %}
         </select>
     </div>
 
 {%- endmacro %}
 
-{% set total = student_file.total %}
-{% set q = student_file.q %}
-{% set file_id = student_file.file.id %}
+{% set total = student_file['total'] %}
+{% set q = student_file['q'] %}
+{% set file_id = student_file['file']['id'] %}
+{% set left_or_right = student_file['left_or_right'] %}
+{% set idx = student_file['index'] %}
 
-    <div id="file_{{ file_id }}_{{ student_file.left_or_right }}" class="parent-{{ student_file.index+1 }} parentContainer col-md-6 file_{{ file_id }} {{ student_file.left_or_right }}" data-fileid="{{ file_id }}" data-question="{{ student_file.q.qNum }}" data-index="{{ student_file.index }}" data-total="{{ total }}">
+    <div id="file_{{ file_id }}_{{ left_or_right }}" class="parent-{{ idx + 1 }} parentContainer col-md-6 file_{{ file_id }} {{ left_or_right }}" data-fileid="{{ file_id }}" data-question="{{ q['qNum'] }}" data-index="{{ idx }}" data-total="{{ total }}">
         <div class="row m-0 stickme">
-            <div class="col-md-12 p-4 card-header-{{ student_file.index+1 }}">
+            <div class="col-md-12 p-4 card-header-{{ idx + 1 }}">
                 <div class="row mb-4 centerFlex">
-                    <h5 class="col-md-6" style="overflow: hidden;text-overflow: ellipsis;">{{ student_file.file.filename }}</h5>
+                    <h5 class="col-md-6" style="overflow: hidden;text-overflow: ellipsis;">{{ student_file['file']['filename'] }}</h5>
                     <div class="col-md-6 centerFlex">
                         <select class="form-control changeFile" data-id="{{ file_id }}">
                             <option value="0">Change file</option>
-                            {% for file in student_file.an.files %}
-                            <option value="{{ file.id }}">{{ file.filename }}</option>
+                            {% for file in student_file['an']['files'] %}
+                                {% if student_file['left_or_right'] == 'sLeft' %}
+                                    {% set file_ids = file['id'] if student_files|length == 1 else [file['id']|string,student_files[1]['file']['id']|string]|join('+') %}
+                                    {% set question_numbers = 1|string if student_files|length == 1 else [1|string,student_files[1]['q']['qNum']|string]|join('+') %}
+                                {% else %}
+                                    {% set file_ids = [student_files[0]['file']['id']|string,file['id']|string]|join('+') %}
+                                    {% set question_numbers = [student_files[0]['q']['qNum']|string,1|string]|join('+') %}
+                                {% endif %}
+                                <option value="/analyse/{{ analysis_id }}/{{ file_ids }}/{{ question_numbers }}">{{ file['filename'] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -59,11 +68,11 @@
                     <div class = "col-md-2">Total sentences</div>
                 </div>
                 <div class = "row" style="font-weight:600">
-                    <div class = "col-md-2">{{ student_file.file.questions|length }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Characters"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Words"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Unique"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Sentences"] }}</div>
+                    <div class = "col-md-2">{{ student_file['file']['questions']|length }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Characters'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Words'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Unique'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Sentences'] }}</div>
                 </div>
                 <div class="row advanced pt-4">
                     <div class = "col-md-2">TTR<sup class="toolt quantext-info" title="Lexical diversity: a number between 0-1 which gives the type to token ratio (TTR) - the number of unique words divided by the total number of words. For example, ‘The cat sat on the mat’ has a TTR of 5/6 = 0.83."></sup></div>
@@ -74,32 +83,39 @@
                     <div class = "col-md-2">F-K<sup class="toolt quantext-info" title="Flesch-Kincaid: roughly correlates with educational attainment. Flesch-Kincaid converts the Flesh reading ease index to an approximation of US grade school level 0-12."></sup></div>
                 </div>
                 <div class="row advanced" style="font-weight:bold">
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["TTR"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["LD"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["SMOG"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Gunning"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["Flesch"] }}</div>
-                    <div class = "col-md-2">{{ student_file["full_corpus"]["FK"] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['TTR'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['LD'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['SMOG'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Gunning'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['Flesch'] }}</div>
+                    <div class = "col-md-2">{{ student_file['full_corpus']['FK'] }}</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-12 pt-4 pl-4 pr-4 pb-0 mt-4 card-header-{{ student_file.index+1 }}">
+        <div class="col-md-12 pt-4 pl-4 pr-4 pb-0 mt-4 card-header-{{ idx + 1 }}">
             <div class="row m-0">
                 <div class="col-md-9 p-0">
-                    <h5 class="m-0 pr-4">Q{{ q.qNum }} {{ q.qText }}</h5>
+                    <h5 class="m-0 pr-4">Q{{ q['qNum'] }} {{ q['qText'] }}</h5>
                 </div>
                 <div class="col-md-3 p-0">
                     <select class="form-control changeQuestion" data-id="{{ file_id }}">
                         <option value="0">Change question</option>
-                            {% for ques in student_file.file.questions %}
-                                <option value="{{ loop.index }}">{{ loop.index }} {{ ques.qText }}</option>
-                            {% endfor %}
+                        {% for ques in student_file['file']['questions'] %}
+                            {% if student_file['left_or_right'] == 'sLeft' %}
+                                {% set file_ids = student_file['file']['id']|string if student_files|length == 1 else [student_file['file']['id']|string,student_files[1]['file']['id']|string]|join('+') %}
+                                {% set question_numbers = ques['qNum']|string if student_files|length == 1 else [ques['qNum']|string,student_files[1]['q']['qNum']|string]|join('+') %}
+                            {% else %}
+                                {% set file_ids = [student_files[0]['file']['id']|string,student_file['file']['id']|string]|join('+') %}
+                                {% set question_numbers = [student_files[0]['q']['qNum']|string,ques['qNum']|string]|join('+') %}
+                            {% endif %}
+                            <option value="/analyse/{{ analysis_id }}/{{ file_ids }}/{{ question_numbers }}">{{ ques['qNum'] }} {{ ques['qText'] }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
             <div class="row mt-4">
                 <h5 class="col-md-12" style="background:none;border:none;font-weight:600">
-                    <span id="responsecount">{{ student_file["sumq"]["qcount"] }}</span>&nbsp;responses
+                    <span id="responsecount">{{ student_file['sumq']['qcount'] }}</span>&nbsp;responses
                 </h5>
             </div>
             <div class="row histogramRow">
@@ -107,7 +123,7 @@
                     Mean response length (words)
                 </div>
                 <div class="col-md-2">
-                    <strong>{{ student_file["sumq"]["means"]["Words"] }}</strong>
+                    <strong>{{ student_file['sumq']['means']['Words'] }}</strong>
                 </div>
                 <div class="col-md-4 histogramChart p-0">
                     <div class="wordsChart"></div>
@@ -118,7 +134,7 @@
                     Mean sentences/response
                 </div>
                 <div class="col-md-2">
-                    <strong>{{ student_file["sumq"]["means"]["Sentences"] }}</strong>
+                    <strong>{{ student_file['sumq']['means']['Sentences'] }}</strong>
                 </div>
                 <div class="col-md-4 histogramChart p-0">
                     <div class="sentenceChart"></div>
@@ -128,11 +144,11 @@
 
         <div class="row">
             <div class="col-md-12">
-                <h5 class="card-header card-header-{{ (student_file.index+1)|string }} centerFlex p-4" style="margin-bottom:-1.5rem">Most frequent words & ngrams ({{ student_file.anaq.top_kwords|length }})
-                    <div id="keywords_{{ student_file.file.id }}_{{ student_file.left_or_right }}" data-id="{{ student_file.file.id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#keyword_settings_{{ student_file.file.id }}_{{ student_file.left_or_right }}"></div>
+                <h5 class="card-header card-header-{{ idx + 1 }} centerFlex p-4" style="margin-bottom:-1.5rem">Most frequent words & ngrams ({{ student_file['anaq']['top_kwords']|length }})
+                    <div id="keywords_{{ file_id }}_{{ left_or_right }}" data-id="{{ file_id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#keyword_settings_{{ file_id }}_{{ left_or_right }}"></div>
                 </h5>
-                <div id="keyword_settings_{{ student_file.file.id }}_{{ student_file.left_or_right }}" class="collapse">
-                    <div class="card-block p-4 pt-5 card-block-{{ (student_file.index+1)|string }}">
+                <div id="keyword_settings_{{ file_id }}_{{ left_or_right }}" class="collapse">
+                    <div class="card-block p-4 pt-5 card-block-{{ idx + 1 }}">
                         <div class="row pb-4 m-0">
                             {{ select("nkey", "Number of words/ngrams to display", [10,15,20,25,30], "Select from 10 to 30 words and ngrams (bigrams & trigrams) to display. This is currently available in steps of 5. i.e. 10, 15, 20 etc.",student_file,6,"keywords","pr-3") }}
                             {{ select("trigram", "Display bigrams or trigrams", ["Bigram","Trigram"], "Bigrams are groups of two words. Trigrams are groups of three words. Collectively, they are called ngrams. You can select whether to display either key bigrams or key trigrams. i.e. these are groups of two or three words that occur together more often than expected by chance.",student_file,6,"keywords","pl-3") }}
@@ -166,17 +182,15 @@
             </div>
         </div>
 
-        <div id="response_summary_{{ file_id }}_{{ student_file['left_or_right'] }}">
-            <div class = "row m-0 card-header-{{ (student_file['index'] + 1)|string }} word_list">
+        <div id="response_summary_{{ file_id }}_{{ left_or_right }}">
+            <div class = "row m-0 card-header-{{ idx + 1 }} word_list">
                 {% include 'keywords.html' %}
             </div>
         </div>
 
-        <div class="row m-0 mt-4 card-header-{{ student_file['index'] + 1 }} advanced">
+        <div class="row m-0 mt-4 card-header-{{ idx + 1 }} advanced">
             <div class="col-md-12 m-0 p-0">
-                <h5 class="centerFlex card-header card-header-{{ student_file['index'] + 1 }} p-4">Readability indices
-                    <!--<div id="readability_{{ student_file.file.id }}_{{ student_file.left_or_right }}" data-which="readability" data-id="{{ student_file.file.id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#readability_settings_{{ student_file.file.id }}_{{ student_file.left_or_right }}"></div>-->
-                </h5>
+                <h5 class="centerFlex card-header card-header-{{ idx + 1 }} p-4">Readability indices</h5>
                 <div class="row histogramRow pt-0 pl-4 pr-4">
                     <div class = "col-md-8">
                         Lexical diversity (TTR)<sup class="toolt quantext-info" title="A number between 0-1 which gives the type to token ratio (TTR) - the number of unique words divided by the total number of words. For example, ‘The cat sat on the mat’ has a TTR of 5/6 = 0.83"></sup>
@@ -222,7 +236,7 @@
                         Flesch-Kincaid grade level<sup class="toolt quantext-info" title="Flesch-Kincaid grade level roughly correlates with educational attainment. Flesch-Kincaid converts the Flesh reading ease index to an approximation of US grade school level 0-12."></sup>
                     </div>
                     <div class="col-md-4 histogramChart p-0">
-                        <div class="flesch-kincaidChart"></div>
+                        <div class="fkChart"></div>
                     </div>
                 </div>
             </div>
@@ -230,34 +244,36 @@
 
         <div class="row m-0 mt-4">
             <div class="col-md-12 m-0 p-0">
-                <h5 class="centerFlex card-header card-header-{{ student_file.index+1 }} p-4" style="margin-bottom:-1.5rem">Similarity
-                    <div id="similarity_{{ student_file.file.id }}_{{ student_file.left_or_right }}" data-which="similarity" data-id="{{ student_file.file.id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#similarity_settings_{{ student_file.file.id }}_{{ student_file.left_or_right }}"></div>
+                <h5 class="centerFlex card-header card-header-{{ idx + 1 }} p-4" style="margin-bottom:-1.5rem">Similarity
+                    <div id="similarity_{{ file_id }}_{{ left_or_right }}" data-which="similarity" data-id="{{ file_id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#similarity_settings_{{ file_id }}_{{ left_or_right }}"></div>
                 </h5>
-                <div id="similarity_settings_{{ student_file.file.id }}_{{ student_file.left_or_right }}" class="collapse">
-                    <div class="card-block p-4 pt-5 card-block-{{ (student_file.index+1)|string }}">
+                <div id="similarity_settings_{{ file_id }}_{{ left_or_right }}" class="collapse">
+                    <div class="card-block p-4 pt-5 card-block-{{ idx + 1 }}">
                         <div class="row pb-4 m-0">
-                            {{ select("simalgorithm", "Similarity algorithm", ["word2vec"], "Currently not selectable. word2vec is the default. Text is converted to an average vector representation using word embeddings (Word2vec) and the cosine similarity between text vectors is calculated and returned as the similarity. Other options yet to be implemented.",student_file,6,"readability","pr-3") }}
+                            {{ select("simalgorithm", "Similarity algorithm", ["Cosine similarity"], "Currently not selectable. Cosine similarity is the default. Text is converted to an average vector representation using word embeddings (Word2vec) and the cosine similarity between text vectors is calculated and returned as the similarity. Other options yet to be implemented.",student_file,6,"readability","pr-3") }}
                         </div>
                     </div>
                 </div>
-                <div class="row m-0 p-4 card-header-{{ student_file['index'] + 1 }}">
+                <div class="row m-0 p-4 card-header-{{ idx + 1 }}">
                     <div class="col-md-12 p-0">
                         <h6 style="display:inline-block">Current reference answer</h6><sup class="toolt quantext-info" title="The currently selected reference answer for the question. By default there are no reference answers. You can add as many reference answers as you like using the Edit answers dialogue box. The current reference answer is then selected from the list you have created."></sup>
                         <div class="centerFlex">
-                            <select id="reference_answer_{{ student_file['file']['id'] }}_{{ student_file['q']['qNum'] }}" class="form-control" name="modelanswer" data-id="{{ student_file.file.id }}" data-question="{{ student_file.q.qNum }}" data-which="question_settings_button">
+                            <select id="reference_answer_{{ file_id }}_{{ q['qNum'] }}" class="form-control" name="modelanswer" data-id="{{ file_id }}" data-question="{{ q['qNum'] }}" data-which="question_settings_button">
                                 {% for k in [""] + student_file["q"]["referenceAnswers"] %}
                                 <option value="{{ k }}"
-                                        {% if student_file["q"]["qSettings"]["modelanswer"] == k %}
+                                        {% if q["qSettings"]["modelanswer"] == k %}
                                         selected="selected"
                                         {% endif %}
                                 >{{ k }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="button" class="btn btn-quantext centerFlex ml-4 p-0" style="background:transparent!important" data-toggle="modal" data-target="#referenceAnswers_{{ student_file.file.id }}"><span class="index-font quantext-edit"></span></button>
+                            <button type="button" class="btn btn-quantext centerFlex ml-4 p-0" style="background:transparent!important" data-toggle="modal" data-target="#referenceAnswers_{{ file_id }}">
+                                <span class="index-font quantext-edit"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="row m-0 histogramRow pt-0 pl-4 pr-4 pb-4 card-header-{{ student_file.index+1 }}">
+                <div class="row m-0 histogramRow pt-0 pl-4 pr-4 pb-4 card-header-{{ idx + 1 }}">
                     <div class = "col-md-8 p-0">
                         Similarity<sup class="toolt quantext-info" title="Similarity to reference answer."></sup>
                     </div>
@@ -267,11 +283,11 @@
                 </div>
             </div>
         </div>
-        <div id="all_responses_{{ file_id }}_{{ student_file.left_or_right }}">
-            <div class="row m-0 mt-4 card-block-{{ student_file.index+1 }}">
+        <div id="all_responses_{{ file_id }}_{{ left_or_right }}">
+            <div class="row m-0 mt-4 card-block-{{ idx + 1 }}">
                 <div class="col-md-12 p-4">
                     <div class="card-block p-0">
-                        <table id="table_{{ student_file.file.id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}" class="wstable display compact ws-{{ (student_file.index+1)|string }}"
+                        <table id="table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}" class="wstable display compact ws-{{ idx + 1 }}"
                                cellspacing="0"
                                width="100%" style="table-layout: fixed">
                             <thead>
@@ -282,16 +298,17 @@
                                 <th data-sortable="true">Words</th>
                                 <th data-sortable="true">Similarity<sup class="toolt iris-info-2" title="Similarity measure (between 0-1) to reference answer."></sup></th>
                                 <th data-sortable="true">Categories</th>
-                                <th data-sortable="false">Readability indices</th>
+                                <th data-sortable="false"></th>
+                                <th data-sortable="false"></th>
                                 <th data-sortable="false"></th>
                             </tr>
                             </thead>
                         </table>
                     </div>
                 </div>
-                <div id="visualisation_{{ file_id }}_{{ student_file.left_or_right }}" class="col-md-12 p-4">
+                <div id="visualisation_{{ file_id }}_{{ left_or_right }}" class="col-md-12 p-4">
                     <h5>Visualisation</h5>
-                    <div id="wordtree_{{ file_id }}_{{ student_file.left_or_right }}" class="wordtree_div">
+                    <div id="wordtree_{{ file_id }}_{{ left_or_right }}" class="wordtree_div">
                         <span class="vis_text">Please select a word or ngram from the responses to see the visualisation.</span>
                     </div>
                 </div>
@@ -308,7 +325,7 @@
                         <div class="close index-font quantext-delete" data-dismiss="modal"></div>
                     </div>
                     <div class="modal-body">
-                        <div id="blist_{{ file_id }}_{{ student_file.left_or_right }}" class="row">
+                        <div id="blist_{{ file_id }}_{{ left_or_right }}" class="row">
                             <div class="col-md-12">
                                 <span><b>Blacklist words</b></span>
                             </div>
@@ -327,14 +344,18 @@
                                 <div class="input-group">
                                     <input id="bListText_{{ file_id }}" type="text" class="form-control" />
                                     <span class="input-group-btn">
-                                        <button id="saveBList_{{ file_id }}" class="btn btn-quantext dark addBList" data-question="{{ q.qNum }}" data-id="{{ file_id }}" type="button"><div class="index-font quantext-add"></div></button>
+                                        <button id="saveBList_{{ file_id }}" class="btn btn-quantext dark addBList" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}" type="button">
+                                            <div class="index-font quantext-add"></div>
+                                        </button>
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer" style="border-top:none!important">
-                        <button type="button" class="btn btn-quantext green saveBList w-100" data-dismiss="modal" data-question="{{ q.qNum }}" data-id="{{ file_id }}"><div class="index-font quantext-check"></div></button>
+                        <button type="button" class="btn btn-quantext green saveBList w-100" data-dismiss="modal" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}">
+                            <div class="index-font quantext-check"></div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -373,7 +394,7 @@
                         <div class="close index-font quantext-delete" data-dismiss="modal"></div>
                     </div>
                     <div class="modal-body">
-                        <div id="categories_{{ file_id }}_{{ student_file['left_or_right'] }}" class="row">
+                        <div id="categories_{{ file_id }}_{{ left_or_right }}" class="row">
                             <div class="col-md-12">
                                 <span><b>Categories</b></span>
                             </div>
@@ -392,14 +413,18 @@
                                 <div class="input-group">
                                     <input id="category_{{ file_id }}" type="text" class="form-control" name="category" />
                                     <span class="input-group-btn">
-                                        <button id="saveCategory_{{ file_id }}" class="btn btn-quantext dark process_category" data-question="{{ q.qNum }}" data-id="{{ file_id }}" type="button"><div class="index-font quantext-add"></div></button>
+                                        <button id="saveCategory_{{ file_id }}" class="btn btn-quantext dark process_category" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}" type="button">
+                                            <div class="index-font quantext-add"></div>
+                                        </button>
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer" style="border-top:none!important">
-                        <button type="button" class="btn btn-quantext green save_categories w-100" data-dismiss="modal" data-question="{{ q.qNum }}" data-id="{{ file_id }}"><div class="index-font quantext-check"></div></button>
+                        <button type="button" class="btn btn-quantext green save_categories w-100" data-dismiss="modal" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}">
+                            <div class="index-font quantext-check"></div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -413,14 +438,20 @@
         var ttrData = sumq.chartdata['TTR'];
         var ldData = sumq.chartdata['LD'];
         var smogData = sumq.chartdata['SMOG'];
+        var gunningData = sumq.chartdata['Gunning'];
+        var fleschData = sumq.chartdata['Flesch'];
+        var fkData = sumq.chartdata['FK'];
         var similarityData = sumq.chartdata['Similarity'];
-        var left_or_right = "{{ student_file['left_or_right'] }}";
+        var left_or_right = "{{ left_or_right }}";
 
         drawBarChart(wordData, ".wordsChart", "." + left_or_right);
         drawBarChart(sentData, ".sentenceChart", "." + left_or_right);
         drawBarChart(ttrData, ".ttrChart", "." + left_or_right);
         drawBarChart(ldData, ".ldChart", "." + left_or_right);
         drawBarChart(smogData, ".smogChart", "." + left_or_right);
+        drawBarChart(gunningData, ".gunningChart", "." + left_or_right);
+        drawBarChart(fleschData, ".fleschChart", "." + left_or_right);
+        drawBarChart(fkData, ".fkChart", "." + left_or_right);
         drawBarChart(similarityData, ".similarityChart", "." + left_or_right);
 
         var tOpts = new function(){
@@ -433,7 +464,7 @@
             this.iDisplayLength = 10;
             this.columns = [];
             this.buttons = [ 'excel', 'pdf' ];
-            this.ajax = "/datatables/{{ file_id }}/{{ student_file['q']['qNum'] }}";
+            this.ajax = "/datatables/{{ file_id }}/{{ q['qNum'] }}";
             this.order = [[ 1, "asc" ]];
             this.deferRender = true;
             this.autoWidth = false;
@@ -476,7 +507,7 @@
             name:"Words",
             className:"word-cell",
             render: function(data,type,row,meta){
-                var table = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable();
+                var table = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable();
                 var total = table.columns(meta.col).data()[0].sort(function(v1, v2){
                     if(parseInt(v1) > parseInt(v2)) return -1;
                     else if (parseInt(v2) > parseInt(v1)) return 1;
@@ -502,78 +533,62 @@
         });
 
         tOpts.columns.push({
-            data:null,
+            data:"PostID",
+            name:"postID",
             visible:false,
-            name:"readability",
-            render: function(data){
-                return "<table style='width:100%;'>" +
-                        "<tr style='background:none'>" +
-                            "<td style='width:33%;border-right:1px solid transparent;padding:0;position:relative'>" +
-                                "<div class='mini-chart' style='width:" + (data["TTR"]*100) + "%'></div>" +
-                                "<div style='z-index:3;position:relative;'>" +
-                                    data["TTR"] +
-                                "</div>" +
-                            "</td>" +
-                            "<td style='width:33%;padding:0;border-right:1px solid transparent;position:relative'>" +
-                                "<div class='mini-chart' style='width:" + (data["LD"]*100) + "%'></div>" +
-                                "<div style='z-index:3;position:relative;'>" +
-                                    data["LD"] +
-                                "</div>" +
-                            "</td>" +
-                            "<td style='width:34%;padding:0;position:relative'>" +
-                                "<div class='mini-chart' style='width:" + (data["SMOG"]/18*100) + "%'></div>" +
-                                "<div style='z-index:3;position:relative;'>" +
-                                    data["SMOG"] +
-                                "</div>" +
-                            "</td>" +
-                        "</tr>" +
-                    "</table>";
-            }
+            render: function(data){ return data; }
+        });
+
+        tOpts.columns.push({
+            data:"children",
+            name:"children",
+            visible:false,
+            render: function(data){ return data; }
         });
 
         tOpts.columns.push({ data: "Notes", name:"hiddenNotes", visible:false });
 
-        var categories = {{ student_file.q.categories|safe }};
+        var categories = {{ q['categories']|safe }};
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable(tOpts);
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable(tOpts);
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().on('select', function(e, dt, type, indexes){
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().on('select', function(e, dt, type, indexes){
             var self = $(this);
             var selectedRows = self.DataTable().rows({selected:true});
-            iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper"));
-            $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').multiselect('disable', false);
-            $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').attr('disabled', false);
-            $("#clearAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").removeAttr("disabled");
+            iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper"));
+            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', false);
+            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', false);
+            $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").removeAttr("disabled");
         }).on('deselect', function(){
             var self = $(this);
             var selectedRows = self.DataTable().rows({selected:true});
             if(selectedRows.count() == 0) {
-                $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').multiselect('loadOptions', [{}]);
-                $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').multiselect('disable', true);
-                $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').attr('disabled', true);
-                $("#clearAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").attr("disabled","disabled");
+                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('loadOptions', [{}]);
+                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', true);
+                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', true);
+                $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").attr("disabled","disabled");
             } else {
-                iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper"));
+                iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper"));
             }
         }).on('page', function(){
-            $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().rows({ page: 'all' }).deselect();
+            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'all' }).deselect();
         });
 
         var div = $("<div class='centerFlex'></div>");
-        var options = "<select data-question='{{ student_file.q.qNum }}' data-id='{{ file_id }}' name='select_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}' class='form-control' multiple></select>";
-        var selectAll = "<button id='selectAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}' type='button' class='btn btn-quantext dark'>Select all rows</button>";
-        var clearAll = "<button id='clearAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}' type='button' class='btn btn-quantext dark ml-4 mr-4' disabled='disabled'>Clear rows</button>";
+        var options = "<select data-question='{{ student_file.q.qNum }}' data-id='{{ file_id }}' name='select_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' class='form-control' multiple></select>";
+        var selectAll = "<button id='selectAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' type='button' class='btn btn-quantext dark'>Select all rows</button>";
+        var clearAll = "<button id='clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' type='button' class='btn btn-quantext dark ml-4 mr-4' disabled='disabled'>Clear rows</button>";
         div.append(selectAll, clearAll, options);
-        var maxHeight = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").height() * .8;
+        var maxHeight = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").height() * .8;
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper .categories").append(div);
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper .categories").data("categories",categories.toString());
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper .dataTables_filter").append("<span class='quantext-search'></span>");
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper .dataTables_filter input").attr("placeholder","Search");
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .categories").append(div);
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .categories").data("categories",categories.toString());
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .dataTables_filter").append("<span class='quantext-search'></span>");
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .dataTables_filter input").attr("placeholder","Search");
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper .worksheet-title").append("<h5>Responses ({{ student_file['sumq']['qcount'] }})</h5>");
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .worksheet-title").append("<h5>Responses ({{ student_file['sumq']['qcount'] }})</h5>");
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('select[multiple]').multiselect({
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect({
             columns : 2,
             selectAll : false,
             search : true,
@@ -584,25 +599,25 @@
             }
         });
 
-        $("#selectAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").on("click", function(){
-            $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().rows({ page: 'current' }).select();
+        $("#selectAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on("click", function(){
+            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'current' }).select();
         });
 
-        $("#clearAll_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").on("click", function(){
-            $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().rows({ page: 'current' }).deselect();
+        $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on("click", function(){
+            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'current' }).deselect();
         });
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}_wrapper").find('.ms-search').append("<div class='quantext-edit' style='position:absolute;right:.5rem;top:0;font-size:2rem;color:#ccc'></div>");
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('.ms-search').append("<div class='quantext-edit' style='position:absolute;right:.5rem;top:0;font-size:2rem;color:#ccc'></div>");
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").on( 'click', 'tbody td .quantext-card', function (e) {
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on( 'click', 'tbody td .quantext-card', function (e) {
             e.stopImmediatePropagation();
             var currTr = $(this).closest('tr');
-            var currRow = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().row(currTr);
-            var prevTr = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").find(".shown");
-            var prevRow = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").DataTable().row(prevTr);
-            var openLength = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file.q.qNum }}").find(".shown").length;
+            var currRow = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().row(currTr);
+            var prevTr = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").find(".shown");
+            var prevRow = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().row(prevTr);
+            var openLength = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").find(".shown").length;
 
-            openHiddenRow(currRow,currTr, "{{ file_id }}", "{{ student_file.q.qNum }}");
+            openHiddenRow(currRow,currTr, "{{ file_id }}", "{{ q['qNum'] }}");
             if(openLength > 0){
                 prevRow.child.hide();
                 prevRow.deselect();
@@ -610,8 +625,8 @@
             }
         });
 
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file['q']['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', true);
-        $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file['q']['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', true);
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', true);
+        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', true);
         $('input[type=search], .dataTables_wrapper select, .ms-options-wrap button').addClass("form-control");
 
         $(".stickme").each(function(){
@@ -632,18 +647,18 @@
             }
         });
 
-        $("#reference_answer_{{ student_file['file']['id'] }}_{{ student_file['q']['qNum'] }}").on("change", function(){
+        $("#reference_answer_{{ file_id }}_{{ q['qNum'] }}").on("change", function(){
             var self = $(this);
             var reference_answer = self.val();
             var $notification = notify("Getting your ducks in a row...");
-            $.post("{{ url_for('similarity', file_id=student_file['file']['id'], question_number=student_file['q']['qNum']) }}",
+            $.post("{{ url_for('similarity', file_id=file_id, question_number=q['qNum']) }}",
                     { reference_answer:reference_answer },
                     function(response) {
                         var $response = JSON.parse(response);
-                        var $table = $("#table_{{ file_id }}_{{ student_file['left_or_right'] }}_{{ student_file['q']['qNum'] }}").DataTable();
-                        $table.ajax.url("/datatables/{{ file_id }}/{{ student_file['q']['qNum'] }}").load(function(data){
+                        var $table = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable();
+                        $table.ajax.url("/datatables/{{ file_id }}/{{ q['qNum'] }}").load(function(data){
                             var similarityData = $response.chartdata['Similarity'];
-                            drawBarChart(similarityData, ".similarityChart", ".{{ student_file['left_or_right'] }}");
+                            drawBarChart(similarityData, ".similarityChart", ".{{ left_or_right }}");
                             $notification.animate({left: 320}, 300,function(){$notification.remove()});
                         });
                     });

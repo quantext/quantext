@@ -21,6 +21,7 @@ from flask_login import login_user, logout_user, current_user
 from oauth import OAuthSignIn
 from oauth2client.client import OAuth2WebServerFlow
 from .models import User, Analysis, RefCorpus, File, Question
+import datetime
 import nlp
 import numpy
 
@@ -30,37 +31,34 @@ import random
 import os
 import re
 import textract
-import textacy
 
 # initialise session vars - not sure this is at all secure!! Need to check :|
 def default_settings():
-    settings = {}
-
-    settings['nkey'] = app.config['KEYWORDS']
-    settings['kblack']= app.config['KEY_BLACKLIST']
-    settings['white']= app.config['ONLY_WHITELIST']
-    settings['punct']= app.config['FILTER_PUNCT']
-    settings['punctuation']=app.config['PUNCTLIST']
-    settings['nums']= app.config['FILTER_NUMS']
-    settings['measure']= app.config['NG_MEASURE']
-    settings['modelanswer'] = app.config['MODEL_ANSWER']
-    settings['ncontractions'] = app.config['NORM_CONTRACTIONS']
-    settings['trigram'] = app.config['TRIGRAM']
-    settings['lcase'] = app.config['LCASE']
-    settings['window'] = app.config['WINDOW']
-    settings['cgcutoff'] = app.config['CGCUTOFF']
-    settings['spell'] = app.config['SPELLCHECK']
+    settings = {'nkey':app.config['KEYWORDS']}
+    settings.update({'kblack':app.config['KEY_BLACKLIST']})
+    settings.update({'white':app.config['ONLY_WHITELIST']})
+    settings.update({'punct':app.config['FILTER_PUNCT']})
+    settings.update({'punctuation':app.config['PUNCTLIST']})
+    settings.update({'nums':app.config['FILTER_NUMS']})
+    settings.update({'measure':app.config['NG_MEASURE']})
+    settings.update({'modelanswer':app.config['MODEL_ANSWER']})
+    settings.update({'ncontractions':app.config['NORM_CONTRACTIONS']})
+    settings.update({'trigram':app.config['TRIGRAM']})
+    settings.update({'lcase':app.config['LCASE']})
+    settings.update({'window':app.config['WINDOW']})
+    settings.update({'cgcutoff':app.config['CGCUTOFF']})
+    settings.update({'spell':app.config['SPELLCHECK']})
+    settings.update({'simalgorithm':app.config['SIM_ALGORITHM']})
     #settings['stem'] = app.config['STEMMING']
     #settings['negreplace'] = app.config['NEGATIVE_REPLACER']
     #settings['synreplace'] = app.config['SYNONYM_REPLACER']
-    settings['simalgorithm'] = app.config['SIM_ALGORITHM']
 
-    settings['readability_words'] = app.config['READABILITY_WORDS']
-    settings['readability_sents'] = app.config['READABILITY_SENTS']
-    settings['readability_ttr'] = app.config['READABILITY_TTR']
-    settings['readability_ld'] = app.config['READABILITY_LD']
-    settings['readability_smog'] = app.config['READABILITY_SMOG']
-    settings['readability_similarity'] = app.config['READABILITY_SIMILARITY']
+    settings.update({'readability_words':app.config['READABILITY_WORDS']})
+    settings.update({'readability_sents':app.config['READABILITY_SENTS']})
+    settings.update({'readability_ttr':app.config['READABILITY_TTR']})
+    settings.update({'readability_ld':app.config['READABILITY_LD']})
+    settings.update({'readability_smog':app.config['READABILITY_SMOG']})
+    settings.update({'readability_similarity':app.config['READABILITY_SIMILARITY']})
 
     return settings
 
@@ -118,20 +116,55 @@ def match_question(file,question_number):
 @app.route('/')
 @app.route('/index')
 def index():
-    # initialise session vars from config file
+    return render_template('index.html',
+                           title = 'Quantext'
+                           )
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html',
+                           title = 'Quantext'
+                           )
+
+@app.route('/')
+@app.route('/controlPanel')
+def control_panel():
     analyses = None
     files = None
     refcorpora = None
+    lastrun_analysis= None
     if not current_user.is_anonymous:
-        analyses = Analysis.objects(owner=current_user.id).order_by('-created')
-        files = File.objects(owner=current_user.id).order_by('-created')
-        refcorpora = RefCorpus.objects(owner=current_user.id).order_by('-created')
+        lastrun_analysis = Analysis.objects(owner=current_user['id']).order_by('-lastrun')
+        if lastrun_analysis:
+            lastrun_analysis = lastrun_analysis[0]
+        analyses = Analysis.objects(owner=current_user['id']).order_by('-created')
+        files = File.objects(owner=current_user['id'], status__ne='deleted').order_by('-created')
+        refcorpora = RefCorpus.objects(owner=current_user['id'], status__ne='deleted').order_by('-created')
 
-    return render_template('index.html',
-                           title = 'Text Analytics App',
+    return render_template('controlPanel.html',
+                           title = 'Quantext',
                            analyses = analyses,
                            files = files,
-                           refcorpora = refcorpora)
+                           refcorpora = refcorpora,
+                           lastrun_analysis=lastrun_analysis)
+
+@app.route('/')
+@app.route('/adminPanel')
+def admin_panel():
+    if not current_user.is_anonymous and current_user['isAdmin'] == "true":
+        users = User.objects
+        user_list = []
+        for u in users:
+            user = {"user":u}
+            analyses = Analysis.objects(owner=u['id']).order_by('-lastrun')
+            user['analyses'] = analyses
+            user_list.append(user)
+        return render_template('adminPanel.html',
+                           title = 'Quantext',
+                           users = user_list
+                           )
+    else:
+        return render_template('404.html'), 404
 
 @app.route('/logout')
 def logout():
@@ -141,7 +174,7 @@ def logout():
 @app.route('/authorize/<provider>')
 def oauth_authorize(provider):
     if not current_user.is_anonymous:
-        return redirect(url_for('index'))
+        return redirect(url_for('control_panel'))
     if provider == 'twitter':
         oauth = OAuthSignIn.get_provider(provider)
         return oauth.authorize()
@@ -180,13 +213,14 @@ def google_callback():
                 user = User.objects.get(social_id=name)
                 create_demo_files(user)
 
+        if user.plan is None:
+            user.plan = "free"
+            user.save()
+
         login_user(user, True)
-        return redirect(url_for('index'))
+        return redirect(url_for('control_panel'))
 
 def create_demo_files(user):
-    s = nlp.SAQData()
-    t = nlp.TeachingData()
-
     filename = "sample.xlsx"
     f = File(filename=filename,owner=user)
     f.save()
@@ -194,15 +228,13 @@ def create_demo_files(user):
     if not os.path.exists(origpath):
         os.makedirs(origpath)
 
-    qdata, rdata = s.getandparsedata_sample(filename)
-
-    # save questions
+    qdata, rdata = nlp.getandparsedata_sample(filename)
     questions = []
     idx = 1
 
     for num,text in qdata.items():
         question = Question(qNum=idx,qTitle=num,qText=text)
-        qcorpus = s.createqcorpus(rdata[num])
+        qcorpus = nlp.createqcorpus(rdata[num])
         settings = default_settings()
         question.qSettings = settings
         question.blist = []
@@ -230,14 +262,15 @@ def create_demo_files(user):
 
     ref = RefCorpus(filename=filenamet,owner=user)
     ref.save()
-    t.createtcorpus_sample(filename_new,ref.id)
+    nlp.createtcorpus_sample(filename_new,ref.id)
 
     return True
 
 @app.route('/callback/<provider>')
 def oauth_callback(provider):
     if not current_user.is_anonymous:
-        return redirect(url_for('index'))
+        return redirect(url_for('control_panel'))
+
     oauth = OAuthSignIn.get_provider(provider)
     social_id, username, email = oauth.callback()
     if social_id is None:
@@ -251,10 +284,12 @@ def oauth_callback(provider):
         user = User.objects.get(social_id=social_id)
         create_demo_files(user)
 
-    print("I am saving anew...")
+    if user.plan is None:
+        user.plan = "free"
+
     user.save()
     login_user(user, True)
-    return redirect(url_for('index'))
+    return redirect(url_for('control_panel'))
 
 @app.errorhandler(404)
 def not_found_error(error):
@@ -262,18 +297,10 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    #db.session.rollback()
     return render_template('500.html'), 500
 
-@app.route('/uploadq', methods = ['GET', 'POST'])
+@app.route('/uploadq', methods = ['POST'])
 def upload_file_qs():
-    s = nlp.SAQData()
-    #This is bare minimum function with rudimenary error checking!
-    #Need to:
-    #check for over-writing files, write filenames to db per user, decide how to handle file persistance??,
-    #check for file size, decide file size limit? ...
-    #interface leaves much to be desired too - should be able to handle multi-uploads and then select files
-    #for analysis etc, file preview would be handy...
     if request.method == 'POST':
         f = request.files['file']
         if f and allowed_fileq(f.filename):
@@ -290,19 +317,25 @@ def upload_file_qs():
                     os.makedirs(origpath)
 
                 # do the processing here on upload
-                qdata, rdata = s.getandparsedata(filename)
+                qdata, rdata = nlp.getandparsedata(filename)
 
                 # save questions
                 questions = []
                 idx = 1
 
-                for num,text in qdata.items():
-                    question = Question(qNum=idx,qTitle=num,qText=text)
-                    qcorpus = s.createqcorpus(rdata[num])
+                for num,*text in qdata:
+                    num = str(num)
+                    question = Question(qNum=idx,qTitle=num,qText=text[0])
+                    qcorpus = nlp.createqcorpus(rdata[num])
                     settings = default_settings()
-                    question.qSettings = settings
-                    question.blist = []
-                    question.wlist = []
+                    question['qSettings'] = settings
+                    if len(text) > 1:
+                        if text[1] and isinstance(text[1], str):
+                            question['referenceAnswers'] = [text[1]]
+                            question["qSettings"]["modelanswer"] = text[1]
+
+                    question['blist'] = []
+                    question['wlist'] = []
 
                     path = os.path.join(origpath,str(idx))
                     if not os.path.exists(path):
@@ -315,20 +348,18 @@ def upload_file_qs():
                 f.questions = questions
                 f.save()
 
-                return redirect(url_for('index'))
+                return render_template('partials/student_file_li.html',f=f), 200
             except Exception as e:
-                flash('There is a problem uploading your file: ' + str(e))
-            return redirect(url_for('index'))
+                return 'There is a problem uploading your file: ' + str(e), 500
 
         else:
-            flash('Your file must have a .xls or .xlsx extension')
+            return 'Your file must have a .xls or .xlsx extension', 500
 
-    return redirect(url_for('index'))
+    return 'Failed', 500
 
-@app.route('/uploadt', methods = ['GET', 'POST'])
+@app.route('/uploadt', methods = ['POST'])
 def upload_file_teach():
 #This is bare minimum function to upload teaching materials
-    t = nlp.TeachingData()
     if request.method == 'POST':
         f = request.files['file']
         if f and allowed_filet(f.filename):
@@ -349,16 +380,15 @@ def upload_file_teach():
                     ref = RefCorpus(filename=filenamet,owner=user)
                     ref.save()
 
-                    t.createtcorpus(filename_new,ref.id)
+                    nlp.createtcorpus(filename_new,ref.id)
 
-                return redirect(url_for('index'))
+                    return render_template('partials/reference_material_li.html',r=ref), 200
             except Exception as e:
-                flash('There is a problem uploading your file: ' + str(e))
-            return redirect(url_for('index'))
+                return 'There is a problem uploading your file: ' + str(e), 500
         else:
-            flash('Your file must have a .pdf or .txt extension')
+            return 'Your file must have a .pdf or .txt extension', 500
 
-    return redirect(url_for('index'))
+    return 'Failed', 500
 
 @app.route('/newAnalysis', methods = ['POST'])
 def new_analysis():
@@ -367,17 +397,17 @@ def new_analysis():
     ref = request.form.get('refcorpus')
     user = User.objects.get(id=current_user.id)
     analysis = Analysis(owner=user)
-    analysis.name = name
+    analysis['name'] = name
 
     if files:
         file_list = files.split(",")
         student_files = File.objects(id__in=file_list)
-        analysis.files = student_files
+        analysis['files'] = student_files
 
     if ref:
         ref_list = ref.split(",")
         ref_corpus = RefCorpus.objects(id__in=ref_list)
-        analysis.refcorpus = ref_corpus
+        analysis['refcorpus'] = ref_corpus
 
     analysis.save()
 
@@ -390,27 +420,41 @@ def delete_analysis():
     an.delete()
     return str(an.id)
 
+@app.route('/deleteFile', methods = ['POST'])
+def delete_file():
+    file_id = request.form.get('id')
+    file = File.objects.get(id=file_id)
+    file['status'] = "deleted"
+    file.save()
+    return str(file.id)
+
+@app.route('/deleteReference', methods = ['POST'])
+def delete_reference():
+    reference_id = request.form.get('id')
+    ref = RefCorpus.objects.get(id=reference_id)
+    ref['status'] = "deleted"
+    ref.save()
+    return str(ref.id)
+
 def build_student_file(analysis_id,file,question,left_or_right):
     analysis = Analysis.objects.get(id=analysis_id)
     qcorpus = load_corpus(file,question)
     anaq = ana_q(qcorpus,question)
     sumq = sum_q(qcorpus,question['qSettings']['modelanswer'])
 
-    student_file = {}
-    student_file["file"] = file
-    student_file["q"] = question
-    student_file["corpus"] = qcorpus
-    student_file["anaq"] = anaq
-    student_file["sumq"] = sumq
-    student_file["left_or_right"] = left_or_right
-    student_file["total"] = len(analysis.files)
-    student_file["index"] = analysis.files.index(file)
-    student_file["an"] = analysis
+    student_file = {"file":file}
+    student_file.update({"q":question})
+    student_file.update({"corpus":qcorpus})
+    student_file.update({"anaq":anaq})
+    student_file.update({"sumq":sumq})
+    student_file.update({"left_or_right":left_or_right})
+    student_file.update({"total":len(analysis["files"])})
+    student_file.update({"index":analysis["files"].index(file)})
+    student_file.update({"an":analysis})
 
     fullcorpus = None
-    t = nlp.TeachingData()
 
-    for q in file.questions:
+    for q in file["questions"]:
         qcorpus = load_corpus(file,q)
         if fullcorpus is None:
             fullcorpus = qcorpus
@@ -418,22 +462,9 @@ def build_student_file(analysis_id,file,question,left_or_right):
             for doc in qcorpus.docs:
                 fullcorpus.add_text(doc.text, doc.metadata)
 
-    chars,totalwords,unique_words,totalsents,lexicaldiversity,lexicaldensity,smog,gunning,flesch_ease,fk = t.summarisetcorpus(fullcorpus)
+    chars,totalwords,unique_words,totalsents,lexicaldiversity,lexicaldensity,smog,gunning,flesch_ease,fk = nlp.summarisetcorpus(fullcorpus)
     student_file["full_corpus"] = {"Characters":chars,"Words":totalwords,"Unique":unique_words,"Sentences":totalsents,"TTR":lexicaldiversity,"LD":lexicaldensity,"SMOG":smog,"Gunning":gunning,"Flesch":flesch_ease,"FK":fk}
     return student_file
-
-@app.route('/loadStudentFile', methods = ['POST'])
-def load_student_file():
-    analysis_id = request.form.get('analysis_id')
-    file_id = request.form.get('file_id')
-    left_or_right = request.form.get('left_or_right')
-
-    file = File.objects.get(id=file_id)
-    question = match_question(file,1)
-    student_file = build_student_file(analysis_id,file,question,left_or_right)
-
-    return render_template('studentFile.html',
-                           student_file=student_file)
 
 @app.route('/get_chart_data', methods = ['GET'])
 def get_chart_data():
@@ -478,22 +509,46 @@ def save_theme():
 @app.route('/analyse/<analysis_id>', methods = ['GET'])
 def analyse(analysis_id=None):
     if not current_user.is_anonymous:
-        an = None
+        student_files = []
+        question_numbers = []
+        if not analysis_id is None:
+            analysis = Analysis.objects.get(id=analysis_id)
+            analysis.lastrun = datetime.datetime.now
+            analysis.save()
+            student_files = []
+
+            if not analysis['laststate'] is None:
+                return redirect(analysis['laststate'])
+            else:
+                for idx in range(0,2):
+                    if len(analysis.files) > idx:
+                        file_id = analysis.files[idx]["id"]
+                        student_files.append(file_id)
+                        question_numbers.append(1)
+
+        return redirect(url_for('analyse_files',analysis_id=analysis_id,file_ids=student_files,question_numbers=question_numbers))
+    else:
+        return redirect(url_for('control_panel'))
+
+@app.route('/analyse/<analysis_id>/<list:file_ids>/<list:question_numbers>', methods=['GET'])
+def analyse_files(analysis_id=None,file_ids=None,question_numbers=None):
+    if not current_user.is_anonymous:
+        analysis = None
         student_files = []
         if not analysis_id is None:
-            an = Analysis.objects.get(id=analysis_id)
-
-            for idx in range(0,2):
-                if len(an.files) > idx:
+            analysis = Analysis.objects.get(id=analysis_id)
+            analysis['laststate'] = request.path
+            analysis.save()
+            if not file_ids is None:
+                for idx,file_id in enumerate(file_ids):
                     left_or_right = "sLeft" if idx == 0 else "sRight"
-                    file_id = an.files[idx]["id"]
                     file = File.objects.get(id=file_id)
-                    question = match_question(file,1)
+                    question = match_question(file,question_numbers[idx])
                     student_file = build_student_file(analysis_id,file,question,left_or_right)
                     student_files.append(student_file)
 
-            if an.refcorpus:
-                for r in an.refcorpus:
+            if analysis['refcorpus']:
+                for r in analysis['refcorpus']:
                     tcorpus = load_tcorpus(r)
                     t_kwords,t_bgs,warning,means = ana_t(tcorpus)
                     r.t_kwords = t_kwords
@@ -502,18 +557,12 @@ def analyse(analysis_id=None):
 
         return render_template('analyse.html',
                                user=current_user,
-                               an=an,
+                               an=analysis,
                                analysis_id=analysis_id,
                                student_files=student_files
                                )
     else:
-        return redirect(url_for('index'))
-
-#@app.route('/visualise')
-#@app.route('/visualise/<question>')
-#@app.route('/visualise/<question>/<ngic>')
-#def visualise(question=None, ngic=None):
-#     return render_template('visualise.html', question=question, ngic=ngic)
+        return redirect(url_for('control_panel'))
 
 @app.route('/charts/<chartdata>/<charttype>')
 def charts(chartdata=None, charttype=None):
@@ -568,7 +617,6 @@ def get_kwic():
     analysis_id = request.form.get("analysis_id")
     myword = request.form.get("myword")
     an = Analysis.objects.get(id=analysis_id)
-
     if an.refcorpus:
         for r in an.refcorpus:
             tcorpus = load_tcorpus(r)
@@ -709,27 +757,22 @@ def delete_blist():
     return "Success"
 
 def load_corpus(file,question):
-    s = nlp.SAQData()
-    path = os.path.join(app.config['CORPUS_FOLDER'],str(file.id),str(question.qNum))
-    qcorpus = s.loadcorpus(path,question)
+    path = os.path.join(app.config['CORPUS_FOLDER'],str(file["id"]),str(question["qNum"]))
+    qcorpus = nlp.loadcorpus(path,question)
     return qcorpus
 
 def load_tcorpus(ref):
-    t = nlp.TeachingData()
     filename = ref.filename.rsplit('.', 1)[0]
     path = os.path.join(app.config['CORPUS_FOLDER'],str(ref.id),filename)
-    tcorpus = t.loadcorpus(path,filename)
+    tcorpus = nlp.loadtcorpus(path,filename)
     return tcorpus
 
-def sum_q(qcorpus,modelanswer):
+def sum_q(qcorpus,reference_answer):
     #summarise responses by length and extract key summary stats
-    s = nlp.SAQData()
-    ws = s.get_worksheet(qcorpus.docs,modelanswer)
-    means = s.get_means(ws)
-    qcount = len(ws)
-    chartdata = get_chartdata(ws)
-    hist, values = numpy.histogram(ws["Sentences"].values)
-    return dict(qcount=qcount,means=means,chartdata=chartdata,sents=hist.tolist())
+    means, docframe = nlp.get_means(qcorpus, reference_answer)
+    qcount = len(qcorpus.docs)
+    chartdata = get_chartdata(docframe)
+    return dict(qcount=qcount,means=means,chartdata=chartdata)
 
 def create_chart(wsdata, chartdata, ws_key):
     obj = {}
@@ -750,7 +793,7 @@ def create_chart(wsdata, chartdata, ws_key):
 
     elif isinstance(maxval,(numpy.float64, numpy.float)):
         binwidth = (maxval-minval)/10
-        bins=numpy.arange(minval, maxval + binwidth, binwidth)
+        bins = numpy.arange(minval, maxval + binwidth, binwidth)
         if not binwidth == 0:
             hist, values = numpy.histogram(wsdata[ws_key].values, bins=bins)
 
@@ -766,54 +809,53 @@ def get_chartdata(wsdata):
     chartdata = create_chart(wsdata,chartdata,"TTR")
     chartdata = create_chart(wsdata,chartdata,"LD")
     chartdata = create_chart(wsdata,chartdata,"SMOG")
+    chartdata = create_chart(wsdata,chartdata,"Gunning")
+    chartdata = create_chart(wsdata,chartdata,"Flesch")
+    chartdata = create_chart(wsdata,chartdata,"FK")
     chartdata = create_chart(wsdata,chartdata,"Similarity")
     return chartdata
 
 def ana_q(qcorpus,q):
-    s = nlp.SAQData()
-    top_kwords, top_bgs, warning = s.analyseqcorpus(qcorpus,q)
+    top_kwords, top_bgs, warning = nlp.analyseqcorpus(qcorpus,q)
     return {"top_kwords":top_kwords, "top_bgs":top_bgs, "warning":warning}
 
 def ana_t(tcorpus):
-    t = nlp.TeachingData()
-    chars,words,unique_words,sentences,ttr,ld,smog,gunning,flesch_ease,fk = t.summarisetcorpus(tcorpus)
+    chars,words,unique_words,sentences,ttr,ld,smog,gunning,flesch_ease,fk = nlp.summarisetcorpus(tcorpus)
     means = {"Characters":chars,"Words":words,"Unique":unique_words,"Sentences":sentences,"TTR":ttr,"LD":ld,"SMOG":smog,"Gunning":gunning,"Flesch":flesch_ease,"FK":fk}
-    top_kwords,top_bgs,warning = t.analysetcorpus(tcorpus,default_settings())
+    top_kwords,top_bgs,warning = nlp.analysetcorpus(tcorpus,default_settings())
     return top_kwords,top_bgs,warning,means
 
 def return_kwic(corpus, myword):
-    s = nlp.SAQData()
-    return s.kwicbyq(corpus,myword)
+    return nlp.kwicbyq(corpus,myword)
 
 #API methods
 @app.route('/datatables/<file_id>/<question_number>', methods=['GET'])
 @app.route('/datatables/<file_id>/<question_number>/<search>', methods=['GET'])
 def get_datatables(file_id, question_number, search=None):
-    s = nlp.SAQData()
     file = File.objects.get(id=file_id)
     question = match_question(file,question_number)
     qcorpus = load_corpus(file,question)
     if search:
-        qcorpus = qcorpus.get(lambda x: bool(re.search(r'\b%s\b' % search,x.text)))
-    else:
-        qcorpus = qcorpus.docs
+        docs = qcorpus.get(lambda x: bool(re.search(r'\b%s\b' % search.lower(),x.text.lower())))
+        qcorpus = nlp.blank_corpus()
+        for doc in docs:
+            qcorpus.add_text(doc.text, doc.metadata)
 
-    ws = s.get_worksheet(qcorpus,question['qSettings']['modelanswer'],search)
+    ws = nlp.get_worksheet(qcorpus,question['qSettings']['modelanswer'],search)
     return ws.to_json(orient='table')
 
 @app.route('/similarity/<file_id>/<question_number>/', methods=['POST'])
 def similarity(file_id, question_number):
     reference_answer = request.form.get('reference_answer')
-    s = nlp.SAQData()
     file = File.objects.get(id=file_id)
     question = match_question(file,question_number)
     question["qSettings"]["modelanswer"] = reference_answer
     question.save()
     qcorpus = load_corpus(file,question)
-    qcorpus = qcorpus.docs
-    ws = s.get_worksheet(qcorpus,reference_answer,None)
+    qcorpus = qcorpus
+    means, ws = nlp.get_means(qcorpus,reference_answer)
     chartdata = get_chartdata(ws)
-    sumq = { "chartdata":chartdata, "ws":ws.to_json(orient='table') }
+    sumq = { "chartdata":chartdata,"ws":ws.to_json(orient='table') }
     return json.dumps(sumq)
 
 @app.route('/reference_answer/<file_id>/<question_number>', methods=['POST'])
@@ -822,9 +864,32 @@ def reference_answer(file_id, question_number):
     file = File.objects.get(id=file_id)
     question = match_question(file,question_number)
     if reference_answer:
-        if question.referenceAnswers:
-            question.referenceAnswers.append(reference_answer)
+        if question['referenceAnswers']:
+            question['referenceAnswers'].append(reference_answer)
         else:
-            question.referenceAnswers = [reference_answer]
+            question['referenceAnswers'] = [reference_answer]
         question.save()
     return "Success"
+
+@app.route('/report/<analysis_id>/<file_id>/<question_number>', methods=['GET'])
+def report(analysis_id=None,file_id=None,question_number=None):
+    report = {}
+    if not analysis_id is None:
+        analysis = Analysis.objects.get(id=analysis_id)
+        if not file_id is None:
+            file = File.objects.get(id=file_id)
+            if not question_number is None:
+                question = match_question(file,question_number)
+                qcorpus = load_corpus(file,question)
+
+                categories = []
+                for category in question["categories"]:
+                    c = {category:[]}
+
+                    for doc in qcorpus.get(lambda x: category in x.metadata['categories'],5):
+                        c[category].append(doc.text)
+
+                    categories.append(c)
+
+                report = {"categories":categories,"question_text":question["qText"],"question_title":question["qTitle"]}
+    return json.dumps(report)

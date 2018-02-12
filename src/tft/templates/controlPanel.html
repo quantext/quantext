@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if current_user.is_authenticated %}
+
+    <style>
+        .container-fluid{ margin-left:3.5rem!important;padding-top:1rem; }
+    </style>
+
+<ul class="notifications"></ul>
+
+<div class="row below m-0 corpora_panel panel_left">
+    <div class="scroll_inside" data-simplebar>
+        <h1 class="top_title pl-4 pt-4 mb-0" style="display:flex;justify-content: space-between;width:100%">
+            Manage files
+            <div class="index-font close_corpora_panel"></div>
+        </h1>
+        <div class="pt-4 pl-4 pr-4 pb-0 centerFlex">
+            <button class="btn btn-quantext dark centerFlex mr-3 quick_upload_student_file" id="uploadFile">Upload student file <span class="quantext-upload index-font ml-1"></span></button>
+            <button class="btn btn-quantext dark centerFlex quick_upload_refcorpus" id="uploadRef">Upload reference material <span class="quantext-upload index-font ml-1"></span></button>
+        </div>
+        <div class="inner_corpora w-100">
+            <div class="centerFlex" style="justify-content: space-between">
+                <h5 id="file_header" class="centerFlex pl-4 pr-4 pt-4 mb-0">Student files (<span class="student_files">{{ files|length }}</span>)</h5>
+                <h5 id="switch_files" class="centerFlex pl-4 pr-4 pt-4 mb-0" style="color: #57b0c2;text-decoration: underline;cursor: pointer;">Reference materials (<span class="reference_files">{{ refcorpora|length }}</span>)</h5>
+            </div>
+            <ul id="files_list" class="list-group mt-2 pl-4 pr-4">
+                {% for f in files %}
+                    {% include 'partials/student_file_li.html' %}
+                {% endfor %}
+            </ul>
+            <ul id="refcorpus_list" class="list-group mt-2 pl-4 pr-4" style="display:none">
+                {% for r in refcorpora %}
+                    {% include 'partials/reference_material_li.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="quantext_sidebar">
+        <div class="sidebar-div">
+            <div class="inner-icon quantext-chunky-duck"></div>
+            <div class="inner-text">
+                <a href="{{ url_for('index') }}"><div>Home</div></a>
+                <a href="{{ url_for('control_panel') }}"><div>Control panel</div></a>
+                <a href="{{ url_for('documentation') }}"><div>Documentation</div></a>
+                <a href="{{ url_for('development') }}"><div>Development journal</div></a>
+                <a href="{{ url_for('contact') }}"><div>Contact</div></a>
+                <a href="{{ url_for('logout') }}"><div>Logout</div></a>
+            </div>
+        </div>
+
+        <div class="sidebar-div">
+            <div class="inner-icon quantext-file"></div>
+            <div class="inner-text">
+                <div id="manageFiles">Manage files</div>
+                <div class="quick_upload_student_file">Quick upload student file (.xlsx)</div>
+                <div class="quick_upload_refcorpus">Quick upload reference materials (.pdf)</div>
+            </div>
+        </div>
+
+        <div class="sidebar-div">
+            <div class="inner-icon quantext-play"></div>
+            <div class="inner-text">
+                {% if lastrun_analysis %}
+                    <a class="run-analysis" href="{{ url_for('analyse', analysis_id=lastrun_analysis['id']) }}"><div>Rerun "{{ lastrun_analysis['name'] }}"</div></a>
+                {% else %}
+                <div>No previous analysis</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+        <div class="row pt-3">
+            <form id="questionUpload" class="form-inline" action = "{{ url_for('upload_file_qs') }}" method = "POST" enctype = "multipart/form-data">
+                <input id="student_file_input" type="file" name="file" style="display: none;" multiple>
+            </form>
+            <form id="corpusUpload" class="form-inline" action = "{{ url_for('upload_file_teach') }}" method = "POST" enctype = "multipart/form-data">
+                <input id="refcorpus_input" type="file" name="file" style="display: none;" multiple>
+            </form>
+            <div class="col-md-12 pl-4 pr-4 pb-4">
+                <h1 class="top_title">Welcome {{ current_user['nickname'] }}</h1>
+                <h4 class="top_title"><span class="student_files">{{ files|length }}</span> student files uploaded</h4>
+                <h4 class="top_title"><span class="reference_files">{{ refcorpora|length }}</span> reference materials uploaded</h4>
+            </div>
+            <div class="col-md-6 pl-4 pr-4 pb-4">
+                <h5 class="centerFlex mb-2">Past analyses ({{ analyses|length }})</h5>
+                <ul class="list-group">
+                    {% for a in analyses %}
+                        <li class="list-group-item m-0" style="border: none;padding: .5rem 0!important;border-bottom: 2px solid #eee!important">
+                            <div class="row w-100 centerFlex m-0">
+                                <div class="col-md-6 pl-0">
+                                    <span style="font-weight:500">{{ a['name'] }}</span>
+                                    <div class="col-md-12 p-0" style="color: #aaa;">
+                                        {{ a['files']|length }} student files | {{ a['refcorpus']|length }} reference materials
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="font-weight:500;text-align:right">{{ a['created'].strftime('%I:%M%p %d/%m/%Y') }}</div>
+                                <div class="col-md-2 pr-0" style="display:flex;justify-content: flex-end;margin-bottom: -.5rem;text-align: right;">
+                                    <a class="index-font mr-2 run-analysis" href="{{ url_for('analyse', analysis_id=a['id']) }}" title="Run this analysis">
+                                        <span class="quantext-play" style="font-size:2.5rem;color:#44c4b1;text-decoration:none;"></span>
+                                    </a>
+                                    <a href="#" class="index-font" title="Delete analysis">
+                                        <span class="quantext-delete deleteAnalysis deleteRed" data-id="{{ a['id'] }}" style="font-size:2.5rem;"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6 pl-4 pr-4 pb-4">
+                <h5 class="centerFlex mb-2">New analysis</h5>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <div class="input-group-addon btn-quantext dark">Name</div>
+                            <input type="text" class="form-control" id="analysisName" />
+                            <button class="btn btn-quantext green centerFlex" id="runAnalysis">Run this analysis <span class="quantext-play index-font ml-1"></span></button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 pt-4">
+                        <h3 class="pb-2" style="color:#999;font-weight:400"><span id="currFileCount">0</span> student files selected</h3>
+                        <h3 class="pb-2" style="color:#999;font-weight:400"><span id="currCorporaCount">0</span> reference materials selected</h3>
+                        <div id="addFiles">
+                            <div class="quantext-add"></div>
+                            <div style="font-weight:500;margin-top:-1.5rem">Add files</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script type="text/javascript">
+    var plan = "{{ current_user['plan'] }}";
+    var $notifications = $(".notifications");
+
+    function notify(text, error) {
+        var $notification;
+        if(error)
+            $notification = $('<li style="background:#EF2828" />').html(text).css({left: 320});
+        else
+            $notification = $('<li />').html(text).css({left: 320});
+        $notifications.append($notification);
+        $notification.animate({left: 0}, 300,function(){});
+        return $notification;
+    }
+
+    $('.run-analysis').on('click', function(){
+        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...",false);
+    });
+
+    $("#addFiles, #manageFiles").on("click", function(){
+        var $corpora_panel = $(".corpora_panel");
+        $corpora_panel.addClass("shown");
+    });
+
+    $(".close_corpora_panel").on("click", function(){
+        $(".corpora_panel").removeClass("shown");
+    });
+
+    $(".quick_upload_student_file").on("click", function(){
+        var student_files = "{{ files|length }}";
+        if(plan == "free" && parseInt(student_files) >= 2) {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your student file limit (2) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else if(plan == "hatchling" && parseInt(student_files) >= 5) {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your student file limit (5) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else
+            $("#student_file_input").click();
+    });
+
+    $(".quick_upload_refcorpus").on("click", function(){
+        var reference_files = "{{ refcorpora|length }}";
+        if(plan == "free" && parseInt(reference_files) >= 2) {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your reference material limit (2) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else if(plan == "hatchling" && parseInt(reference_files) >= 5) {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your reference material limit (5) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else
+            $("#refcorpus_input").click();
+    });
+
+    $(document).on('change', ':file', function() {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+
+        var studentFile = (input.attr("id") == "student_file_input");
+
+        var ext = input.val().match(/\.([^\.]+)$/);
+        if(ext) {
+            ext = ext[1];
+            if(studentFile) {
+                switch (ext) {
+                    case 'xls':
+                    case 'xlsx':
+                        input.trigger('fileselect', [numFiles, label, studentFile]);
+                        break;
+                    default:
+                        var $notification = notify("<span class='quantext-alert'></span> Sorry, student files must be of type .xls or .xlsx.",true);
+                        setTimeout(function(){
+                            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+                        },3000);
+                        input.val('');
+                }
+            }
+            else{
+                switch (ext) {
+                    case 'pdf':
+                        input.trigger('fileselect', [numFiles, label, studentFile]);
+                        break;
+                    default:
+                        var $notification = notify("<span class='quantext-alert'></span> Sorry, reference materials must be of type .pdf.",true);
+                        setTimeout(function(){
+                            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+                        },3000);
+                        input.val('');
+                }
+            }
+        } else {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, this type of file is not allowed.",true);
+            setTimeout(function(){
+                $notification.animate({left: 320}, 300,function(){$notification.remove()});
+            },3000);
+        }
+    });
+
+    $(':file').on('fileselect', function(event, numFiles, label, isStudentFile) {
+        var displayBar = "<div id='questionUploadProgress' class='progress' style='width:200px'>\n" +
+            "<div class='progress-bar progress-bar-striped progress-bar-animated w-100' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='background-color: #44c4b1;'></div>\n" +
+            "</div>";
+        var $notification = notify("Uploading file..."+displayBar,false);
+        var self = $(this);
+        var files = self[0].files;
+        var formData = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            formData.append('file',file,file.name);
+        }
+        if(isStudentFile){
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('upload_file_qs') }}",
+                data: formData,
+                success: function(data, textStatus, xhr) {
+                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
+                    if(xhr.status == 200)
+                    {
+                        var number_files = $("span.student_files:first").text();
+                        $("span.student_files").text(parseInt(number_files) + 1);
+                        $("#files_list").prepend(data);
+                        var $notify = notify("<span class='quantext-check'></span> File uploaded.",false);
+                        setTimeout(function(){
+                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
+                        },3000);
+                    }
+                    else
+                    {
+                        var $notify = notify("<span class='quantext-alert'></span> " + response,true);
+                        setTimeout(function(){
+                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
+
+                        },3000);
+                    }
+                },
+                error: function(response) {
+
+                },
+                processData: false,
+                contentType: false
+            });
+        }
+        else
+        {
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('upload_file_teach') }}",
+                data: formData,
+                success: function(data, textStatus, xhr) {
+                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
+                    if(xhr.status == 200)
+                    {
+                        var number_files = $("span.reference_files:first").text();
+                        $("span.reference_files").text(parseInt(number_files) + 1);
+                        $("#refcorpus_list").prepend(data);
+                        var $notify = notify("<span class='quantext-check'></span> File uploaded.",false);
+                        setTimeout(function(){
+                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
+                        },3000);
+                    }
+                    else
+                    {
+                        var $notify = notify("<span class='quantext-alert'></span> " + response,true);
+                        setTimeout(function(){
+                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
+                        },3000);
+                    }
+                },
+                error: function(response) {
+
+                },
+                processData: false,
+                contentType: false
+            });
+        }
+    });
+
+    $(document).on('click', '.student_file', function(){
+        $("#currFileCount").text($("input.student_file:checked").length);
+    });
+
+    $(document).on('click', '.ref_file', function(){
+        $("#currCorporaCount").text($("input.ref_file:checked").length);
+    });
+
+    $("#analysisName").on("keyup", function(e){
+        if(e.keyCode == 13)
+            $("#runAnalysis").click();
+    });
+
+    $("#runAnalysis").on('click', function() {
+        var analyses = "{{ analyses|length }}";
+        if (plan == "free" && parseInt(analyses) >= 1)
+        {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached the analysis limit (1) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else if (plan == "hatchling" && parseInt(analyses) >= 5)
+        {
+            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached the analysis limit (5) for this plan.", true);
+            setTimeout(function () {
+                $notification.animate({left: 320}, 300, function () {
+                    $notification.remove()
+                });
+            }, 3000);
+        }
+        else
+        {
+            var name = $("#analysisName").val();
+            var hasFiles = false;
+            var hasCorpus = false;
+
+            if (name != "") {
+                var data = [];
+                $("input.student_file:checked").each(function (i, e) {
+                    data.push($(e).data("id"));
+                });
+                if (data.length > 0) hasFiles = true;
+                var files = data.join(',');
+                data = [];
+
+                $("input.ref_file:checked").each(function (i, e) {
+                    data.push($(e).data("id"));
+                });
+                if (data.length > 0) hasCorpus = true;
+                var refcorpus = data.join(',');
+
+                var url = "{{ url_for('new_analysis') }}";
+
+                if (hasFiles) {
+                    var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...",false);
+                    $.post(url, {files: files, name: name, refcorpus: refcorpus}, function (response) {
+                        window.location = "{{ url_for('analyse') }}" + response;
+                    });
+                }
+                else {
+                    var $notification = notify("<span class='quantext-alert'></span> Please select at least one student file to analyse...", true);
+                    setTimeout(function () {
+                        $notification.animate({left: 320}, 300, function () {
+                            $notification.remove()
+                        });
+                    }, 3000);
+                }
+            }
+            else {
+                var $notification = notify("<span class='quantext-alert'></span> Please enter a name...", true);
+                setTimeout(function () {
+                    $notification.animate({left: 320}, 300, function () {
+                        $notification.remove()
+                    });
+                }, 3000);
+            }
+        }
+    });
+
+    $(document).on("click",".deleteAnalysis", function(){
+        var self = $(this);
+        var id = self.data("id");
+        $.post("{{ url_for('delete_analysis') }}", {id:id}, function(){
+            window.location.reload();
+        });
+    });
+
+    $(document).on("click", ".deleteFile", function(){
+        var self = $(this);
+        var id = self.data("id");
+        $.post("{{ url_for('delete_file') }}", {id:id}, function(){
+            window.location.reload();
+        });
+    });
+
+    $(document).on("click", ".deleteReference", function(){
+        var self = $(this);
+        var id = self.data("id");
+        $.post("{{ url_for('delete_reference') }}", {id:id}, function(){
+            window.location.reload();
+        });
+    });
+
+    $("#switch_files").on("click", function(){
+        if($("#files_list").is(":visible")){
+            $("#files_list").hide();
+            $("#refcorpus_list").show();
+        } else {
+            $("#files_list").show();
+            $("#refcorpus_list").hide();
+        }
+        var file_header = $("#file_header").text();
+        var switch_files = $("#switch_files").text();
+        $("#file_header").text(switch_files);
+        $("#switch_files").text(file_header);
+    });
+
+</script>
+
+    {% else %}
+    <div class="pt-4">
+        <div style="text-align:center">
+            <img src="/static/img/quantext_duck_v4.svg" style="height:200px;max-width:100%" /><br/>
+            <br/>
+            <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='twitter') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Twitter <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div><br/>
+            <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='google') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Google <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div>
+
+        </div>
+        You have to log in for that first.
+
+        {% include 'footer.html' %}
+
+    </div>
+    {% endif %}
+
+{% endblock %}
+

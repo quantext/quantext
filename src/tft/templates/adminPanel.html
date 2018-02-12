@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include 'nav.html' %}
+
+<div class="pt-4">
+    <div class="row pl-5 pr-5">
+        <div class="col-md-12 pl-0 pr-0">
+            <h1 class="top_title">Admin panel</h1>
+        </div>
+        <div class="col-md-12 pl-0 pr-0">
+            <h5 class="mt-4">Users ({{ users|length }})</h5>
+            {% for user in users %}
+                <div class="adminPanel">
+                    <span style="width:33%;text-align:left">
+                        <span style="font-weight:600">{{ user['user']['nickname'] }}</span><br/>
+                        {{ user['analyses']|length }} analyses
+                        {% if user['analyses']|length > 0 %}
+                            | Last analysis run {{ user['analyses'][0]['lastrun'].strftime('%d/%m/%Y') }}
+                        {% endif %}
+                    </span>
+                    <span style="width:33%;text-align:center"><a href="mailto:{{ user['user']['email'] }}">{{ user['user']['email'] }}</a></span>
+                    <span class="{{ user['user']['plan'] }}_plan" style="width:33%;text-align:right">
+                        {{ user['user']['plan'] }} plan
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</div>
+
+{% endblock %}
+

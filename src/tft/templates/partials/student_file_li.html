@@ -1,0 +1,22 @@
+<li class="list-group-item" style="border:none;padding: .5rem 0!important;border-bottom: 2px solid #eee!important;margin: 0;">
+    <input id="checkbox_{{ f['id'] }}" class="student_file" type="checkbox" data-id="{{ f['id'] }}" data-filename="{{ f['filename'] }}" />
+    <div class="w-100">
+        <div class="row w-100 centerFlex m-0">
+            <div class="col-md-6 p-0" style="text-overflow: ellipsis;overflow: hidden;">
+                <span style="font-weight:500">{{ f['filename'] }}</span>
+                <div class="col-md-12 p-0" style="color: #aaa;">
+                    {{ f['questions']|length }} questions
+                </div>
+            </div>
+            <div class="col-md-4 pr-0" style="font-weight:500;text-align:right">{{ f['created'].strftime('%d/%m/%Y') }}</div>
+            <div class="col-md-2 p-0" style="display:flex;justify-content: flex-end;margin-bottom: -.5rem;">
+                <label for="checkbox_{{ f['id'] }}" style="margin-bottom: 0;">
+                    <span class="file_checkbox"></span>
+                </label>
+                <a href="#" class="index-font">
+                    <span class="quantext-delete deleteRed deleteFile" data-id="{{ f['id'] }}" style="font-size:2.5rem;"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</li>

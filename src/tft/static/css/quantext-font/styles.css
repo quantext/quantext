@@ -152,3 +152,33 @@
 .quantext-star:before {
   content: "\4c";
 }
+.quantext-side-by-side:before {
+  content: "\4d";
+}
+.quantext-top-and-bottom:before {
+  content: "\4e";
+}
+.quantext-graduate:before {
+  content: "\4f";
+}
+.quantext-chunky-duck:before {
+  content: "\50";
+}
+.quantext-circle-half-left:before {
+  content: "\51";
+}
+.quantext-circle-half-right:before {
+  content: "\52";
+}
+.quantext-circle-full:before {
+  content: "\53";
+}
+.quantext-report:before {
+  content: "\54";
+}
+.quantext-alert:before {
+  content: "\55";
+}
+.quantext-check-full:before {
+  content: "\56";
+}

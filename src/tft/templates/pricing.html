@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include 'nav.html' %}
+
+<div class="pt-4">
+    <div class="row mt-5 pl-5 pr-5">
+        <div class="col-md-12 pl-0 pr-0">
+            <h1 class="top_title">Pricing</h1>
+        </div>
+        <div class="col-md-4">
+            <div class="centerFlex" style="flex-flow: column;">
+                <img src="/static/img/quantext_egg.svg" style="height:200px;max-width:100%">
+                <h2>Egg tier</h2>
+                <table width="100%" style="margin-top: 2rem;">
+                    <tbody>
+                        <tr>
+                            <td class="pricing_left">Price</td>
+                            <td class="pricing_right">Free</td>
+                        </tr>
+                        <tr>
+                            <td class="pricing_left">Student file limits</td>
+                            <td class="pricing_right">2 active files at a time</td>
+                        </tr>
+                        <tr>
+                            <td class="pricing_left">Reference material limits</td>
+                            <td class="pricing_right">2 active files at a time</td>
+                        </tr>
+                        <tr>
+                            <td class="pricing_left">Analysis limits</td>
+                            <td class="pricing_right">1 active analysis at a time</td>
+                        </tr>
+                        <tr>
+                            <td class="pricing_left">Export options</td>
+                            <td class="pricing_right">.pdf only</td>
+                        </tr>
+                        <tr>
+                            <td class="pricing_left">Reporting</td>
+                            <td class="pricing_right">Standard options only</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="centerFlex" style="flex-flow: column;">
+                <img src="/static/img/quantext_hatchling.svg" style="height:200px;max-width:100%">
+                <h2>Hatchling tier</h2>
+                <table width="100%" style="margin-top: 2rem;">
+                    <tbody>
+                    <tr>
+                        <td class="pricing_left">Price</td>
+                        <td class="pricing_right">$7/month</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Student file limits</td>
+                        <td class="pricing_right">5 active files at a time</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Reference material limits</td>
+                        <td class="pricing_right">5 active files at a time</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Analysis limits</td>
+                        <td class="pricing_right">5 active analyses at a time</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Export options</td>
+                        <td class="pricing_right">.pdf, .xlsx</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Reporting</td>
+                        <td class="pricing_right">Customisable reporting options</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Additional themes</td>
+                        <td class="pricing_right">Harlequin, Ruddy Duck</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="centerFlex" style="flex-flow: column;">
+                <img src="/static/img/quantext_full_flight.svg" style="height:200px;max-width:100%">
+                <h2>Full flight tier</h2>
+                <table width="100%" style="margin-top: 2rem;">
+                    <tbody>
+                    <tr>
+                        <td class="pricing_left">Price</td>
+                        <td class="pricing_right">$25/month</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Student file limits</td>
+                        <td class="pricing_right">Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Reference material limits</td>
+                        <td class="pricing_right">Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Analysis limits</td>
+                        <td class="pricing_right">Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Export options</td>
+                        <td class="pricing_right">.pdf, .xlsx</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Reporting</td>
+                        <td class="pricing_right">Customisable reporting options</td>
+                    </tr>
+                    <tr>
+                        <td class="pricing_left">Additional themes</td>
+                        <td class="pricing_right">Harlequin, Ruddy Duck, Darkwing, Rubber Ducky, Mighty I, Mighty II</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</div>
+
+{% endblock %}
+

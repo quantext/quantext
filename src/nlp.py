@@ -15,7 +15,6 @@
 ###    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import collections
 import pandas as pd
 import textacy
 
@@ -26,223 +25,256 @@ from tft import app
 #Following paths for standalone tests. Replace with ... in app
 #DATAPATH = '../../SampleData/'
 #CORPUSPATH = './TestData/'
-#
 
-class SAQData:
-    """Instance of Short-Answer Question Data required for each data file
-    Ultimately, want to be able to compare and contrast by student, by course etc. For now, embryonic prototype => focus on SAQ and TeachingData"""
+def blank_corpus():
+    return textacy.Corpus("en")
 
-    def __init__(self):
-        print('init SAQ Data ...')
+def getdata_sample(datafname):
+    #file upload here - should deal with filetypes etc
+    #for now just deal with one type and hang the consequences...
+    data = pd.ExcelFile(os.path.join(app.config['FILES_FOLDER'],datafname),encoding='utf-8')
+    return data
 
-    def getdata_sample(self, datafname):
-        #file upload here - should deal with filetypes etc
-        #for now just deal with one type and hang the consequences...
-        data = pd.ExcelFile(os.path.join(app.config['FILES_FOLDER'],datafname))
-        return data
+def getdata(datafname):
+    #file upload here - should deal with filetypes etc
+    #for now just deal with one type and hang the consequences...
+    data = pd.ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'],datafname),encoding='utf-8')
+    return data
 
-    def getdata(self, datafname):
-        #file upload here - should deal with filetypes etc
-        #for now just deal with one type and hang the consequences...
-        data = pd.ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'],datafname))
-        return data
+def parsedata(data):
+    #identify questions and responses
+    #clean data - should also do the unicode sandwich thing...
 
-    def parsedata(self, data):
-        #identify questions and responses
-        #clean data - should also do the unicode sandwich thing...
+    print('parsing data file ...')
+    rdata = {} # initialise dict for responses
+    qdata = data.parse('qIndex', header=None) #Must be one sheet in excel file called qIndex with two columns question id and question, or 3 columns question id, question and reference answer
+    rows, columns = qdata.shape
 
-        print('parsing data file ...')
-        rdata = {} # initialise dict for responses
-        qdata = data.parse('qIndex', header=None) #Must be one sheet in excel file called qIndex with two columns question id and question
+    if columns == 2:
+        subset = qdata[[0,1]]
+    else:
+        subset = qdata[[0,1,2]]
+    qdata = [tuple(x) for x in subset.values]
+    #populate response dictionary question id is the key - responses should be on separate sheets named by question id
+    for key,*v in qdata:
+        if key != 'qIndex':
+            key = str(key)
+            d = data.parse(key, header = None,dtype='object')
+            rdata.update({key:d})
+            rdata[key].rename(columns = {0:"Response",1:"ID",2:"PostID",3:"ParentID"}, inplace = True)
+            rdata[key] = rdata[key][rdata[key]["Response"].notnull()]
 
-        qdata = collections.OrderedDict(zip(map(str,qdata[0]), qdata[1]))
-        #populate response dictionary question id is the key - responses should be on separate sheets named by question id
-        for key in qdata:
-            if key != 'qIndex':
-                rdata.update({key:data.parse(key, header = None, )})
-                rdata[key].rename(columns = {0:"Response",1:"ID"}, inplace = True)
-                rdata[key].dropna(inplace = True) #drop any na values
+    return qdata, rdata
 
-        return qdata, rdata
+def getandparsedata_sample(datafname):
+    data = getdata_sample(datafname)
+    return parsedata(data)
 
-    def getandparsedata_sample(self, datafname):
-        data = self.getdata_sample(datafname)
-        return self.parsedata(data)
+def getandparsedata(datafname):
+    data = getdata(datafname)
+    return parsedata(data)
 
-    def getandparsedata(self, datafname):
-        data = self.getdata(datafname)
-        return self.parsedata(data)
+def createqcorpus(q):
+    data = [tuple(x) for x in q.values]
+    qcorpus = textacy.Corpus("en") #initialise corpus for question
 
-    def createqcorpus(self, q):
-        #Want to do this once only for each question since time intensive - when have db - should serialise etc..
-        responses = q["Response"]
-        ids = q["ID"]
+    for r,*items in data:
+        response = " ".join(r.split())
+        if len(items) == 1:
+            qcorpus.add_text(response, metadata={"ID":str(items[0]),"categories":[], "notes":""})
+        elif len(items) == 2:
+            qcorpus.add_text(response, metadata={"ID":str(items[0]),"PostID":str(items[1]),"categories":[], "notes":""})
+        elif len(items) == 3:
+            qcorpus.add_text(response, metadata={"ID":str(items[0]),"PostID":str(items[1]),"ParentID":str(items[2]),"categories":[], "notes":""})
 
-        data = zip(responses,ids)
-        qcorpus = textacy.Corpus("en") #initialise corpus for question
+    return qcorpus
 
-        for response,ids in data:
-            qcorpus.add_text(response, metadata={"ID":str(ids), "categories":[], "notes":""})
+def loadcorpus(path, q):
+    qcorpus = textacy.Corpus.load(path,name=str(q.qNum),compression='gzip')
+    return qcorpus
 
-        return qcorpus
+def get_worksheet(corpus, reference_answer, search=None):
+    ref_doc = textacy.Doc(reference_answer,lang='en')
+    worksheetlist = []
 
-    def loadcorpus(self, path, q):
-        qcorpus = textacy.Corpus.load(path,name=str(q.qNum),compression='gzip')
-        return qcorpus
-
-    def get_worksheet(self, docs, reference_answer, search=None):
-        #produce summary data for specified question
-        s = textacy.Doc(reference_answer,lang='en')
-        worksheetlist = []
-        for doc in docs:
+    for doc in corpus.docs:
+        if "PostID" in doc.metadata and doc.metadata["PostID"] != "":
+            newdict = {'StudentID':doc.metadata["PostID"]}
+            newdict.update({'DT_RowId':doc.metadata["PostID"]})
+        else:
             newdict = {'StudentID':doc.metadata["ID"]}
-            newdict.update({'Full_response':doc.text})
-            if search is None:
-                newdict.update({'Response':doc.text})
-            else:
-                newdict.update({'Response':list(textacy.text_utils.KWIC(doc.text,keyword=search,print_only=False))})
+            newdict.update({'DT_RowId':doc.metadata["ID"]})
 
-            newdict.update({'Category':','.join(doc.metadata["categories"])})
-            newdict.update({'Notes':"" if "notes" not in doc.metadata else doc.metadata["notes"]})
+        newdict.update({'Full_response':doc.text})
+        if search is None:
+            newdict.update({'Response':doc.text})
+        else:
+            newdict.update({'Response':list(textacy.text_utils.KWIC(doc.text,keyword=search,print_only=False))})
 
-            words = nlp.get_words(doc)
-            n_words = len(words)
-            n_unique_words = len({word.lower for word in words})
-            n_polysyllable_words = nlp.count_syllables(words)[1]
-            n_sents = doc.n_sents if n_words > 0 else 0
+        newdict.update({'Category':','.join(doc.metadata["categories"])})
+        newdict.update({'Notes':"" if "notes" not in doc.metadata else doc.metadata["notes"]})
+        if "PostID" in doc.metadata and doc.metadata["PostID"] != "":
+            newdict.update({'PostID':doc.metadata["PostID"]})
+            children = corpus.get(lambda d: d.metadata["ParentID"] == doc.metadata["PostID"])
+            kids = []
+            for c in children:
+                kids.append({'text':c.text,'ID':c.metadata["PostID"]})
+            newdict.update({'children':kids})
+        else:
+            newdict.update({'PostID':""})
+            newdict.update({'children':""})
 
-            newdict.update({'Words':n_words})
-            newdict.update({'Sentences':n_sents})
-            content_words = nlp.content_words_in_response(doc.pos_tagged_text)
-            if n_words !=0:
-                newdict.update({'TTR':nlp.ttr(n_unique_words,n_words)})
-                newdict.update({'LD':nlp.lexical_density(content_words,n_words)})
-            else:
-                newdict.update({'TTR':0}) #this was None, now 0
-                newdict.update({'LD':0}) #this was None, now 0
-            if n_sents != 0:
-                newdict.update({'SMOG':nlp.smog(n_polysyllable_words,n_sents)}) #Simple Measure of Gobbledygook - best for 30+ word responses
-            else:
-                newdict.update({'SMOG':0}) #this was None, now 0
+        newdict.update({'ParentID':"" if "ParentID" not in doc.metadata else doc.metadata["ParentID"]})
 
-            newdict.update({'Similarity':textacy.similarity.word2vec(s,doc)})
-            worksheetlist.append(newdict)
+        words = nlp.get_words(doc)
+        n_words = len(words)
+        n_sents = doc.n_sents if n_words > 0 else 0
+        newdict.update({'Words':n_words})
+        newdict.update({'Sentences':n_sents})
+        newdict.update({'Similarity':textacy.similarity.word2vec(ref_doc,doc)})
+        worksheetlist.append(newdict)
 
-        #convert list of dictionaries to pandas dataframe
-        worksheet = pd.DataFrame.from_dict(worksheetlist)
-        worksheet.sort_values(by = 'Words', ascending=True)
-        worksheet = worksheet.round({'LD':2,'TTR':2,'SMOG':2,'Similarity':2})
-        return worksheet
+    #convert list of dictionaries to pandas dataframe
+    worksheet = pd.DataFrame.from_dict(worksheetlist)
+    worksheet.sort_values(by = 'Words', ascending=True)
+    worksheet = worksheet.round({'LD':2,'TTR':2,'SMOG':2,'Similarity':2})
+    return worksheet
 
-    def get_means(self, worksheet):
-        means = {}
-        means["Words"] =  "{0:.0f}".format(worksheet['Words'].mean())
-        means["Sentences"] = "{0:.0f}".format(worksheet['Sentences'].mean())
-        means["LD"] = "{0:.2f}".format(worksheet['LD'].mean())
-        means["TTR"] = "{0:.2f}".format(worksheet['TTR'].mean())
-        means["SMOG"] = "{0:.2f}".format(worksheet['SMOG'].mean())
-        return means
-
-    def analyseqcorpus(self, qcorpus, q):
-        #returns top_keywords,top_ngrams,warning
-        return nlp.analysecorpus(qcorpus,q)
-
-    def getcollocgraph(self,qcorpus,settings):
-        #returns json formatted d3 collocation graphdata
-        return nlp.buildcollocgraph(qcorpus,settings)
-
-    def kwicbyq(self,qcorpus,keyword):
-        return nlp.kwic(qcorpus,keyword)
-
-    def bigrambyq(self,qcorpus,keyword_phrase):
-        return nlp.kwic(qcorpus,keyword_phrase)
-
-###########################################################################################################################################################
-
-###########################################################################################################################################################
-
-class TeachingData:
-    """Instance of Teaching Data can handle multiple files thro' textacy.filio.read.read() - just need to implement UI to support multi-upload.
-    """
-
-    def __init__(self):
-
-        print('init teaching Data ...')
-
-        #self.corpus_root = 'tft/tmp/uploads/' #for pythonanywhere server
-        self.corpus_root = 'tmp/uploads/' #for local server
-        self.corpus_root_sample = 'tft/static/files/' #for local server
-
-    def createtcorpus_sample(self, filename, refId):
-        # just reading one text for now - use tcorpus.add_texts() when multifile upload implemented
-        tcorpus = textacy.Corpus("en")
-        text_to_add = textacy.fileio.read.read_file(self.corpus_root_sample + filename)
-        tcorpus.add_text(text_to_add)
-
-        origpath = os.path.join(app.config['CORPUS_FOLDER'],str(refId))
-        if not os.path.exists(origpath):
-            os.makedirs(origpath)
-
-        fname = filename.rsplit('.', 1)[0]
-        path = os.path.join(origpath,fname)
-        if not os.path.exists(path):
-            os.makedirs(path)
-        tcorpus.save(path,name=fname,compression="gzip")
-        return tcorpus
-
-    def createtcorpus(self, filename, refId):
-        # just reading one text for now - use tcorpus.add_texts() when multifile upload implemented
-        tcorpus = textacy.Corpus("en")
-        text_to_add = textacy.fileio.read.read_file(self.corpus_root + filename)
-        tcorpus.add_text(text_to_add)
-
-        origpath = os.path.join(app.config['CORPUS_FOLDER'],str(refId))
-        if not os.path.exists(origpath):
-            os.makedirs(origpath)
-
-        fname = filename.rsplit('.', 1)[0]
-        path = os.path.join(origpath,fname)
-        if not os.path.exists(path):
-            os.makedirs(path)
-        tcorpus.save(path,name=fname,compression="gzip")
-        return tcorpus
-
-    def loadcorpus(self, path, filename):
-        tcorpus = textacy.Corpus.load(path,name=filename,compression='gzip')
-        return tcorpus
-
-    def summarisetcorpus(self, tcorpus):
-        n_sents = 0
-        words = []
-        pos_tagged_text = []
-        for d in tcorpus.docs:
-            new_words = list(textacy.extract.words(d, filter_punct=True, filter_stops=False, filter_nums=False))
-            words.extend(new_words)
-            n_sents += d.n_sents
-            pos_tagged_text.extend(d.pos_tagged_text)
-
+def get_means(corpus, reference_answer):
+    ref_doc = textacy.Doc(reference_answer,lang='en')
+    doclist = []
+    for doc in corpus.docs:
+        words = nlp.get_words(doc)
+        n_words = len(words)
+        n_unique_words = len({word.lower for word in words})
         n_syllables, n_polysyllable_words = nlp.count_syllables(words)
-        totalsents = n_sents
-        totalwords = len(words)
-        unique_words = len({word.lower for word in words})
-        totalchars = sum(len(word) for word in words)
-        content_words = nlp.content_words_in_response(pos_tagged_text)
+        n_sents = doc.n_sents if n_words > 0 else 0
+        content_words = nlp.content_words_in_response(doc.pos_tagged_text)
 
-        lexicaldiversity = "{0:.2f}".format(nlp.ttr(unique_words,totalwords))
-        lexicaldensity = "{0:.2f}".format(nlp.lexical_density(content_words,totalwords))
-        smog = "{0:.2f}".format(nlp.smog(n_polysyllable_words,n_sents))
-        gunning = "{0:.2f}".format(nlp.gunning_fog(totalwords,n_sents,n_polysyllable_words))
-        flesch_ease = "{0:.2f}".format(nlp.flesch_ease(totalwords,n_syllables,n_sents))
-        fk = "{0:.2f}".format(nlp.flesch_kincaid(totalwords,n_syllables,n_sents))
+        newdict = {'Words':n_words}
+        newdict.update({'Sentences':n_sents})
+        if n_words !=0:
+            newdict.update({'TTR':nlp.ttr(n_unique_words,n_words)})
+            newdict.update({'LD':nlp.lexical_density(content_words,n_words)})
+        else:
+            newdict.update({'TTR':0}) #this was None, now 0
+            newdict.update({'LD':0}) #this was None, now 0
+        if n_sents != 0:
+            newdict.update({'SMOG':nlp.smog(n_polysyllable_words,n_sents)}) #Simple Measure of Gobbledygook - best for 30+ word responses
+            newdict.update({'Gunning':nlp.gunning_fog(n_words,n_sents,n_polysyllable_words)})
+            newdict.update({'Flesch':nlp.flesch_ease(n_words,n_syllables,n_sents)})
+            newdict.update({'FK':nlp.flesch_kincaid(n_words,n_syllables,n_sents)})
+        else:
+            newdict.update({'SMOG':0}) #this was None, now 0
+            newdict.update({'Gunning':0})
+            newdict.update({'Flesch':0})
+            newdict.update({'FK':0})
 
-        return totalchars,totalwords,unique_words,totalsents,lexicaldiversity,lexicaldensity,smog,gunning,flesch_ease,fk
+        newdict.update({'Similarity':textacy.similarity.word2vec(ref_doc,doc)})
+        doclist.append(newdict)
 
-    def analysetcorpus(self, tcorpus, settings):
-        key_count,bg_count,warning = nlp.analysecorpus(tcorpus, {"qSettings":settings,"blist":[],"wlist":[]})
-        return key_count,bg_count,warning
+    docframe = pd.DataFrame.from_dict(doclist)
+    means = {"Words":"{0:.0f}".format(docframe['Words'].mean())}
+    means.update({"Sentences":"{0:.0f}".format(docframe['Sentences'].mean())})
+    means.update({"LD":"{0:.2f}".format(docframe['LD'].mean())})
+    means.update({"TTR":"{0:.2f}".format(docframe['TTR'].mean())})
+    means.update({"SMOG":"{0:.2f}".format(docframe['SMOG'].mean())})
+    means.update({"Gunning":"{0:.2f}".format(docframe['Gunning'].mean())})
+    means.update({"Flesch":"{0:.2f}".format(docframe['Flesch'].mean())})
+    means.update({"FK":"{0:.2f}".format(docframe['FK'].mean())})
+    return means, docframe
 
-    def kwicbyt(self, tcorpus, keyword):
-        return nlp.kwic(tcorpus, keyword)
+def analyseqcorpus(qcorpus, q):
+    #returns top_keywords,top_ngrams,warning
+    return nlp.analysecorpus(qcorpus,q)
 
-    def bigrambyt(self, tcorpus, keyword_phrase):
-        return nlp.kwic(tcorpus, keyword_phrase)
+def getcollocgraph(qcorpus,settings):
+    #returns json formatted d3 collocation graphdata
+    return nlp.buildcollocgraph(qcorpus,settings)
+
+def kwicbyq(qcorpus,keyword):
+    return nlp.kwic(qcorpus,keyword)
+
+def bigrambyq(qcorpus,keyword_phrase):
+    return nlp.kwic(qcorpus,keyword_phrase)
+
+###########################################################################################################################################################
+
+###########################################################################################################################################################
+
+CORPUS_ROOT = 'tmp/uploads/'
+CORPUS_ROOT_SAMPLE = 'tft/static/files/'
+
+def createtcorpus_sample(filename, refId):
+    # just reading one text for now - use tcorpus.add_texts() when multifile upload implemented
+    tcorpus = textacy.Corpus("en")
+    text_to_add = textacy.fileio.read.read_file(CORPUS_ROOT_SAMPLE + filename)
+    tcorpus.add_text(text_to_add)
+
+    origpath = os.path.join(app.config['CORPUS_FOLDER'],str(refId))
+    if not os.path.exists(origpath):
+        os.makedirs(origpath)
+
+    fname = filename.rsplit('.', 1)[0]
+    path = os.path.join(origpath,fname)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    tcorpus.save(path,name=fname,compression="gzip")
+    return tcorpus
+
+def createtcorpus(filename, refId):
+    # just reading one text for now - use tcorpus.add_texts() when multifile upload implemented
+    tcorpus = textacy.Corpus("en")
+    text_to_add = textacy.fileio.read.read_file(CORPUS_ROOT + filename)
+    tcorpus.add_text(text_to_add)
+
+    origpath = os.path.join(app.config['CORPUS_FOLDER'],str(refId))
+    if not os.path.exists(origpath):
+        os.makedirs(origpath)
+
+    fname = filename.rsplit('.', 1)[0]
+    path = os.path.join(origpath,fname)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    tcorpus.save(path,name=fname,compression="gzip")
+    return tcorpus
+
+def loadtcorpus(path, filename):
+    tcorpus = textacy.Corpus.load(path,name=filename,compression='gzip')
+    return tcorpus
+
+def summarisetcorpus(tcorpus):
+    n_sents = 0
+    words = []
+    pos_tagged_text = []
+    for d in tcorpus.docs:
+        new_words = list(textacy.extract.words(d, filter_punct=True, filter_stops=False, filter_nums=False))
+        words.extend(new_words)
+        n_sents += d.n_sents
+        pos_tagged_text.extend(d.pos_tagged_text)
+
+    n_syllables, n_polysyllable_words = nlp.count_syllables(words)
+    totalsents = n_sents
+    totalwords = len(words)
+    unique_words = len({word.lower for word in words})
+    totalchars = sum(len(word) for word in words)
+    content_words = nlp.content_words_in_response(pos_tagged_text)
+
+    lexicaldiversity = "{0:.2f}".format(nlp.ttr(unique_words,totalwords))
+    lexicaldensity = "{0:.2f}".format(nlp.lexical_density(content_words,totalwords))
+    smog = "{0:.2f}".format(nlp.smog(n_polysyllable_words,n_sents))
+    gunning = "{0:.2f}".format(nlp.gunning_fog(totalwords,n_sents,n_polysyllable_words))
+    flesch_ease = "{0:.2f}".format(nlp.flesch_ease(totalwords,n_syllables,n_sents))
+    fk = "{0:.2f}".format(nlp.flesch_kincaid(totalwords,n_syllables,n_sents))
+
+    return totalchars,totalwords,unique_words,totalsents,lexicaldiversity,lexicaldensity,smog,gunning,flesch_ease,fk
+
+def analysetcorpus(tcorpus, settings):
+    key_count,bg_count,warning = nlp.analysecorpus(tcorpus, {"qSettings":settings,"blist":[],"wlist":[]})
+    return key_count,bg_count,warning
+
+def kwicbyt(tcorpus, keyword):
+    return nlp.kwic(tcorpus, keyword)
+
+def bigrambyt(tcorpus, keyword_phrase):
+    return nlp.kwic(tcorpus, keyword_phrase)

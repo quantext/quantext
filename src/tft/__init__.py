@@ -19,6 +19,11 @@ from flask_mongoengine import MongoEngine
 from flask_login import LoginManager
 
 app = Flask(__name__)
+
+from .util import ListConverter
+
+app.url_map.converters['list'] = ListConverter
+
 app.config.from_object('config')
 
 db = MongoEngine(app)

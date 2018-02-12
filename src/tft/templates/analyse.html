@@ -23,12 +23,151 @@
 <link rel="stylesheet" href="/static/css/dataTables_custom.css"/>
 
 <div id="themeDiv">
-<!-- theme css -->
-{% if user.theme %}
-<link rel="stylesheet" href="/static/css/themes/{{ user.theme }}.css"/>
-{% else %}
-<link rel="stylesheet" href="/static/css/themes/original.css"/>
-{% endif %}
+    <!-- theme css -->
+    {% if user.theme %}
+        <link rel="stylesheet" href="/static/css/themes/{{ user.theme }}.css"/>
+    {% else %}
+        <link rel="stylesheet" href="/static/css/themes/original.css"/>
+    {% endif %}
+</div>
+
+<div class="quantext_sidebar">
+    <div class="sidebar-div">
+        <div class="inner-icon quantext-chunky-duck"></div>
+        <div class="inner-text">
+            <a href="{{ url_for('index') }}"><div>Home</div></a>
+            <a href="{{ url_for('control_panel') }}"><div>Control panel</div></a>
+            <a href="{{ url_for('documentation') }}"><div>Documentation</div></a>
+            <a href="{{ url_for('development') }}"><div>Development journal</div></a>
+            <a href="{{ url_for('contact') }}"><div>Contact</div></a>
+            <a href="{{ url_for('logout') }}"><div>Logout</div></a>
+        </div>
+    </div>
+
+    <div class="sidebar-div">
+        <div class="inner-icon quantext-book"></div>
+        <div class="inner-text">
+            <div>Open reference materials (not yet implemented)</div>
+        </div>
+    </div>
+    <div class="sidebar-div">
+        <div class="inner-icon quantext-report"></div>
+        <div class="inner-text">
+            {% for student_file in student_files %}
+                <div class="generate_report" style="word-break: break-word;" data-url="/report/{{ analysis_id }}/{{ student_file['file']['id'] }}/{{ student_file['q']['qNum'] }}">Generate report for {{ student_file["file"]["filename"] }} Q{{ student_file['q']['qNum'] }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="sidebar-div" style="margin-bottom:0!important;position:absolute;bottom:0;left:0;right:0;">
+        <div class="inner-icon quantext-circle" style="z-index:2"></div>
+        <div class="inner-icon theme-color-1 quantext-circle-half-left"></div>
+        <div class="inner-icon theme-color-2 quantext-circle-half-right"></div>
+        <div class="inner-text" style="top:auto!important;">
+            <div class="theme_item" data-theme="original">Quantext Original
+                <span>
+                    <span class="quantext-circle-full" style="color:#57b0c2"></span>
+                    <span class="quantext-circle-full" style="color:#307583"></span>
+                    <span class="quantext-circle-full" style="color:#ef8928"></span>
+                    <span class="quantext-circle-full" style="color:#52b9a9"></span>
+                    <span class="quantext-circle-full" style="color:#6496b4"></span>
+                </span>
+            </div>
+            <div class="theme_item" data-theme="drakemallard">Drake Mallard
+                <span>
+                    <span class="quantext-circle-full" style="color:#126ba8"></span>
+                    <span class="quantext-circle-full" style="color:#04865d"></span>
+                    <span class="quantext-circle-full" style="color:#f9b234"></span>
+                    <span class="quantext-circle-full" style="color:#f66723"></span>
+                    <span class="quantext-circle-full" style="color:#9f8e70"></span>
+                </span>
+            </div>
+            <div class="theme_item" data-theme="mandarin">Mandarin
+                <span>
+                    <span class="quantext-circle-full" style="color:#953272"></span>
+                    <span class="quantext-circle-full" style="color:#fd722d"></span>
+                    <span class="quantext-circle-full" style="color:#ef1047"></span>
+                    <span class="quantext-circle-full" style="color:#4d7ee7"></span>
+                    <span class="quantext-circle-full" style="color:#e99e4d"></span>
+                </span>
+            </div>
+            <div class="theme_item" data-theme="torrent">Torrent
+                <span>
+                    <span class="quantext-circle-full" style="color:#6f7a84"></span>
+                    <span class="quantext-circle-full" style="color:#ce893e"></span>
+                    <span class="quantext-circle-full" style="color:#da5a2b"></span>
+                    <span class="quantext-circle-full" style="color:#575f72"></span>
+                    <span class="quantext-circle-full" style="color:#758199"></span>
+                </span>
+            </div>
+            <div class="theme_item" data-theme="greenwingedteal">Green Winged Teal
+                <span>
+                    <span class="quantext-circle-full" style="color:#20a949"></span>
+                    <span class="quantext-circle-full" style="color:#e1723d"></span>
+                    <span class="quantext-circle-full" style="color:#06cada"></span>
+                    <span class="quantext-circle-full" style="color:#b5917b"></span>
+                    <span class="quantext-circle-full" style="color:#00d67a"></span>
+                </span>
+            </div>
+            {% if current_user['plan'] == "hatchling" or current_user['plan'] == "full" %}
+                <div class="theme_item" data-theme="harlequin">Harlequin
+                    <span>
+                        <span class="quantext-circle-full" style="color:#c52d05"></span>
+                        <span class="quantext-circle-full" style="color:#848483"></span>
+                        <span class="quantext-circle-full" style="color:#4e4f53"></span>
+                        <span class="quantext-circle-full" style="color:#92786c"></span>
+                        <span class="quantext-circle-full" style="color:#65625f"></span>
+                    </span>
+                </div>
+                <div class="theme_item" data-theme="ruddyduck">Ruddy Duck
+                    <span>
+                        <span class="quantext-circle-full" style="color:#37b3df"></span>
+                        <span class="quantext-circle-full" style="color:#9c4615"></span>
+                        <span class="quantext-circle-full" style="color:#2a3d62"></span>
+                        <span class="quantext-circle-full" style="color:#4c5457"></span>
+                        <span class="quantext-circle-full" style="color:#bd5b2c"></span>
+                    </span>
+                </div>
+                {% if current_user['plan'] == "full" %}
+                    <div class="theme_item" data-theme="darkwing">Darkwing
+                        <span>
+                            <span class="quantext-circle-full" style="color:#775789"></span>
+                            <span class="quantext-circle-full" style="color:#605969"></span>
+                            <span class="quantext-circle-full" style="color:#5b2252"></span>
+                            <span class="quantext-circle-full" style="color:#2f7581"></span>
+                            <span class="quantext-circle-full" style="color:#b42d19"></span>
+                        </span>
+                    </div>
+                    <div class="theme_item" data-theme="rubberducky">Rubber Ducky
+                        <span>
+                            <span class="quantext-circle-full" style="color:#f9b234"></span>
+                            <span class="quantext-circle-full" style="color:#ddb30d"></span>
+                            <span class="quantext-circle-full" style="color:#fd722d"></span>
+                            <span class="quantext-circle-full" style="color:#ff9000"></span>
+                            <span class="quantext-circle-full" style="color:#ffbb00"></span>
+                        </span>
+                    </div>
+                    <div class="theme_item" data-theme="mighty1">Mighty I
+                        <span>
+                            <span class="quantext-circle-full" style="color:#068c95"></span>
+                            <span class="quantext-circle-full" style="color:#8e2543"></span>
+                            <span class="quantext-circle-full" style="color:#014e5e"></span>
+                            <span class="quantext-circle-full" style="color:#ed9033"></span>
+                            <span class="quantext-circle-full" style="color:#8a8782"></span>
+                        </span>
+                    </div>
+                    <div class="theme_item" data-theme="mighty2">Mighty II
+                        <span>
+                            <span class="quantext-circle-full" style="color:#547840"></span>
+                            <span class="quantext-circle-full" style="color:#853f61"></span>
+                            <span class="quantext-circle-full" style="color:#583c55"></span>
+                            <span class="quantext-circle-full" style="color:#e39236"></span>
+                            <span class="quantext-circle-full" style="color:#75a453"></span>
+                        </span>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <style>
@@ -115,76 +254,13 @@
 <div id="panel" class="pt-3">
     <div class="row pb-4">
         <div class="col-md-6 pl-4">
-            <h1 class="top_title">{{ an.name }}</h1>
-            <h4 class="top_title">created {{ an.created.strftime('%d/%m/%Y') }}</h4>
-            <h4 class="top_title">{{ an.files|length}} response files | {{ an.refcorpus|length }} reference materials</h4>
+            <h1 class="top_title">{{ an['name'] }}</h1>
+            <h4 class="top_title">created {{ an['created'].strftime('%d/%m/%Y') }}</h4>
+            <h4 class="top_title">{{ an['files']|length}} response files | {{ an['refcorpus']|length }} reference materials</h4>
         </div>
         <div class="col-md-3"></div>
         <div class="col-md-3 pr-4">
             <div class="row">
-                <div class="col-md-12">
-                    <h6>Theme</h6>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle theme_button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% if user.theme %}
-                                {% if user.theme == "original" %} Quantext Original {% endif %}
-                                {% if user.theme == "drakemallard" %} Drake Mallard {% endif %}
-                                {% if user.theme == "mandarin" %} Mandarin {% endif %}
-                                {% if user.theme == "torrent" %} Torrent {% endif %}
-                                {% if user.theme == "greenwingedteal" %} Green Winged Teal {% endif %}
-                                {% if user.theme == "harlequin" %} Harlequin {% endif %}
-                            {% else %}
-                                Quantext Original
-                            {% endif %}
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item theme_item" href="#" data-theme="original">Quantext Original
-                                <div class="theme_box" style="background:#6496b4"></div>
-                                <div class="theme_box" style="background:#52b9a9"></div>
-                                <div class="theme_box" style="background:#ef8928"></div>
-                                <div class="theme_box" style="background:#307583"></div>
-                                <div class="theme_box" style="background:#57b0c2"></div>
-                            </a>
-                            <a class="dropdown-item theme_item" href="#" data-theme="drakemallard">Drake Mallard
-                                <div class="theme_box" style="background:#9f8e70"></div>
-                                <div class="theme_box" style="background:#f66723"></div>
-                                <div class="theme_box" style="background:#f9b234"></div>
-                                <div class="theme_box" style="background:#04865d"></div>
-                                <div class="theme_box" style="background:#126ba8"></div>
-                            </a>
-                            <a class="dropdown-item theme_item" href="#" data-theme="mandarin">Mandarin
-                                <div class="theme_box" style="background:#e99e4d"></div>
-                                <div class="theme_box" style="background:#4d7ee7"></div>
-                                <div class="theme_box" style="background:#ef1047"></div>
-                                <div class="theme_box" style="background:#fd722d"></div>
-                                <div class="theme_box" style="background:#953272"></div>
-                            </a>
-                            <a class="dropdown-item theme_item" href="#" data-theme="torrent">Torrent
-                                <div class="theme_box" style="background:#758199"></div>
-                                <div class="theme_box" style="background:#575f72"></div>
-                                <div class="theme_box" style="background:#da5a2b"></div>
-                                <div class="theme_box" style="background:#ce893e"></div>
-                                <div class="theme_box" style="background:#6f7a84"></div>
-                            </a>
-                            <a class="dropdown-item theme_item" href="#" data-theme="greenwingedteal">Green Winged Teal
-                                <div class="theme_box" style="background:#00d67a"></div>
-                                <div class="theme_box" style="background:#b5917b"></div>
-                                <div class="theme_box" style="background:#06cada"></div>
-                                <div class="theme_box" style="background:#e1723d"></div>
-                                <div class="theme_box" style="background:#20a949"></div>
-                            </a>
-                            <a class="dropdown-item theme_item" href="#" data-theme="harlequin">Harlequin
-                                <div class="theme_box" style="background:#65625f"></div>
-                                <div class="theme_box" style="background:#92786c"></div>
-                                <div class="theme_box" style="background:#4e4f53"></div>
-                                <div class="theme_box" style="background:#848483"></div>
-                                <div class="theme_box" style="background:#c52d05"></div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
                 <div class="col-md-12 centerFlex" style="justify-content: flex-end">
                     <div class="simple-view pr-4" style="font-weight:bold">Simple view</div>
                     <label class="switch">
@@ -195,25 +271,19 @@
                 </div>
             </div>
         </div>
-     <!--   <div class="col-md-6 centerFlex pr-4" style="justify-content: flex-end;align-items:baseline">
-            <button type="button" class="panelTag btn btn-quantext dark centerFlex">
-                <div class="index-font quantext-book mr-1"></div>
-                <div>Reference corpora</div>
-            </button>
-        </div>-->
     </div>
     <div class="row">
-        {% set student_file = student_files[0] %}
-        {% include 'studentFile.html' %}
-        {% if student_files|length > 1 %}
-            {% set student_file = student_files[1] %}
+        {% for student_file in student_files %}
             {% include 'studentFile.html' %}
-        {% endif %}
+        {% endfor %}
     </div>
 
-    <div class="row below m-0 corpora_footer">
+    <div class="row below m-0 corpora_panel">
         <div class="scroll_inside" data-simplebar>
-            <div class="index-font close_corpora_panel"></div>
+            <h1 class="top_title pl-4 pt-4" style="display:flex;justify-content: space-between;width:100%">
+                Reference materials
+                <div class="index-font close_corpora_panel"></div>
+            </h1>
             <div class="inner_corpora w-100">
                 {% include 'kwic.html' %}
             </div>
@@ -274,8 +344,12 @@
 <script type="text/javascript">
     var $notifications = $(".notifications");
 
-    function notify(text) {
-        var $notification = $('<li />').text(text).css({left: 320});
+    function notify(text, error) {
+        var $notification;
+        if(error)
+            $notification = $('<li style="background:#EF2828" />').html(text).css({left: 320});
+        else
+            $notification = $('<li />').html(text).css({left: 320});
         $notifications.append($notification);
         $notification.animate({left: 0}, 300,function(){});
         return $notification;
@@ -295,16 +369,14 @@
 
     $(document).on("change", ".setting-control", function(){
         var self = $(this);
-        var which = self.data("which");
         var val = self.val();
-
         if(self.is(":checkbox"))
             val = self.is(":checked") ? "True" : "False";
 
         var pageInfo = getPageInfo(self);
         pageInfo['key'] = self.attr("name");
         pageInfo['val'] = val;
-        var $notification = notify("Getting your ducks in a row...");
+        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
 
         $.post("{{ url_for('settings') }}",pageInfo,function(response){
             $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
@@ -401,7 +473,6 @@
     }
 
     function iterateCategories(selectedRows, wrapper){
-        console.log(selectedRows);
         var optionList = [];
         var catList = wrapper.find('.categories').data("categories");
         catList = (catList) ? catList.split(",") : [];
@@ -443,6 +514,14 @@
         else
             response = d.Full_response;
 
+        var children = "";
+        if(d["children"] && d["children"].length > 0) {
+            children += "<div class='col-md-12 p-0 mt-4'><h6>Replies</h6>";
+            for (var child in d["children"])
+                children += "<div data-question_number='" + question_number +"' data-file_id='" + file_id +"' data-id='" + d["children"][child].ID + "' class='reply_div'>" + d["children"][child].text + "</div>";
+            children += "</div>";
+        }
+
         return '<div class="ws-card">'+
                 '<div class="row m-0">' +
                 '<div class="col-md-12 p-0">' +
@@ -450,11 +529,10 @@
                 d.StudentID +
                 ')</h5></div>' +
                 '<div class="col-md-12 p-0" style="box-sizing:border-box">' +
-                '<div>' +
                 '<h6>Full response</h6>' +
-                    response +
+                response +
                 '</div>' +
-                '</div>' +
+                children +
                 '<div class="col-md-12 p-0 mt-4" style="box-sizing:border-box">' +
                 '<div>' +
                 '<h6>Notes</h6>' +
@@ -465,34 +543,6 @@
                 '<h6>Categories</h6>' +
                 d.Category +
                 '</div>' +
-                '<div class="col-md-6 p-0 mt-4">' +
-                '<h6>Readability indices</h6>' +
-                "<table style='width:100%;'>" +
-                "<tr style='background:none'>" +
-                '<td>TTR</td><td>LD</td><td>SMOG</td>' +
-                '</tr>' +
-                "<tr style='background:none'>" +
-                "<td style='width:33%;border-right:1px solid transparent;padding:0;position:relative;border-top:0'>" +
-                "<div class='mini-chart' style='width:" + (d["TTR"]*100) + "%'></div>" +
-                "<div style='z-index:3;position:relative;'>" +
-                d["TTR"] +
-                "</div>" +
-                "</td>" +
-                "<td style='width:33%;padding:0;border-right:1px solid transparent;position:relative;border-top:0'>" +
-                "<div class='mini-chart' style='width:" + (d["LD"]*100) + "%'></div>" +
-                "<div style='z-index:3;position:relative;'>" +
-                d["LD"] +
-                "</div>" +
-                "</td>" +
-                "<td style='width:34%;padding:0;position:relative;border-top:0'>" +
-                "<div class='mini-chart' style='width:" + (d["SMOG"]/18*100) + "%'></div>" +
-                "<div style='z-index:3;position:relative;'>" +
-                d["SMOG"] +
-                "</div>" +
-                "</td>" +
-                "</tr>" +
-                "</table>" +
-                '</div>' +
                 '<div class="col-md-12 p-0 mt-4">' +
                 '<button data-id="' + file_id + '" data-question="' + question_number + '" data-response="' + d.Full_response + '" type="button" class="saveRefAnswer btn btn-quantext dark centerFlex"><span class="quantext-star index-font mr-1"></span> Save as a reference answer</button>' +
                 '</div>' +
@@ -502,9 +552,6 @@
 
     function openHiddenRow(row, tr, file_id, question_number){
         if (!row.child.isShown()) {
-            // Open this row
-            console.log(row);
-            console.log(row.data());
             row.child(format(row.data(),file_id,question_number)).show();
             tr.addClass('shown');
             tr.next().find('td').addClass("card-cell");
@@ -545,67 +592,58 @@
 
     $(document).on("change", ".changeQuestion", function(){
         var self = $(this);
-        var pageInfo = getPageInfo(self);
-        pageInfo['question'] = $("option:selected",self).val();
-        if(parseInt(pageInfo['question']) != 0)
+        var url = $("option:selected",self).val();
+        if(url != 0)
         {
-            var other = pageInfo['left_or_right'] == 'sLeft' ? 'sRight' : 'sLeft';
-            var $other = $('.'+other);
-            var sameQuestion = false;
-            if($other.data('fileid') == pageInfo['id'] && $other.data('question') == pageInfo['question'])
-                sameQuestion = true;
-
-            if(!sameQuestion) {
-                $.post("{{ url_for('change_question') }}", pageInfo, function (response) {
-                    $("."+pageInfo['left_or_right']).replaceWith(response);
-                });
-            }
-            else {
-                alert("Sorry, you cannot load the same question in the side-by-side comparison.");
-                self.val(0);
-            }
+            var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
+            window.location.href = url;
         }
     });
 
     $(document).on("change", ".changeFile", function(){
         var self = $(this);
-        var pageInfo = getPageInfo(self);
-        pageInfo['file_id'] = $("option:selected",self).val();
-
-        if(pageInfo['left_or_right']=='sLeft')
-            studentFilesForGet[0] = pageInfo['file_id'];
-        else
-            studentFilesForGet[1] = pageInfo['file_id'];
-
-        $.post("{{ url_for('load_student_file') }}", pageInfo, function (response) {
-            $.get("{{ url_for('get_chart_data') }}", {analysis_id:"{{ analysis_id }}",f1:studentFilesForGet[0],f2:studentFilesForGet[1],q1:1,q2:1}, function(response){
-                var $response = JSON.parse(response);
-                repaintGauge($response[1]["means"]["TTR"], $response[0]["means"]["TTR"],$response[1].index,$response[0].index, "#ttr-chart-gauge", "TTR");
-                repaintGauge($response[1]["means"]["LD"], $response[0]["means"]["LD"],$response[1].index,$response[0].index, "#ld-chart-gauge", "LD");
-                repaintGauge($response[1]["means"]["SMOG"] / 18, $response[0]["means"]["SMOG"] / 18,$response[1].index,$response[0].index, "#smog-chart-gauge", "SMOG");
-            });
-            $("."+pageInfo['left_or_right']).replaceWith(response);
-        });
+        var url = $("option:selected",self).val();
+        if(url != 0) {
+            var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
+            window.location.href = url;
+        }
     });
 
-        var height, svg, width;
-        var studentFilesForGet = [];
+    var height, svg, width;
+    var studentFilesForGet = [];
+
+    $(document).on("click",".reply_div", function(){
+        var self = $(this);
+        var id = "#"+self.data("id");
+        var file_id = self.data("file_id");
+        var question_number = self.data("question_number");
+        var tableId = "#"+self.parents("table").attr("id");
+        var currRow = $(tableId).DataTable().row(id);
+        var prevTr = $(tableId).find(".shown");
+        var prevRow = $(tableId).DataTable().row(prevTr);
+        var openLength = $(tableId).find(".shown").length;
+
+        var pos = currRow.index();
+        var page = Math.floor( pos / $(tableId).DataTable().page.info().length );
+        $(tableId).DataTable().page(page).draw(false);
+
+        openHiddenRow(currRow,$(currRow.node()), file_id, question_number);
+        if(openLength > 0){
+            prevRow.child.hide();
+            prevRow.deselect();
+            prevTr.removeClass('shown');
+        }
+    });
+
     </script>
 
     {% for student_file in student_files %}
         <script type="text/javascript">
-            studentFilesForGet.push("{{ student_file.file.id }}");
+            studentFilesForGet.push("{{ student_file['file']['id'] }}");
         </script>
     {% endfor %}
 
 <script type="text/javascript">
-
-    $.get("{{ url_for('get_chart_data') }}", {analysis_id:"{{ analysis_id }}",f1:studentFilesForGet[0],f2:studentFilesForGet[1],q1:1,q2:1}, function(response){
-        var $response = JSON.parse(response);
-        repaintGauge($response[1]["means"]["TTR"], $response[0]["means"]["TTR"],$response[1].index,$response[0].index, "#ttr-chart-gauge", "TTR");
-        repaintGauge($response[1]["means"]["LD"], $response[0]["means"]["LD"],$response[1].index,$response[0].index, "#ld-chart-gauge", "LD");
-        repaintGauge($response[1]["means"]["SMOG"] / 18, $response[0]["means"]["SMOG"] / 18,$response[1].index,$response[0].index, "#smog-chart-gauge", "SMOG");
-    });
 
     $(document).on('click', ".process_model_answer", function(e) {
         e.preventDefault();
@@ -625,15 +663,15 @@
 
     $(document).on('click','.keyword', function(){
         var self = $(this);
-        var $notification = notify("Getting your ducks in a row...");
+        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
         var parent = self.parents('.parentContainer');
         var left_or_right = parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
         var id = parent.data("fileid");
         var question = parent.data("question");
         var $table = $("#table_" + id+"_"+left_or_right+"_"+question).DataTable();
-        var $corpora_footer = $(".corpora_footer");
+        var $corpora_panel = $(".corpora_panel");
         if(self.hasClass("highlight")){
-            $corpora_footer.removeClass("shown");
+            $corpora_panel.removeClass("shown");
             self.removeClass("highlight");
             $table.ajax.url("/datatables/" + id + "/" + question).load(function(data){
                 $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text("Responses (" + data.data.length + ")");
@@ -646,19 +684,22 @@
             parent.find(".highlight").removeClass("highlight");
             self.addClass("highlight");
             var word = self.text();
+            var refcorpus_length = "{{ an['refcorpus']|length }}";
             $.post("{{ url_for('get_kwic') }}", {analysis_id:"{{ analysis_id }}",myword:word}, function(response){
                 if(left_or_right == "sLeft") {
-                    $.when($corpora_footer.removeClass("panel_left").addClass("panel_right")).then(function(){
-                        $corpora_footer.addClass("shown");
+                    $.when($corpora_panel.removeClass("panel_left").addClass("panel_right")).then(function(){
+                        if(refcorpus_length > 0)
+                            $corpora_panel.addClass("shown");
                     });
                 }
                 else {
-                    $.when($corpora_footer.removeClass("panel_right").addClass("panel_left")).then(function(){
-                        $corpora_footer.addClass("shown");
+                    $.when($corpora_panel.removeClass("panel_right").addClass("panel_left")).then(function(){
+                        if(refcorpus_length > 0)
+                            $corpora_panel.addClass("shown");
                     });
                 }
 
-                $corpora_footer.find(".inner_corpora").empty().append(response).show();
+                $corpora_panel.find(".inner_corpora").empty().append(response).show();
 
                 $table.ajax.url("/datatables/" + id + "/" + question + "/" + word).load(function(data){
                     $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text(word + " (" + data.data.length + ")");
@@ -676,6 +717,25 @@
                 });
             });
         }
+    });
+
+    $(document).on("click",".reset_filter",function(){
+        var self = $(this);
+        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
+        var parent = self.parents('.parentContainer');
+        var left_or_right = parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
+        var question = parent.data("question");
+        var id = parent.data("fileid");
+        var $table = $("#table_" + id+"_"+left_or_right+"_"+question).DataTable();
+        $(".corpora_panel").removeClass("shown");
+        parent.find(".keyword.highlight").removeClass("highlight");
+        $table.ajax.url("/datatables/" + id + "/" + question).load(function(data){
+            $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text("Responses (" + data.data.length + ")");
+            $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
+            Waypoint.refreshAll();
+            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+        });
+        $("#wordtree_"+id+"_"+left_or_right).html('<span class="vis_text">Please select a word or phrase from the responses to see the visualisation.</span>');
     });
 
     function createTree(data,div,index) {
@@ -709,7 +769,7 @@
     $(document).on("click",".saveBList", function(){
         var self = $(this);
         var pageInfo = getPageInfo(self);
-        var $notification = notify("Getting your ducks in a row...");
+        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
         $.post("{{ url_for('settings') }}",pageInfo,function(response){
             $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
             $notification.animate({left: 320}, 300,function(){$notification.remove()});
@@ -742,15 +802,56 @@
     $(".theme_item").on("click", function(){
         var self = $(this);
         var theme = self.data("theme");
-        var fullname = self.text();
         $.post("{{ url_for('save_theme') }}", {theme:theme}, function(){
-            $(".theme_button").text(fullname);
             $('#themeDiv').append('<link rel="stylesheet" href="/static/css/themes/' + theme + '.css" type="text/css" />');
         });
     });
 
     $(".close_corpora_panel").on("click", function(){
-        $(".corpora_footer").removeClass("shown");
+        $(".corpora_panel").removeClass("shown");
+    });
+
+    $(".generate_report").on("click",function(){
+        var self = $(this);
+        var date = new Date();
+        var datestring = date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
+        var url = self.data("url");
+        $.get(url, function(response){
+            var $response = JSON.parse(response);
+            var content = [{text:'Quantext report {{ an.name }}',color:'#0c1f22',fontSize:16},{text:datestring,margin: [ 0, 0, 0, 20 ], color: 'gray'}];
+            content.push({text:"Question " + $response["question_title"],bold:true,color:'#0c1f22'});
+            content.push({color:'#193e45',text:$response["question_text"],margin: [ 0, 0, 0, 20 ]});
+
+            for(var k in $response["categories"]){
+                var obj = $response["categories"][k];
+                for(var n in Object.keys(obj)){
+                    var key = Object.keys(obj)[n];
+                    var header = [{color:'#193e45',text: key+':', style: 'tableHeader',italics: true,bold:true}];
+                    var body = [header];
+                    for(var item in obj[key])
+                        body.push([obj[key][item]]);
+
+                    content.push({
+                        margin:[0,0,0,20],
+                        style: 'tableExample',
+                            table: {
+                            widths:['*'],
+                            headerRows: 1,
+                            body: body
+                        },
+                        layout: 'lightHorizontalLines'
+                    });
+                }
+            }
+
+            var docDefinition = {
+                footer: function(currentPage, pageCount) {
+                    return {text:currentPage.toString() + ' of ' + pageCount,margin:[20,0,0,0],fontSize:8};
+                },
+                content: content
+            };
+            pdfMake.createPdf(docDefinition).download("Quantext report " + datestring + " - {{ an.name }}.pdf");
+        });
     });
 
 </script>
