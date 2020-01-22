@@ -67,7 +67,7 @@ qtconsole==4.2.1
 QtPy==1.1.2
 rauth==0.7.2
 requests==2.12.4
-rope==0.9.4
+rope==0.11.0
 scipy==0.18.1
 simplegeneric==0.8.1
 singledispatch==3.4.0.3
