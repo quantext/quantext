@@ -1,0 +1,41 @@
+<div class="full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: column;padding: 2rem 0 0;border: 1px solid #ddd;">            
+        <div class="text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size:1rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem 2rem;line-height: 1;">
+            {{ file['filename'] }}
+            <!--<div title="Download file" data-id="{{ file['id'] }}" class="index-font download_file quantext-download" style="margin-left: auto;margin-right: 1rem;color: #666!important;font-family: quantext;font-weight: 400;text-transform: none;font-size: 2rem;cursor: pointer;padding-top: 0!important;"></div>-->
+            <div title="Delete file" class="index-font delete_file quantext-trash deleteFile" data-id="{{ file['id'] }}" style="margin-left: auto;margin-right: 0;color: #666!important;font-family: quantext;font-weight: 400;text-transform: none;font-size: 2rem;cursor: pointer;padding-top: 0!important;" data-num="{{ urls|length }}"></div>
+        </div>    
+    <div class="text_div main-theme-color-dark" style="align-items:baseline;display:flex;flex-direction:column;margin-top:0!important;font-size:.9rem;font-weight: 400;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem 2rem;">
+        Created: {{ file['created'].strftime('%d.%m.%Y %H:%M') }}<br>Size: {{ "{:,}".format((file['filesize']/1024)|int) if file['filesize'] else "0" }} KB<br>Used on {{ urls|length }} analyses
+    </div>                                                                                
+    <div style="text-transform:uppercase;font-size:.8rem;font-weight:600;display:flex;align-items: center;line-height: 1;position: relative;padding:1rem;border-top:1px solid #ddd;background:#fbfbfb;flex-wrap: wrap;">
+        <div class="words_info_box">{{ file['columns']|length }} COLUMNS</div>
+        <div class="words_info_box">{{ file['rows'] }} ROWS</div>
+
+        <div style="width: 100%;overflow: auto;">
+            <div class="w-100 row m-0 mt-4" style="flex-wrap:nowrap">
+            {% for col in spreadsheet['columns'] %}
+                <div class="p-0 col-md" style="min-width:20%;background: white;font-weight: 500;border: 1px solid #ddd;padding: .5rem!important;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;
+                {% if not loop.last %}
+                    border-right: none
+                {% endif %}
+                ">
+                    {{ col }}
+                </div>                
+            {% endfor %}
+            </div>
+            {% for d in spreadsheet['data'] %}
+            <div class="w-100 row m-0" style="flex-wrap: nowrap">
+                {% for dd in d %}
+                <div class="p-0 col-md" style="min-width:20%;background: white;font-weight: 300;text-transform: none;border: 1px solid #ddd;padding: .5rem!important;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;
+                {% if not loop.last %}
+                    border-right: none
+                {% endif %}
+                ">                
+                    {{ dd }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}    
+        </div>       
+    </div>
+</div>

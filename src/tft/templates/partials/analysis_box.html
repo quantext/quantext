@@ -1,0 +1,20 @@
+<div class="full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: column;padding: 2rem 0 0;border: 1px solid #ddd;">            
+    <div class="text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size:1rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem 2rem;line-height: 1">
+        {{ analysis['name'] }}
+        <div title="Delete analysis" class="index-font delete_analysis quantext-trash deleteAnalysis" data-id="{{ analysis['id'] }}" style="margin-right: 0;color: #666!important;font-family: quantext;font-weight: 400;text-transform: none;font-size: 2rem;cursor: pointer;padding-top: 0!important;margin-left:auto;
+        {% if lastrun == True %}
+            display:none;
+        {% endif %}
+        "></div>
+    </div>
+    <div class="text_div main-theme-color-dark" style="align-items:baseline;display:flex;flex-direction:column;margin-top:0!important;font-size:.9rem;font-weight: 400;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem 2rem;">
+        Created: {{ analysis['created'].strftime('%d.%m.%Y %H:%M') }}<br/>
+        Last run: {{ analysis['lastrun'].strftime('%d.%m.%Y %H:%M') }}<br/>
+        <a href="/analyse/{{ analysis['id'] }}">Click to run again</a>
+    </div>                                                                                
+    <div style="text-transform:uppercase;font-size:.8rem;font-weight:600;display:flex;align-items: center;line-height: 1;position: relative;padding:1rem;border-top:1px solid #ddd;background:#fbfbfb">
+        <div class="words_info_box" style="width:100%!important;align-items: center;">
+            {{ analysis['files']|length }} FILES <span class="quantext-chevron-down" style="margin-left: auto;font-size: 1.3rem;margin-bottom: -.5rem;margin-top: -.1rem;"></span>
+        </div>                                
+    </div>
+</div> 

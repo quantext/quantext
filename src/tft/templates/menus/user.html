@@ -1,0 +1,55 @@
+<div class="m-0 corpora_panel user_panel panel_right main-theme-fill-menu">
+    <div class="scroll_inside">
+        <h1 class="top_title pt-4 pl-4 pb-4 mb-0">
+            User profile
+            <div class="index-font close_corpora_panel"></div>
+        </h1>
+        <div class="row w-100 m-0 pb-4 centerFlex pl-3 pr-3">
+            <div id="update_user" class="btn btn-quantext" style="font-weight:400;font-size: .9rem;">Update profile</div>
+        </div>
+        <div class="col-md-12 p-0">
+            <div class="row p-0 m-0">
+                <div class="col-md-12 p-0">
+                    <div class="mb-4 ml-4 mr-4 small_text-8">Currently on {{ current_user['plan'] }} plan</div>
+                </div>
+                <div class="col-md-12 p-0">
+                    <div class="mb-1 ml-4 mr-4 small_text-8">Username</div>
+                    <div class="ml-3 mr-3 mt-0 mb-0">
+                        <input disabled="disabled" type="text" class="form-control main-theme-fill-dark" style="padding:1rem" value="{{ current_user['username'] }}"/>
+                        <div class="mb-2 helper_text_white">Cannot be changed</div>
+                    </div>
+                </div>
+                <div class="col-md-12 p-0 mt-4">
+                    <div class="mb-1 ml-4 mr-4 small_text-8">Password</div>
+                    <div class="ml-4 mr-3 mt-0 mb-0" style="font-size:.9rem">
+                        <i>You can't change your password yet!</i>
+                    </div>
+                </div>
+                <div class="col-md-12 p-0 mt-4">
+                    <div class="mb-1 ml-4 mr-4 small_text-8">Primary email</div>
+                    <div class="ml-3 mr-3 mt-0 mb-0">
+                        <input id="update_email" type="text" class="form-control main-theme-fill-dark" style="padding:1rem" value="{{ current_user['email'] }}" />
+                        <div class="mb-2 helper_text_white">Enter your email</div>
+                    </div>
+                </div>
+                <div class="col-md-12 p-0 mt-3">
+                    <div class="mb-1 ml-4 mr-4 small_text-8">Display name</div>
+                    <div class="ml-3 mr-3 mt-0 mb-0">
+                        <input id="update_display_name" type="text" class="form-control main-theme-fill-dark" style="padding:1rem" value="{{ current_user['display_name'] }}" />
+                        <div class="mb-2 helper_text_white">Enter a display name</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("update_user").addEventListener("click", (event) => {
+        let email = document.getElementById("update_email").value;
+        let display_name = document.getElementById("update_display_name").value;
+        postData("/update_profile",{email:email,display_name:display_name}).then(response => response.text()).then(result => {
+
+        });
+    });
+</script>

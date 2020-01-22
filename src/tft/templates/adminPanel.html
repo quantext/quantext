@@ -8,21 +8,49 @@
         <div class="col-md-12 pl-0 pr-0">
             <h1 class="top_title">Admin panel</h1>
         </div>
-        <div class="col-md-12 pl-0 pr-0">
+        <div class="mt-3 mb-3 col-md-12 pl-0 pr-0">
+            <button id="export_users" class="btn btn-quantext" style="font-weight:500">Export users as xlsx</button>
+        </div>
+        <div class="col-md-12 pl-0 pr-0 pb-4">
             <h5 class="mt-4">Users ({{ users|length }})</h5>
+            <div class="row w-100" style="display:flex;flex-direction:column;font-weight:500">
+                <div class="col-md-2"><span class="free_count"></span> free</div>
+                <div class="col-md-2"><span class="egg_count"></span> egg</div>
+                <div class="col-md-2"><span class="hatchling_count"></span> hatchling</div>
+                <div class="col-md-2"><span class="full_count"></span> full</div>
+                <div class="col-md-2"><span class="flock_count"></span> flock</div>
+                <div class="col-md-2"><span class="beta_count"></span> BETA</div>
+            </div>
             {% for user in users %}
-                <div class="adminPanel">
+                <div class="adminPanel {{ user['user']['plan'] }}_plan">
                     <span style="width:33%;text-align:left">
-                        <span style="font-weight:600">{{ user['user']['nickname'] }}</span><br/>
+                        <span style="font-weight:600">{{ user['user']['display_name'] }} ({{ user['user']['username'] }})</span><br/>
                         {{ user['analyses']|length }} analyses
                         {% if user['analyses']|length > 0 %}
                             | Last analysis run {{ user['analyses'][0]['lastrun'].strftime('%d/%m/%Y') }}
                         {% endif %}
                     </span>
                     <span style="width:33%;text-align:center"><a href="mailto:{{ user['user']['email'] }}">{{ user['user']['email'] }}</a></span>
-                    <span class="{{ user['user']['plan'] }}_plan" style="width:33%;text-align:right">
-                        {{ user['user']['plan'] }} plan
-                    </span>
+                    <div>
+                        <select class="user_plan form-control" data-email="{{ user['user']['email'] }}" style="width:100%">
+                            {% for plan in ["free","beta","egg","hatchling","full","flock"] %}
+                                    {% if user['user']['plan'] == plan %}
+                                        <option selected="selected" value="{{ plan }}">{{ plan }} plan</option>
+                                    {% else %}
+                                        <option value="{{ plan }}">{{ plan }} plan</option>
+                                    {% endif %}
+                            {% endfor %}
+                        </select>
+                        <select class="user_beta form-control" data-email="{{ user['user']['email'] }}" style="width:100%">
+                            {% for b in ["True","False"] %}
+                                {% if user['user']['beta'] == b %}
+                                    <option selected="selected" value="{{ b }}">{{ b }} (BETA)</option>
+                                {% else %}
+                                    <option value="{{ b }}">{{ b }} (BETA)</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -31,5 +59,31 @@
     {% include 'footer.html' %}
 </div>
 
-{% endblock %}
+<script>
 
+    document.addEventListener("change", event => {
+        if(event.target.matches(".user_plan")){            
+            let email = event.target.dataset.email;
+            let plan = event.target.value;
+            postData("{{ url_for('update_user') }}",{email:email,plan:plan}).then(response => response.text()).then(result => {
+                window.location.reload(false);
+            });
+        }
+    });
+
+ /*   $("#export_users").on("click", function(){
+        $.get("/export_users", function(response){
+            console.log(response);
+        });
+    });*/
+
+    document.querySelectorAll(".free_count")[0].innerHTML = document.querySelectorAll(".free_plan").length;
+    document.querySelectorAll(".egg_count")[0].innerHTML = document.querySelectorAll(".egg_plan").length;
+    document.querySelectorAll(".hatchling_count")[0].innerHTML = document.querySelectorAll(".hatchling_plan").length;
+    document.querySelectorAll(".full_count")[0].innerHTML = document.querySelectorAll(".full_plan").length;
+    document.querySelectorAll(".flock_count")[0].innerHTML = document.querySelectorAll(".flock_plan").length;
+    document.querySelectorAll(".beta_count")[0].innerHTML = document.querySelectorAll(".beta_plan").length;
+
+</script>
+
+{% endblock %}

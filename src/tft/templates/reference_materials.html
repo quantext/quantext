@@ -1,0 +1,66 @@
+<div class="col-md-12 p-0">
+{% for r in analysis['files'] %}
+<div class="full_response_div main-theme-color-dark">
+    <div class="row m-0 corpus_box ref_{{ r['id'] }}">
+        <div class="col-md-12 p-0">
+            <div class="row">
+                <div class="col-md-12"><h6 class="m-0 p-0 small_text-8" style="font-weight:600">{{ r.filename }}</h6></div>
+            </div>
+            <div class="col-md-12 mt-3 p-0 top_stats">
+                <div style="display:flex;">
+                    {% if r['file_type'] == 'reference' %}
+                        <canvas id="the-canvas_{{ r['id'] }}" style="width:150px;border:1px solid black">Loading...</canvas>
+                        <script>
+                            drawPDF("{{ url_for('uploaded_files', filename=r['filename']) }}","{{ r['id'] }}");
+                        </script>
+                    {% endif %}
+                    <div style="margin-left:auto;width:calc(100% - 200px)">
+                        <div class="row main-theme-color-dark header-row">
+                            {% if r['file_type'] == 'quantext' %}
+                            <div class = "col-md-2">Questions</div>
+                            {% endif %}
+                            <div class = "col-md-2">Characters</div>
+                            <div class = "col-md-2">Words</div>
+                            <div class = "col-md-2">Sentences</div>
+                        </div>
+                        <div class = "row main-theme-color-1" style="font-weight: 300;margin-top: -.5rem;font-size: 1.5rem;">
+                            {% if r['file_type'] == 'quantext' %}
+                            <div class = "col-md-2">{{ r['questions']|length }}</div>
+                            {% endif %}
+                            <div class = "col-md-2">{{ r['statistics']['Characters'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['Words'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['Sentences'] }}</div>
+                        </div>
+                        <div class="row main-theme-color-dark header-row mt-2">
+                            <div class = "col-md-2">TTR</div>
+                            <div class = "col-md-2">MTLD</div>
+                            <div class = "col-md-2">HDD</div>
+                            <div class = "col-md-2">LD</div>
+                            <div class = "col-md-2">SMOG</div>
+                            <div class = "col-md-2">Gunning</div>
+                        </div>
+                        <div class = "row main-theme-color-1" style="font-weight: 300;margin-top: -.5rem;font-size: 1.5rem;">
+                            <div class = "col-md-2">{{ r['statistics']['TTR'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['MTLD'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['HDD'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['LD'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['SMOG'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['Gunning'] }}</div>
+                        </div>
+                        <div class="row main-theme-color-dark header-row mt-2">
+                            <div class = "col-md-2">Flesch</div>
+                            <div class = "col-md-2">FK</div>
+                        </div>
+                        <div class = "row main-theme-color-1" style="font-weight: 300;margin-top: -.5rem;font-size: 1.5rem;">
+                            <div class = "col-md-2">{{ r['statistics']['Flesch'] }}</div>
+                            <div class = "col-md-2">{{ r['statistics']['FK'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kwic_box"></div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>

@@ -1,0 +1,29 @@
+{% if tuples|length > 0 %}
+    {% for r in tuples %}
+        <div class="full_response_div normal_response main-theme-color-dark"
+            data-words="{{ r[3] }}"
+            data-sents="{{ r[4] }}"
+            style="display: flex;position: relative;flex-direction: column;padding: 2rem 0 0;border: 1px solid #ddd;margin-top:1rem">            
+            <div class="text_div main-theme-color-dark w-100" style="margin-top:0!important;font-size:1rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;justify-content:center;color:#666!important;align-self:center;margin-top:0;padding: 0 2rem 2rem;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">{{ r[1] }}</div>
+
+            <div style="text-transform:uppercase;font-size:.8rem;font-weight:600;display:flex;align-items: center;line-height: 1;position: relative;padding:1rem;border-top:1px solid #ddd;background:#fbfbfb">
+                <div class="words_info_box">{{ "{0:.0f}".format(r[3]) }} WORDS</div>
+                <div class="words_info_box">{{ "{0:.0f}".format(r[4]) }} SENTENCES</div>
+              
+                <div title="LD (Lexical Diversity)" class="index_info_box" style="margin-left:auto">{{ "{0:.2f}".format(r[7]) }} LD</div>
+                <div title="TTR (Type Token Ratio)" class="index_info_box">{{ "{0:.2f}".format(r[8]) }} TTR</div>
+                <div title="SMOG (Simple Measure Of Gobbledygook)" class="index_info_box">{{ "{0:.2f}".format(r[9]) }} SMOG</div>
+                <div title="Gunning Fog" class="index_info_box">{{ "{0:.2f}".format(r[10]) }} GF</div>
+                <div title="Flesch Reading Ease" class="index_info_box">{{ "{0:.2f}".format(r[11]) }} FRE</div>
+                <div title="Flesch-Kincaid" class="index_info_box">{{ "{0:.2f}".format(r[12]) }} FK</div>
+                <div title="MTLD (Measure of Textual Lexical Diversity)" class="index_info_box">{{ "{0:.2f}".format(r[13]) }} MTLD</div>
+                <div title="HD-D (Hypergeometric Distribution)" class="index_info_box">{{ "{0:.2f}".format(r[14]) }} HD-D</div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="pl-4 pr-4" style="font-size:.9rem;font-style:italic">
+        No responses found.
+    </div>
+{% endif %}
+

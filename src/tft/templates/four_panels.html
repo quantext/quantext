@@ -1,0 +1,11 @@
+<div style="font-size: .8rem;font-style: italic;display:none" class="main-theme-color-dark sorting_info mb-2">*Currently <span class="sort_action" style="font-weight:bold">sorting</span> on <span class="sort_value" style="font-weight:bold">Words (low-high)</span></div>
+<div class="all_responses_div parent_response_div" style="overflow-y:auto;height: 500px;padding-right: 1rem;overflow-x: hidden;">
+    {% include 'partials/getting_ducks.html' %}
+</div>
+<div class="kwic_info mt-3 parent_response_div hiddenNotHidden main-theme-color-dark" style="font-size: 1.5rem;font-weight: 300;line-height: 1;">
+    <span class="kwic_matches">0</span> matches found in <span class="search_matches">0</span> responses.
+    <div class="helper_text_white mb-4 mt-2" style="color:#aaa">Click on any KWIC result to read the text response in its entirety.</div>
+</div>
+<div class="kwic_results_div parent_response_div hiddenNotHidden" style="overflow-y:auto;height: 500px;">
+    {% include 'responses_kwic.html' %}
+</div>

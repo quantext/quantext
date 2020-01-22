@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% from 'macros.html' import checkbox %}
+
+{% if current_user.is_authenticated %}
+
+<style>
+    .main-theme-fill-dark:disabled { color:#aaa!important }
+</style>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='js/choices/choices.min.css') }}">
+<script src="{{ url_for('static', filename='js/choices/choices.min.js') }}"></script>
+
+<div id="themeDiv">
+    <!-- theme css -->
+    {% if current_user.theme %}
+    <link rel="stylesheet" href="/static/css/themes/{{ current_user.theme }}.css"/>
+    {% else %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}"/>
+    {% endif %}
+</div>
+
+<ul class="notifications"></ul>
+
+<div class="m-0 corpora_panel panel_left new_live_panel main-theme-fill-menu">
+    <div class="scroll_inside">
+        <h1 class="top_title pl-4 pt-4 pb-0 mb-0">
+            New Quantext Live
+            <div class="index-font close_corpora_panel"></div>
+        </h1>
+        <div class="col-md-12 pt-4 p-0">
+            <div class="row p-0 m-0">
+                <div class="col-md-12 p-0">
+                    <div style="position:relative;margin-left:.8rem;margin-right:.8rem">
+                        <input type="text" class="form-control main-theme-fill-dark" id="new_question_text" style="padding:1rem" />
+                        <div class="mb-2 helper_text_white">Enter your question text here</div>
+                    </div>
+                </div>
+                <div class="col-md-12 pt-4" style="padding-left:.8rem;padding-right:.8rem">
+                    <div class="w-100">
+                        <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Show frequent words to users</h6><sup class="toolt quantext-info" title="When should users be able to see frequent word counts on this Quantext Live?"></sup>
+                        <select id="showFreq" class="form-control setting-control" name="show_freq">
+                            <option value="always">Always</option>
+                            <option value="after">After responding</option>
+                            <option value="never">Never</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12 pt-4" style="padding-left:.8rem;padding-right:.8rem">
+                    <div class="w-100">
+                        <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Is this Live public or private?</h6><sup class="toolt quantext-info" title="Should this Quantext Live be public (anyone can respond and responses are anonymous) or private (participants need to login to respond)"></sup>
+                        <select id="public" class="form-control setting-control" name="public">
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-4 p-0" style="justify-content: flex-end;display: flex;">
+                    <button class="btn btn-quantext main-theme-fill-1 centerFlex" id="new_live" style="margin-right:.8rem;font-weight:400;font-size:.9rem">Create Live</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- id="new_live" -->
+    <div class="quantext_sidebar main-theme-fill-dark">
+        <div class="inner-banner" style="opacity:.3"></div>
+        <div class="sidebar-div">
+            <div class="inner-icon quantext-chunky-duck" style="margin-top:.2rem"></div>
+        </div>
+        <div class="sidebar-div left_div mobile_hidden centerFlex pt-0" data-panel="menu">
+            <div class="inner-icon quantext-hamburger" style="margin-bottom: -.5rem;"></div>
+            <div class="sidebar-div-text">MENU</div>
+        </div>
+        <div id="new_panel" class="sidebar-div left_div mobile_hidden centerFlex pt-0" data-panel="new_live">
+            <div class="inner-icon quantext-add" style="margin-bottom: -.5rem;"></div>
+            <div class="sidebar-div-text">NEW</div>
+        </div>
+
+        <div class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="theme" style="margin-left:auto">
+            <div style="position:relative;display:block;margin-top:.5rem">
+                <div class="inner-icon quantext-circle" style="position:absolute;top:0;bottom:0;z-index:2"></div>
+                <div class="inner-icon theme-color-1 quantext-circle-half-left" style="position:absolute;top:0;bottom:0;"></div>
+                <div class="inner-icon theme-color-2 quantext-circle-half-right" style="position:absolute;top:0;bottom:0;"></div>
+            </div>
+            <div class="sidebar-div-text" style="margin-left:2.1rem">THEMES</div>
+        </div>
+        <div id="user_panel" class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="user">
+            <div class="main-theme-fill-menu" style="padding: .9rem .7rem;border-radius: 10rem;">
+                <div class="inner-icon quantext-user" style="margin-bottom: -.5rem;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="quantext_mobile_bar">
+        <div class="mobile_bar_div" data-panel="menu">
+            <div class="inner-icon quantext-hamburger"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="new">
+            <div class="inner-icon quantext-add"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="analyses">
+            <div class="inner-icon quantext-chart"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="files">
+            <div class="inner-icon quantext-file"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="theme">
+            <div class="inner-icon quantext-circle" style="z-index:2"></div>
+            <div class="inner-icon theme-color-1 quantext-circle-half-left"></div>
+            <div class="inner-icon theme-color-2 quantext-circle-half-right"></div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <div class="row pb-4 main-theme-border-1 centerFlex" style="padding-top: 3.5rem;border-bottom-width: 1px;border-bottom-style: solid;">
+            <div class="col-md-6 pl-4 pr-4 main-theme-color-1" style="font-size:2.5rem;font-weight:300">
+                Quantext Live
+            </div>
+            <div class="col-md-6 p-0 pr-4">
+                <h5 class="card-header centerFlex pl-0 pr-0 pb-0 mb-0 pt-0 small_text-9" style="background:white">Live analyses</h5>
+                <select id="live_analyses_list">
+                    <option placeholder>Please choose a Live analysis to view details</option>
+                    {% for q in all_columns %}
+                    <option value="{{ q[1] }}">{{ q[0] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row student_file_div">
+            {% if current_user.config["live_help"] == "True" %}
+            <div class="help_box p-4 ml-4 mt-4 mr-4 main-theme-border-1 main-theme-color-dark">
+                <div class="main-theme-fill-1" style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;z-index: 0;opacity: .05;"></div>
+                <div style="position: relative;z-index: 1;margin-right: 1rem;">Welcome to <b>Quantext Live</b>, a live data collection tool built on the Quantext platform that allows you to gather and analyse text data in real-time. You can create new Quantext Live questions, and then distribute the links to your participants. As they respond, your Quantext Live analyses will update the most frequent word and ngram counts, as well as some basic summary statistics. For more detailed analysis, you can open Quantext Live questions in the standard analysis console.</div>
+                <div class="close_help quantext-delete main-theme-color-1" style="z-index: 20;cursor:pointer;font-size: 1.8rem;margin-right: -.8rem;margin-top: -1rem;"></div>
+            </div>
+            {% endif %}
+            <div class="parent_0 p-4 pt-5 parentContainer col-md-12">
+                <div class="row m-0">
+                    <div class="col-md-12 p-0 mt-0 button_group" style="display:flex;align-items:baseline">
+                        <div class="overview_button main_buttons btn btn-quantext main-theme-fill-dark mr-2" style="border: none;box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;font-size:.9rem;cursor:pointer">
+                            Overview
+                        </div>
+                        <div class="explore_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                            Explore
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-0 overview_panel">
+                        <div class="row m-0">
+                            <div class="col-md-2 mt-5 p-0">
+                                <div class="histogramChart first_chart p-4 main-theme-fill-1">
+                                    <div id="analysis_count" style="font-size: 2.5rem;font-weight: 300;line-height: 1;">{{ all_columns|length }}</div>
+                                    Live analyses
+                                    <div class="quick_click left_div mobile_hidden centerFlex p-0" data-panel="new" style="cursor:pointer;justify-content: flex-end;margin-bottom: -1.5rem;">
+                                        <div class="sidebar-div-text">NEW</div><div class="inner-icon quantext-add" style="margin-left: .2rem;margin-bottom: -.5rem;margin-right:-.5rem;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-0 explore_panel hiddenNotHidden">
+                        <div class="empty_nest mt-2 pl-2 pr-2 main-theme-color-dark">Empty nest... click on a Live analysis from the dropdown list to view details</div>
+                        <div class="quantext-nest empty_nest main-theme-color-dark" style="font-size:4rem!important"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% include 'menus/menu.html' %}
+{% include 'menus/themes.html' %}
+{% include 'menus/user.html' %}
+
+<script type="text/javascript">
+
+    let key = "";
+
+    const freq_choices = new Choices('#showFreq',{itemSelectText:"",searchEnabled:false,shouldSort:false});
+    const public_choices = new Choices('#public',{itemSelectText:"",searchEnabled:false,shouldSort:false});
+
+    const live_choices = new Choices("#live_analyses_list",{itemSelectText:"",searchEnabled:false,shouldSort:false})
+    
+
+    let interval = null;
+
+/*    setInterval(function(){
+        fetch(`/live_ajax`).then(response => response.json()).then(result => {
+            let participants = document.querySelectorAll(".quantext-qlive");
+            result.forEach((opt, idx) => {
+                if(opt === 'True') {
+                    participants[idx].classList.add("main-theme-color-1");
+                    participants[idx].setAttribute("title","Participants are live now");
+                } else {
+                    participants[idx].classList.remove("main-theme-color-1");
+                    participants[idx].setAttribute("title","No participants live now");
+                }
+            });
+        });
+    },2000);*/
+
+    document.addEventListener("click", event => {
+        if (event.target)
+            if(event.target.matches("#new_live")){
+                let text = document.getElementById("new_question_text").value;
+                let show_freq = document.getElementById("showFreq").value;
+                let pub = document.getElementById("public").value;
+                let data = {
+                    "text":text,
+                    "show_freq":show_freq,
+                    "public":pub
+                };
+                if(text !== "")
+                    postData("{{ url_for('new_quantext_live') }}", data).then(response => {
+                        document.querySelectorAll(".panel_left.shown")[0].classList.remove("shown");
+                    });
+            } else if(event.target.closest(".quick_click")){                
+                document.getElementById("new_panel").click();
+            } else if(event.target.matches(".close_help")) {
+                postData("{{ url_for('close_help') }}",{"help":"live_help"}).then(response => {
+                    event.target.closest(".help_box").remove();
+                });
+            } else if (event.target.closest(".main_buttons")) {
+                let target = event.target.matches(".main_buttons") ? event.target : event.target.closest(".main_buttons");
+                //let number = target.dataset.number;
+                let parent = target.closest(".button_group");
+                parent.querySelectorAll(".main_buttons").forEach(div => {
+                    div.classList.remove("btn-quantext", "main-theme-fill-dark");
+                });
+                target.classList.add("btn-quantext", "main-theme-fill-dark");
+                target.classList.remove("button_outline");
+                if (target.matches(".overview_button")) {
+                    document.getElementsByClassName(`overview_panel`)[0].classList.remove("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel`)[0].classList.add("hiddenNotHidden");
+                } else if (target.matches(".explore_button")) {
+                    document.getElementsByClassName(`overview_panel`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel`)[0].classList.remove("hiddenNotHidden");
+                }
+        }
+    });
+
+    document.addEventListener("change", event => {
+        if(event.target)
+            if(event.target.matches("#live_analyses_list")) {
+                key = event.target.value;
+                event.target.classList.add("chosen");
+                fetch(`/live_top_data/${key}/admin`).then(response => response.text()).then(result => {
+                    document.querySelectorAll(".explore_panel")[0].innerHTML = result;
+                    const choices = new Choices('.live_control[name=show_freq]',{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                    const pchoices = new Choices('.live_control[name=public]',{itemSelectText:"",searchEnabled:false,shouldSort:false});
+
+                    document.querySelectorAll(".explore_button")[0].click();
+                    interval = setInterval(function(){
+                        fetch(`/poll_live_responses/${key}/admin`).then(response => response.json()).then(result => {
+                            document.getElementById("index_keywords_top_features").innerHTML = result.top;
+                            document.getElementById("all_responses_admin").innerHTML = result.right;
+                        });
+                    },2000);
+                });
+            } else if (event.target.matches(".live_control")) {
+                let val = event.target.value;
+                let name = event.target.getAttribute("name");
+                let file_id = event.target.dataset.file_id;
+                let analysis_id = event.target.dataset.analysis_id;
+                postData("/update_live_settings",{file_id:file_id,analysis_id:analysis_id,name:name,val:val}).then(response => response.text()).then(result => {
+                    console.log(result);
+                });
+            }
+    });
+
+</script>
+
+    {% else %}
+    <div class="pt-4">
+        <div style="text-align:center">
+            <img src="/static/img/quantext_duck_v4.svg" style="height:200px;max-width:100%" /><br/>
+            <br/>
+            <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='twitter') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Twitter <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div><br/>
+            <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='google') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Google <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div>
+
+        </div>
+        You have to log in for that first.
+
+        {% include 'footer.html' %}
+
+    </div>
+    {% endif %}
+
+{% endblock %}
+

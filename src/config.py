@@ -22,47 +22,59 @@ SECRET_KEY = 'you-will-never-guess'
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 #set defaults for file uploads
+DOC_FOLDER = os.path.join(basedir, 'doc_folder')
 UPLOAD_FOLDER = os.path.join(basedir, 'tmp/uploads')
+PANDAS_FOLDER = os.path.join(basedir, 'tmp/pandas')
 CORPUS_FOLDER = os.path.join(basedir, 'tmp/corpus')
 FILES_FOLDER = os.path.join(basedir, 'tft/static/files')
-ALLOWED_Q_EXTENSIONS = set(['xls', 'xlsx'])
+ALLOWED_Q_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 ALLOWED_T_EXTENSIONS = set(['pdf', 'txt'])
-MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024 * 10
 
-#Twitter credentials
-TWITTER_ID = "your-twitter-id"
-TWITTER_SECRET = "your-twitter-secret"
-
-#Google credentials
-GOOGLE_CLIENT_ID ="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+CELERY_BROKER_URL='redis://localhost:6379'
+CELERY_RESULT_BACKEND='redis://localhost:6379/0'
 
 #Mongo
 #NEED TO CHANGE THESE EACH TIME FOR LOCALHOST
 MONGODB_SETTINGS = {
     'db': 'tft'
+    #'host': 'mongodb://tft:tft@ds155587.mlab.com:55587/tft'
 }
 
 #Basic default settings
-KEYWORDS = 10
-#Trigrams sets length of keyphrase as 3 instead of default 2
-TRIGRAM = "Trigram"
-#NG_MEASURES: LR, PMI, CHISQ, STUDT, RAW
-NG_MEASURE = "LR"
+PREFILTER = True
+
+NKEYWORDS = 10
+REVERSELISTS = False
+
+NG_MEASURE = "STUDT"
 BLACKLIST = []
 WHITELIST = []
-MODEL_ANSWER = ""
+STOPLIST = "nltk"
+PUNCTLIST = [',','.',':',';','(',')','\\','/','_','@','#','^']
+SPECIAL_STOPS = ['URL_ADDR','EMAIL_ADDR','TWITTER_HANDLE',
+                 'NUMBER_IND', 'CUSTOM_PATTERN', 'AMB_HAD_WOULD',
+                 'AMB_IT_APOS_S']
+CUSTOM_PATTERN = r''
 
-# Frequency default settings
-KEY_BLACKLIST = True
-ONLY_WHITELIST = False
+FILTER_STOPS = 'ngstops'
+FILTER_SPECIALS = False
+#ONLY_WHITELIST = False
 FILTER_PUNCT = True
 FILTER_NUMS = False
+FILTER_URLS = False
+FILTER_EMAIL = False
+FILTER_TWITTER = False
+FILTER_CUSTOM = False
 NORM_CONTRACTIONS = True
-LCASE = True
-PUNCTLIST = [',','.',':',';','(',')','\\','/','_','@','#','^']
-WINDOW = 6
-# CGCUTOFF: >=1
+LCASE = "lcase"
+
+CONTENT_POS = ['NOUN','PROPN','VERB','ADJ','ADV']
+INCLUDE_POS = []
+EXCLUDE_POS = []
+MIN_FREQ = 1
+
+WINDOW = 2
 CGCUTOFF = 2
 
 #Similarity default settings
@@ -71,32 +83,28 @@ SPELLCHECK = False
 STEMMING = False
 NEGATIVE_REPLACER = False
 SYNONYM_REPLACER = False
-SIM_ALGORITHM = "word2vec"
+SIM_ALGORITHM = "cosine_diff"
+FEATURELIST = ['1gram','2gram','3gram','noun-phrase','named-entity']
+READABILITY_THRESHOLD = 30
+LUMINOSO = True
 
-#Readability show/hide
-READABILITY_WORDS = True
-READABILITY_SENTS = True
-READABILITY_TTR = True
-READABILITY_LD = True
-READABILITY_SMOG = True
-READABILITY_SIMILARITY = True
 
 OAUTH_CREDENTIALS = {
     'twitter': {
-        'id': TWITTER_ID,
-        'secret': TWITTER_SECRET
+        'id': 'H1qEC1ZzBLixBOjz9sZXfknxu',
+        'secret': 'RLTvVNiGig9TXbraoVe8IFNg9q6uZCL4Da7IVzXGbbfrQN6nhN'
     },
     'google':{
         "web":
             {
-                "client_id":GOOGLE_CLIENT_ID,
-                "project_id":"your-project-id",
+                "client_id":"361087200465-8mlufddta1so0aoosktih0c7cfqda5q8.apps.googleusercontent.com",
+                "project_id":"text-analytics-for-teachers",
                 "auth_uri":"https://accounts.google.com/o/oauth2/auth",
                 "token_uri":"https://accounts.google.com/o/oauth2/token",
                 "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-                "client_secret":GOOGLE_CLIENT_SECRET,
-                "redirect_uris":["http://127.0.0.1:8000","http://127.0.0.1:8000/google_callback"],
-                "javascript_origins":["http://127.0.0.1:8000"]
+                "client_secret":"GRtwpo6bjYvnYrdnBm0qA41S",
+                "redirect_uris":["http://0.0.0.0:80","http://0.0.0.0:80/google_callback"],
+                "javascript_origins":["http://0.0.0.0:80"]
             }
     }
 }

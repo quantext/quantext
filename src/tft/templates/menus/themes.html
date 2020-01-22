@@ -1,0 +1,153 @@
+<div class="m-0 corpora_panel panel_right theme_panel main-theme-fill-menu">
+    <div class="scroll_inside">
+        <h1 class="top_title pl-4 pt-4 pb-4 mb-0">
+            Themes
+            <div class="index-font close_corpora_panel"></div>
+        </h1>
+        <div class="w-100">
+            <div class="menu_item main-theme-color-dark small_text-9 p-4
+                {% if current_user.theme and current_user.theme == 'original' %}
+                selected
+                {% endif %}
+                " data-theme="original">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Quantext original</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #57b0c2 0, #57b0c2 33%, #193e45 33%, #193e45 66%, #ef8928 66%, #ef8928 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item main-theme-color-dark small_text-9 p-4
+                {% if current_user.theme and current_user.theme == 'drakemallard' %}
+                selected
+                {% endif %}
+                " data-theme="drakemallard">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Drake Mallard</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #1475b7 0, #1475b7 33%, #04865d 33%, #04865d 66%, #f9ac24 66%, #f9ac24 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item main-theme-color-dark small_text-9 p-4
+                {% if current_user.theme and current_user.theme == 'mandarin' %}
+                selected
+                {% endif %}
+                " data-theme="mandarin">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Mandarin</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #a2367c 0, #a2367c 33%, #fd722d 33%, #fd722d 66%, #ef1047 66%, #ef1047 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item main-theme-color-dark small_text-9 p-4
+                {% if current_user.theme and current_user.theme == 'torrent' %}
+                selected
+                {% endif %}
+                " data-theme="torrent">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Torrent</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #6f7a84 0, #6f7a84 33%, #ce893e 33%, #ce893e 66%, #da5a2b 66%, #da5a2b 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                {% if current_user.theme and current_user.theme == 'greenwingedteal' %}
+                selected
+                {% endif %}
+                " data-theme="greenwingedteal">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Green Winged Teal</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #20a949 0, #20a949 33%, #df672e 33%, #df672e 66%, #716049 66%, #716049 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                    {% if current_user.theme and current_user.theme == 'harlequin' %}
+                    selected
+                    {% endif %}
+                    " data-theme="harlequin">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Harlequin</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #c52d05 0, #c52d05 33%, #65625f 33%, #65625f 66%, #92786c 66%, #92786c 100%);"></div>
+                </div>
+            </div>
+            {% if current_user['beta'] and current_user['beta'] == 'True' %}
+                <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                        {% if current_user.theme and current_user.theme == 'cayuga' %}
+                        selected
+                        {% endif %}
+                        " data-theme="cayuga">
+                    <div class="row m-0">
+                        <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Cayuga (Beta)</div>
+                        <div class="col-md theme_bar" style="background: linear-gradient(to right, #0ab7b1 0, #0ab7b1 33%, #4062c3 33%, #4062c3 66%, #686de2 66%, #686de2 100%);"></div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if current_user['plan'] != "free" %}
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                    {% if current_user.theme and current_user.theme == 'ruddyduck' %}
+                    selected
+                    {% endif %}
+                    " data-theme="ruddyduck">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Ruddy Duck</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #37b3df 0, #37b3df 33%, #9c4615 33%, #9c4615 66%, #2a3d62 66%, #2a3d62 100%);"></div>
+                </div>
+            </div>
+            {% if current_user['plan'] == "hatchling" or current_user['plan'] == "full" or current_user['plan'] == "flock" %}
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                        {% if current_user.theme and current_user.theme == 'darkwing' %}
+                        selected
+                        {% endif %}
+                        " data-theme="darkwing">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Darkwing</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #875789 0, #875789 33%, #2f7581 33%, #2f7581 66%, #5b2252 66%, #5b2252 100%);"></div>
+                </div>
+            </div>
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                        {% if current_user.theme and current_user.theme == 'rubberducky' %}
+                        selected
+                        {% endif %}
+                        " data-theme="rubberducky">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Rubber Ducky</div>
+                    <div class="col-md theme_bar" style="background: linear-gradient(to right, #f9b234 0, #f9b234 33%, #fd722d 33%, #fd722d 66%, #ff9000 66%, #ff9000 100%);"></div>
+                </div>
+            </div>
+            {% if current_user['plan'] == "full" or current_user['plan'] == "flock" %}
+                <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                        {% if current_user.theme and current_user.theme == 'mighty1' %}
+                        selected
+                        {% endif %}
+                        " data-theme="mighty1">
+                    <div class="row m-0">
+                        <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Mighty I</div>
+                        <div class="col-md theme_bar" style="background: linear-gradient(to right, #068c95 0, #068c95 33%, #8e2543 33%, #8e2543 66%, #8a8782 66%, #8a8782 100%);"></div>
+                    </div>
+                </div>
+                <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                            {% if current_user.theme and current_user.theme == 'mighty2' %}
+                            selected
+                            {% endif %}
+                            " data-theme="mighty2">
+                    <div class="row m-0">
+                        <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>Mighty II</div>
+                        <div class="col-md theme_bar" style="background: linear-gradient(to right, #547840 0, #547840 33%, #853f61 33%, #853f61 66%, #583c55 66%, #583c55 100%);"></div>
+                    </div>
+                </div>
+            {% if current_user['plan'] == "flock" %}
+            <link rel="stylesheet" href="/static/css/themes/institutions.css"/>
+            <div class="menu_item  main-theme-color-dark small_text-9 p-4
+                        {% if current_user.theme and current_user.theme == current_user.institution %}
+                        selected
+                        {% endif %}
+                        " data-theme="{{ current_user.institution }}">
+                <div class="row m-0">
+                    <div class="col-md-7 pl-0 centerFlex"><div class="arrow" style="margin-top: -1px;">►</div>{{ current_user.institution }}</div>
+                    <div class="col-md theme_bar institution-box-1 {{ current_user.institution }}"></div>
+                    <div class="col-md theme_bar institution-box-2 {{ current_user.institution }}"></div>
+                    <div class="col-md theme_bar institution-box-3 {{ current_user.institution }}"></div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,460 +1,734 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% from 'macros.html' import checkbox %}
+
 {% if current_user.is_authenticated %}
 
-    <style>
-        .container-fluid{ margin-left:3.5rem!important;padding-top:1rem; }
-    </style>
+<style>
+    .main-theme-fill-dark:disabled { color:#aaa!important }
+</style>
 
-<ul class="notifications"></ul>
+<script src="{{ url_for('static', filename='js/moment.js') }}"></script>
 
-<div class="row below m-0 corpora_panel panel_left">
-    <div class="scroll_inside" data-simplebar>
-        <h1 class="top_title pl-4 pt-4 mb-0" style="display:flex;justify-content: space-between;width:100%">
-            Manage files
-            <div class="index-font close_corpora_panel"></div>
-        </h1>
-        <div class="pt-4 pl-4 pr-4 pb-0 centerFlex">
-            <button class="btn btn-quantext dark centerFlex mr-3 quick_upload_student_file" id="uploadFile">Upload student file <span class="quantext-upload index-font ml-1"></span></button>
-            <button class="btn btn-quantext dark centerFlex quick_upload_refcorpus" id="uploadRef">Upload reference material <span class="quantext-upload index-font ml-1"></span></button>
-        </div>
-        <div class="inner_corpora w-100">
-            <div class="centerFlex" style="justify-content: space-between">
-                <h5 id="file_header" class="centerFlex pl-4 pr-4 pt-4 mb-0">Student files (<span class="student_files">{{ files|length }}</span>)</h5>
-                <h5 id="switch_files" class="centerFlex pl-4 pr-4 pt-4 mb-0" style="color: #57b0c2;text-decoration: underline;cursor: pointer;">Reference materials (<span class="reference_files">{{ refcorpora|length }}</span>)</h5>
-            </div>
-            <ul id="files_list" class="list-group mt-2 pl-4 pr-4">
-                {% for f in files %}
-                    {% include 'partials/student_file_li.html' %}
-                {% endfor %}
-            </ul>
-            <ul id="refcorpus_list" class="list-group mt-2 pl-4 pr-4" style="display:none">
-                {% for r in refcorpora %}
-                    {% include 'partials/reference_material_li.html' %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+<link rel="stylesheet" href="{{ url_for('static', filename='js/choices/choices.min.css') }}">
+<script src="{{ url_for('static', filename='js/choices/choices.min.js') }}"></script>
+
+<div id="themeDiv">
+    <!-- theme css -->
+    {% if current_user.theme %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/' + current_user.theme + '.css') }}"/>
+    {% else %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}"/>
+    {% endif %}
 </div>
 
-    <div class="quantext_sidebar">
-        <div class="sidebar-div">
-            <div class="inner-icon quantext-chunky-duck"></div>
-            <div class="inner-text">
-                <a href="{{ url_for('index') }}"><div>Home</div></a>
-                <a href="{{ url_for('control_panel') }}"><div>Control panel</div></a>
-                <a href="{{ url_for('documentation') }}"><div>Documentation</div></a>
-                <a href="{{ url_for('development') }}"><div>Development journal</div></a>
-                <a href="{{ url_for('contact') }}"><div>Contact</div></a>
-                <a href="{{ url_for('logout') }}"><div>Logout</div></a>
-            </div>
-        </div>
+<!-- panels -->
 
+    <div class="quantext_sidebar main-theme-fill-dark">
+        <div class="inner-banner" style="opacity:.3"></div>
         <div class="sidebar-div">
-            <div class="inner-icon quantext-file"></div>
-            <div class="inner-text">
-                <div id="manageFiles">Manage files</div>
-                <div class="quick_upload_student_file">Quick upload student file (.xlsx)</div>
-                <div class="quick_upload_refcorpus">Quick upload reference materials (.pdf)</div>
-            </div>
+            <div class="inner-icon quantext-chunky-duck" style="margin-top:.2rem"></div>
         </div>
-
-        <div class="sidebar-div">
-            <div class="inner-icon quantext-play"></div>
-            <div class="inner-text">
-                {% if lastrun_analysis %}
-                    <a class="run-analysis" href="{{ url_for('analyse', analysis_id=lastrun_analysis['id']) }}"><div>Rerun "{{ lastrun_analysis['name'] }}"</div></a>
-                {% else %}
-                <div>No previous analysis</div>
-                {% endif %}
+        <div class="sidebar-div left_div mobile_hidden centerFlex pt-0" data-panel="menu">
+            <div class="inner-icon quantext-hamburger" style="margin-bottom: -.5rem;"></div>
+            <div class="sidebar-div-text">MENU</div>
+        </div>
+        
+        <div class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="theme" style="margin-left:auto">
+            <div style="position:relative;display:block;margin-top:.5rem">
+                <div class="inner-icon quantext-circle" style="position:absolute;top:0;bottom:0;z-index:2"></div>
+                <div class="inner-icon theme-color-1 quantext-circle-half-left" style="position:absolute;top:0;bottom:0;"></div>
+                <div class="inner-icon theme-color-2 quantext-circle-half-right" style="position:absolute;top:0;bottom:0;"></div>
+            </div>
+            <div class="sidebar-div-text" style="margin-left:2.1rem">THEMES</div>
+        </div>
+        <div id="user_panel" class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="user">
+            <div class="main-theme-fill-menu" style="padding: .9rem .7rem;border-radius: 10rem;">
+                <div class="inner-icon quantext-user" style="margin-bottom: -.5rem;"></div>
             </div>
         </div>
     </div>
-
-        <div class="row pt-3">
-            <form id="questionUpload" class="form-inline" action = "{{ url_for('upload_file_qs') }}" method = "POST" enctype = "multipart/form-data">
-                <input id="student_file_input" type="file" name="file" style="display: none;" multiple>
-            </form>
-            <form id="corpusUpload" class="form-inline" action = "{{ url_for('upload_file_teach') }}" method = "POST" enctype = "multipart/form-data">
-                <input id="refcorpus_input" type="file" name="file" style="display: none;" multiple>
-            </form>
-            <div class="col-md-12 pl-4 pr-4 pb-4">
-                <h1 class="top_title">Welcome {{ current_user['nickname'] }}</h1>
-                <h4 class="top_title"><span class="student_files">{{ files|length }}</span> student files uploaded</h4>
-                <h4 class="top_title"><span class="reference_files">{{ refcorpora|length }}</span> reference materials uploaded</h4>
+    <div class="quantext_mobile_bar">
+        <div class="mobile_bar_div" data-panel="menu">
+            <div class="inner-icon quantext-hamburger"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="new">
+            <div class="inner-icon quantext-add"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="analyses">
+            <div class="inner-icon quantext-chart"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="files">
+            <div class="inner-icon quantext-file"></div>
+        </div>
+        <div class="mobile_bar_div" data-panel="theme">
+            <div class="inner-icon quantext-circle" style="z-index:2"></div>
+            <div class="inner-icon theme-color-1 quantext-circle-half-left"></div>
+            <div class="inner-icon theme-color-2 quantext-circle-half-right"></div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <div class="row pb-4 main-theme-border-1 centerFlex" style="padding-top: 3.5rem;border-bottom-width: 1px;border-bottom-style: solid;">
+            <div class="col-md-6 pl-4 pr-4 main-theme-color-1" style="font-size:2.5rem;font-weight:300">
+                Welcome {{ current_user['display_name'] }}
             </div>
-            <div class="col-md-6 pl-4 pr-4 pb-4">
-                <h5 class="centerFlex mb-2">Past analyses ({{ analyses|length }})</h5>
-                <ul class="list-group">
-                    {% for a in analyses %}
-                        <li class="list-group-item m-0" style="border: none;padding: .5rem 0!important;border-bottom: 2px solid #eee!important">
-                            <div class="row w-100 centerFlex m-0">
-                                <div class="col-md-6 pl-0">
-                                    <span style="font-weight:500">{{ a['name'] }}</span>
-                                    <div class="col-md-12 p-0" style="color: #aaa;">
-                                        {{ a['files']|length }} student files | {{ a['refcorpus']|length }} reference materials
-                                    </div>
-                                </div>
-                                <div class="col-md-4" style="font-weight:500;text-align:right">{{ a['created'].strftime('%I:%M%p %d/%m/%Y') }}</div>
-                                <div class="col-md-2 pr-0" style="display:flex;justify-content: flex-end;margin-bottom: -.5rem;text-align: right;">
-                                    <a class="index-font mr-2 run-analysis" href="{{ url_for('analyse', analysis_id=a['id']) }}" title="Run this analysis">
-                                        <span class="quantext-play" style="font-size:2.5rem;color:#44c4b1;text-decoration:none;"></span>
-                                    </a>
-                                    <a href="#" class="index-font" title="Delete analysis">
-                                        <span class="quantext-delete deleteAnalysis deleteRed" data-id="{{ a['id'] }}" style="font-size:2.5rem;"></span>
-                                    </a>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="col-md-6 pl-4 pr-4 pb-4">
-                <h5 class="centerFlex mb-2">New analysis</h5>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="input-group">
-                            <div class="input-group-addon btn-quantext dark">Name</div>
-                            <input type="text" class="form-control" id="analysisName" />
-                            <button class="btn btn-quantext green centerFlex" id="runAnalysis">Run this analysis <span class="quantext-play index-font ml-1"></span></button>
-                        </div>
-                    </div>
-                    <div class="col-md-12 pt-4">
-                        <h3 class="pb-2" style="color:#999;font-weight:400"><span id="currFileCount">0</span> student files selected</h3>
-                        <h3 class="pb-2" style="color:#999;font-weight:400"><span id="currCorporaCount">0</span> reference materials selected</h3>
-                        <div id="addFiles">
-                            <div class="quantext-add"></div>
-                            <div style="font-weight:500;margin-top:-1.5rem">Add files</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-md-6 p-0 pr-4">
+        
             </div>
         </div>
+        <div class="row">
+            {% if current_user.config["control_help"] == "True" %}
+            <div class="help_box p-4 ml-4 mt-4 mr-4 main-theme-border-1 main-theme-color-dark">
+                <div class="main-theme-fill-1" style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;z-index: 0;opacity: .05;"></div>
+                <div style="position: relative;z-index: 1;margin-right: 1rem;">Welcome to the <b>Quantext control panel</b>. Here you can manage your files and analyses, and create new analyses. You can update your user details by clicking the user icon in the top right corner of the screen.
+                    Want to give your Quantext a fresh look? Try out the different themes, each inspired by the colours of real duck types!</div>
+                <div class="close_help quantext-delete main-theme-color-1" style="z-index: 20;cursor:pointer;font-size: 1.8rem;margin-right: -.8rem;margin-top: -1rem;"></div>
+            </div>
+            {% endif %}
+            <div class="parent_0 p-4 pt-5 parentContainer col-md-12">
+                <div class="row m-0" style="align-items: flex-start;">                    
+                    <div class="col-md-6 p-0 mt-0 button_group" style="display:flex;align-items:baseline">
+                        <div class="overview_button main_buttons btn btn-quantext main-theme-fill-dark mr-2" style="border: none;box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;font-size:.9rem;cursor:pointer">
+                            Overview
+                        </div>
+                        <div class="new_analysis_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                            New analysis
+                        </div>
+                        <div class="past_analyses_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                            Manage analyses
+                        </div>
+                        <div class="file_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                            Manage files
+                        </div>
+
+                        <div class="col-md-12 p-0 file_manager_panel hiddenNotHidden mt-5" style="height: 600px;display: flex;flex-direction: column;">
+                            <div class="row w-100 m-0 pb-3 centerFlex pl-0 pr-0">
+                                <div class="search_button_group">
+                                    <div class="quantext_files btn btn-quantext search_button search_selected" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">Quantext files (<span id="num_uploaded_files">{{ quantext_files|length }}</span>)</div>
+                                </div>
+                            </div>
+
+                            <div class="row m-0 pt-4 full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: row;padding: 0;padding-right: 2rem;">            
+                                <div class="col-md-6 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Filename</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Date created</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem;">Size</div>                                                                                                                                                                
+                            </div>
+                            <div id="files_list" style="overflow:auto;flex:1 1 0;padding-right: 1rem;">  
+                                {% if quantext_files|length > 0 %}
+                                    {% for file in quantext_files %}                  
+                                        {% include 'partials/file.html' %}
+                                    {% endfor %}
+                                {% else %}                                
+                                    {% include 'partials/empty_files.html' %}                                    
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 p-0 past_analyses_panel hiddenNotHidden mt-5" style="height: 600px;display: flex;flex-direction: column;">
+                            <div class="row w-100 m-0 pb-3 centerFlex pl-0 pr-0">
+                                <div class="search_button_group">
+                                    <div class="my_analyses btn btn-quantext search_button search_selected" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">My analyses (<span id="my_analyses_count">{{ analyses|length }}</span>)</div>
+                                    <div class="shared_with_me_analyses btn btn-quantext search_button ml-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">Shared with me (0)</div>
+                                </div>
+                            </div>
+
+                            <div class="row m-0 pt-4 full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: row;padding: 0;padding-right: 2rem;">            
+                                <div class="col-md-6 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Analysis name</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Date created</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem;">Date last run</div>                                                                                                                                                                
+                            </div>
+                            <div id="analysis_list" style="overflow:auto;flex:1 1 0;padding-right: 1rem;">  
+                                {% if analyses|length > 0 %}
+                                    {% for analysis in analyses %}                  
+                                        {% include 'partials/analysis.html' %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% include 'partials/empty_analyses.html' %}                                    
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 p-0 new_analysis_panel hiddenNotHidden mt-5" style="height: 600px;display: flex;flex-direction: column;">
+                            <div class="row w-100 m-0 pb-3 centerFlex pl-0 pr-0">
+                                <div class="search_button_group">
+                                    <div class="quantext_files btn btn-quantext search_button search_selected" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">Quantext files (<span id="num_uploaded_files_new">{{ quantext_files|length }}</span>)</div>
+                                </div>
+                            </div>
+
+                            <div class="row m-0 pt-4 full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: row;padding: 0;padding-right: 2rem;">            
+                                <div class="col-md-6 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Filename</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 0;color:#666!important;margin-top:0;padding: 0 2rem;">Date created</div>
+                                <div class="col-md-3 text_div main-theme-color-dark centerFlex" style="margin-top:0!important;font-size: .9rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem;">Size</div>                                                                                                                                                                
+                            </div>
+                            <div id="add_files_list" style="overflow:auto;flex:1 1 0;padding-right: 1rem;">  
+                                {% if quantext_files|length > 0 %}
+                                    {% for file in quantext_files %}                  
+                                        {% include 'partials/file.html' %}
+                                    {% endfor %}
+                                {% else %}                                
+                                    {% include 'partials/empty_files.html' %}                                    
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 p-0 overview_panel">
+                            <div class="row m-0" style="display:flex;align-items:flex-start">
+                                <div class="col-md-12 p-0">
+                                    <div class="row m-0">
+                                        <div class="col-md-4 mt-5 p-0">
+                                            <div class="histogramChart first_chart p-4 main-theme-fill-1">
+                                                <div id="analysis_count" style="font-size: 2.5rem;font-weight: 300;line-height: 1;">{{ analyses|length }}</div>
+                                                Analyses
+                                                <div class="quick_click left_div mobile_hidden centerFlex p-0" data-panel="new" style="cursor:pointer;justify-content: flex-end;margin-bottom: -1.5rem;">
+                                                    <div class="sidebar-div-text">NEW</div><div class="inner-icon quantext-add" style="margin-left: .2rem;margin-bottom: -.5rem;margin-right:-.5rem;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mt-5 p-0">
+                                            <div class="histogramChart p-4 main-theme-fill-2">
+                                                <div class="inner-banner"></div>
+                                                <div id="quantext_files_count" style="font-size: 2.5rem;font-weight: 300;line-height: 1;">{{ quantext_files|length }}</div>
+                                                Quantext files
+                                                <div class="quick_click left_div mobile_hidden centerFlex p-0" data-panel="files" style="cursor:pointer;justify-content: flex-end;margin-bottom: -1.5rem;">
+                                                    <div class="sidebar-div-text">UPLOAD</div><div class="inner-icon quantext-upload" style="margin-left: .2rem;margin-bottom: -.5rem;margin-right:-.5rem;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mt-5 p-0">
+                                            <div class="histogramChart p-4 main-theme-fill-3">
+                                                <div class="inner-banner"></div>
+                                                <div class="quantext_live_count" style="font-size: 2.5rem;font-weight: 300;line-height: 1;">{{ live_files|length }}</div>
+                                                Quantext Live
+                                                <a class="quick_click left_div mobile_hidden centerFlex p-0" href="{{ url_for('live_panel') }}" style="color:white!important;cursor:pointer;justify-content: flex-end;margin-bottom: -1.5rem;">
+                                                    <div class="sidebar-div-text">NEW</div><div class="inner-icon quantext-qlive" style="margin-left: .2rem;margin-bottom: -.5rem;margin-right:-.5rem;"></div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-0">
+                                        <div class="col-md-8 p-0 pl-0 pr-2 mt-5 screen_only" style="display:flex;flex-direction:column">
+                                            <div class="main-theme-color-dark mb-3 small_text-9" style="font-weight:500;">Activity graph</div>
+    
+                                            {% set currYear = "2020" %}                                
+                                            {% set months = ["J","F","M","A","M","J","J","A","S","O","N","D"] %}
+                                            {% for i in range(12) %}
+                                                <div class="month_cell">
+                                                    <div class="day_cell main-theme-color-menu" style="opacity:1;display:flex;font-size:.7rem;font-weight:bold;align-items:center;justify-content:center;background:white">{{ months[i] }}</div>
+                                                    {% for j in range(31) %}                                            
+                                                        <div class="day_cell main-theme-fill-1" style="
+                                                        {% if activity[currYear] and activity[currYear][i|string] and activity[currYear][i|string][j|string] %}
+                                                            {% set op = activity[currYear][i|string][j|string]/maxNum %}
+                                                            opacity:{{ op }};
+                                                        {% endif %}
+            
+                                                        {% if i in [3,5,8,10] %}
+                                                            {% if j == 30 %}
+                                                                background:white!important;
+                                                            {% endif %}
+                                                        {% elif i == 1 %}
+                                                            {% if j in [28,29,30] %}
+                                                                background:white!important;
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        "
+                                                        {% if activity[currYear] and activity[currYear][i|string] and activity[currYear][i|string][j|string] %}
+                                                            title="{{ activity[currYear][i|string][j|string] }}"
+                                                        {% endif %}
+                                                        ></div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>                                                        
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-0 pl-4 hiddenNotHidden file_manager_panel">
+                        <div class="main-theme-color-dark mt-0 mb-3 pl-2 small_text-9" style="font-weight:500;">UPLOAD NEW FILE</div>
+                        <form id="questionUpload" class="form-inline main-theme-fill-dark p-2 ml-2" action="{{ url_for('upload_file_qs') }}" method="POST" enctype="multipart/form-data">
+                            <input id="student_file_input" type="file" name="file" style="font-size:.8rem">
+                        </form>
+                        <div class="mb-2 helper_text_white ml-2" style="color: #aaa;">Click to choose a file</div>
+                        <div class="w-100 p-0 pt-4">
+                            <div class="row m-0 pt-0" style="height: 100%;">                        
+                                <div class="col-md-12 p-0" style="display: flex;flex-direction: column;padding-left: 1rem!important;">
+                                    <div class="main-theme-color-dark mt-4 pt-2 mb-3 small_text-9" style="font-weight:500;">FILE INFO</div>
+                                    <div id="file_details" class="w-100">
+                                        {% include 'partials/no_details.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-0 pl-4 hiddenNotHidden past_analyses_panel">                            
+                        <div class="w-100 p-0 pt-4">
+                            <div class="row m-0 pt-0" style="height: 100%;">                        
+                                <div class="col-md-12 p-0" style="display: flex;flex-direction: column;padding-left: 1rem!important;">
+                                    <div class="main-theme-color-dark mt-4 pt-2 mb-3 small_text-9" style="font-weight:500;">ANALYSIS INFO</div>
+                                    <div id="analysis_details" class="w-100">
+                                        {% include 'partials/no_details.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-0 pl-4 hiddenNotHidden new_analysis_panel">                            
+                        <div class="w-100 p-0 pt-4">
+                            <div class="row m-0 pt-0" style="height: 100%;">                        
+                                <div class="col-md-12 p-0" style="display: flex;flex-direction: column;padding-left: 1rem!important;">
+                                    <div class="main-theme-color-dark mt-4 pt-2 mb-3 small_text-9" style="font-weight:500;">NEW ANALYSIS DETAILS</div>
+                                    <div id="new_analysis_details" class="w-100">
+                                        {% include 'new_analysis_data.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-1 overview_panel"></div>
+                    <div class="col-md-4 p-0 pl-0 overview_panel">
+                        <div class="main-theme-color-dark mt-0 mb-3 small_text-9" style="font-weight:500;">LAST RUN ANALYSIS</div>
+                        {% if lastrun_analysis %}
+                            {% set analysis = lastrun_analysis %}
+                            {% set lastrun = True %}                              
+                            {% include 'partials/analysis_box.html' %}
+                        {% endif %}
+                    </div>                                                                            
+                </div>
+            </div>            
+        </div>
+    </div>
+
+{% include 'menus/menu.html' %}
+{% include 'menus/themes.html' %}
+{% include 'menus/user.html' %}
 
 <script type="text/javascript">
-    var plan = "{{ current_user['plan'] }}";
-    var $notifications = $(".notifications");
+    let plan = "{{ current_user['plan'] }}";
 
-    function notify(text, error) {
-        var $notification;
-        if(error)
-            $notification = $('<li style="background:#EF2828" />').html(text).css({left: 320});
-        else
-            $notification = $('<li />').html(text).css({left: 320});
-        $notifications.append($notification);
-        $notification.animate({left: 0}, 300,function(){});
-        return $notification;
-    }
-
-    $('.run-analysis').on('click', function(){
-        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...",false);
-    });
-
-    $("#addFiles, #manageFiles").on("click", function(){
-        var $corpora_panel = $(".corpora_panel");
-        $corpora_panel.addClass("shown");
-    });
-
-    $(".close_corpora_panel").on("click", function(){
-        $(".corpora_panel").removeClass("shown");
-    });
-
-    $(".quick_upload_student_file").on("click", function(){
-        var student_files = "{{ files|length }}";
-        if(plan == "free" && parseInt(student_files) >= 2) {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your student file limit (2) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
+    document.addEventListener("click", event => {
+        if (event.target)
+            if (event.target.closest(".search_button")) {
+                let parent = event.target.closest(".search_button_group");
+                parent.querySelectorAll(".search_button").forEach(div => {
+                    div.classList.remove("search_selected");
                 });
-            }, 3000);
-        }
-        else if(plan == "hatchling" && parseInt(student_files) >= 5) {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your student file limit (5) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
-                });
-            }, 3000);
-        }
-        else
-            $("#student_file_input").click();
-    });
-
-    $(".quick_upload_refcorpus").on("click", function(){
-        var reference_files = "{{ refcorpora|length }}";
-        if(plan == "free" && parseInt(reference_files) >= 2) {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your reference material limit (2) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
-                });
-            }, 3000);
-        }
-        else if(plan == "hatchling" && parseInt(reference_files) >= 5) {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached your reference material limit (5) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
-                });
-            }, 3000);
-        }
-        else
-            $("#refcorpus_input").click();
-    });
-
-    $(document).on('change', ':file', function() {
-        var input = $(this),
-            numFiles = input.get(0).files ? input.get(0).files.length : 1,
-            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-        var studentFile = (input.attr("id") == "student_file_input");
-
-        var ext = input.val().match(/\.([^\.]+)$/);
-        if(ext) {
-            ext = ext[1];
-            if(studentFile) {
-                switch (ext) {
-                    case 'xls':
-                    case 'xlsx':
-                        input.trigger('fileselect', [numFiles, label, studentFile]);
-                        break;
-                    default:
-                        var $notification = notify("<span class='quantext-alert'></span> Sorry, student files must be of type .xls or .xlsx.",true);
-                        setTimeout(function(){
-                            $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                        },3000);
-                        input.val('');
+                event.target.classList.add("search_selected");
+                if(event.target.matches("#analysis_quantext_files")){
+                    document.getElementById("analysis_quantext_files_list").style.display = "block";
+                    document.getElementById("analysis_quantext_live_list").style.display = "none";
+                } else if(event.target.matches("#analysis_quantext_live")){
+                    document.getElementById("analysis_quantext_files_list").style.display = "none";
+                    document.getElementById("analysis_quantext_live_list").style.display = "block";
+                } else if(event.target.matches("#my_analyses")){
+                    document.getElementById("analyses_list").style.display = "block";
+                    document.getElementById("shared_list").style.display = "none";
+                } else if(event.target.matches("#shared_analyses")){
+                    document.getElementById("analyses_list").style.display = "none";
+                    document.getElementById("shared_list").style.display = "block";
                 }
-            }
-            else{
-                switch (ext) {
-                    case 'pdf':
-                        input.trigger('fileselect', [numFiles, label, studentFile]);
-                        break;
-                    default:
-                        var $notification = notify("<span class='quantext-alert'></span> Sorry, reference materials must be of type .pdf.",true);
-                        setTimeout(function(){
-                            $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                        },3000);
-                        input.val('');
-                }
-            }
-        } else {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, this type of file is not allowed.",true);
-            setTimeout(function(){
-                $notification.animate({left: 320}, 300,function(){$notification.remove()});
-            },3000);
-        }
-    });
-
-    $(':file').on('fileselect', function(event, numFiles, label, isStudentFile) {
-        var displayBar = "<div id='questionUploadProgress' class='progress' style='width:200px'>\n" +
-            "<div class='progress-bar progress-bar-striped progress-bar-animated w-100' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='background-color: #44c4b1;'></div>\n" +
-            "</div>";
-        var $notification = notify("Uploading file..."+displayBar,false);
-        var self = $(this);
-        var files = self[0].files;
-        var formData = new FormData();
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            formData.append('file',file,file.name);
-        }
-        if(isStudentFile){
-            $.ajax({
-                type: 'POST',
-                url: "{{ url_for('upload_file_qs') }}",
-                data: formData,
-                success: function(data, textStatus, xhr) {
-                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                    if(xhr.status == 200)
-                    {
-                        var number_files = $("span.student_files:first").text();
-                        $("span.student_files").text(parseInt(number_files) + 1);
-                        $("#files_list").prepend(data);
-                        var $notify = notify("<span class='quantext-check'></span> File uploaded.",false);
-                        setTimeout(function(){
-                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
-                        },3000);
-                    }
-                    else
-                    {
-                        var $notify = notify("<span class='quantext-alert'></span> " + response,true);
-                        setTimeout(function(){
-                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
-
-                        },3000);
-                    }
-                },
-                error: function(response) {
-
-                },
-                processData: false,
-                contentType: false
-            });
-        }
-        else
-        {
-            $.ajax({
-                type: 'POST',
-                url: "{{ url_for('upload_file_teach') }}",
-                data: formData,
-                success: function(data, textStatus, xhr) {
-                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                    if(xhr.status == 200)
-                    {
-                        var number_files = $("span.reference_files:first").text();
-                        $("span.reference_files").text(parseInt(number_files) + 1);
-                        $("#refcorpus_list").prepend(data);
-                        var $notify = notify("<span class='quantext-check'></span> File uploaded.",false);
-                        setTimeout(function(){
-                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
-                        },3000);
-                    }
-                    else
-                    {
-                        var $notify = notify("<span class='quantext-alert'></span> " + response,true);
-                        setTimeout(function(){
-                            $notify.animate({left: 320}, 300,function(){$notify.remove()});
-                        },3000);
-                    }
-                },
-                error: function(response) {
-
-                },
-                processData: false,
-                contentType: false
-            });
-        }
-    });
-
-    $(document).on('click', '.student_file', function(){
-        $("#currFileCount").text($("input.student_file:checked").length);
-    });
-
-    $(document).on('click', '.ref_file', function(){
-        $("#currCorporaCount").text($("input.ref_file:checked").length);
-    });
-
-    $("#analysisName").on("keyup", function(e){
-        if(e.keyCode == 13)
-            $("#runAnalysis").click();
-    });
-
-    $("#runAnalysis").on('click', function() {
-        var analyses = "{{ analyses|length }}";
-        if (plan == "free" && parseInt(analyses) >= 1)
-        {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached the analysis limit (1) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
+            } else if (event.target.closest(".main_buttons")) {
+                let target = event.target.matches(".main_buttons") ? event.target : event.target.closest(".main_buttons");
+                let parent = target.closest(".button_group");
+                parent.querySelectorAll(".main_buttons").forEach(div => {
+                    div.classList.remove("btn-quantext", "main-theme-fill-dark");
                 });
-            }, 3000);
-        }
-        else if (plan == "hatchling" && parseInt(analyses) >= 5)
-        {
-            var $notification = notify("<span class='quantext-alert'></span> Sorry, you have reached the analysis limit (5) for this plan.", true);
-            setTimeout(function () {
-                $notification.animate({left: 320}, 300, function () {
-                    $notification.remove()
-                });
-            }, 3000);
-        }
-        else
-        {
-            var name = $("#analysisName").val();
-            var hasFiles = false;
-            var hasCorpus = false;
-
-            if (name != "") {
-                var data = [];
-                $("input.student_file:checked").each(function (i, e) {
-                    data.push($(e).data("id"));
-                });
-                if (data.length > 0) hasFiles = true;
-                var files = data.join(',');
-                data = [];
-
-                $("input.ref_file:checked").each(function (i, e) {
-                    data.push($(e).data("id"));
-                });
-                if (data.length > 0) hasCorpus = true;
-                var refcorpus = data.join(',');
-
-                var url = "{{ url_for('new_analysis') }}";
-
-                if (hasFiles) {
-                    var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...",false);
-                    $.post(url, {files: files, name: name, refcorpus: refcorpus}, function (response) {
-                        window.location = "{{ url_for('analyse') }}" + response;
+                target.classList.add("btn-quantext", "main-theme-fill-dark");
+                target.classList.remove("button_outline");
+                if (target.matches(".overview_button")) {
+                    document.querySelectorAll(`.overview_panel`).forEach(div => {
+                        div.classList.remove("hiddenNotHidden");
                     });
+                    document.querySelectorAll(`.file_manager_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.past_analyses_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.new_analysis_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                } else if (target.matches(".file_button")) {
+                    document.querySelectorAll(`.overview_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.file_manager_panel`).forEach(div => {
+                        div.classList.remove("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.past_analyses_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.new_analysis_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                } else if(target.matches(".new_analysis_button")){
+                    document.querySelectorAll(`.overview_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.file_manager_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.past_analyses_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.new_analysis_panel`).forEach(div => {
+                        div.classList.remove("hiddenNotHidden");
+                    });
+                } else if(target.matches(".past_analyses_button")){
+                    document.querySelectorAll(`.overview_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.file_manager_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.past_analyses_panel`).forEach(div => {
+                        div.classList.remove("hiddenNotHidden");
+                    });
+                    document.querySelectorAll(`.new_analysis_panel`).forEach(div => {
+                        div.classList.add("hiddenNotHidden");
+                    });
+                }
+            } else if(event.target.closest(".file_manager_div")){
+                let target = event.target.matches(".file_manager_div") ? event.target : event.target.closest(".file_manager_div");
+                let file_id = target.dataset.file_id;
+                document.querySelectorAll(".file_manager_div.file_selected").forEach(div => {
+                    div.classList.remove("file_selected");
+                });
+                target.classList.add("file_selected");
+                (async ()=> {
+                    document.getElementById("file_details").innerHTML = await request(`/file_data/${file_id}`);
+                })();
+            } else if(event.target.closest(".new_analysis_div")){
+                let target = event.target.matches(".new_analysis_div") ? event.target : event.target.closest(".new_analysis_div");
+                let file_id = target.dataset.file_id;
+                let add_files = document.getElementById("add_files");
+
+                if(target.classList.contains("file_selected")){
+                    target.classList.remove("file_selected");
+                    document.querySelectorAll(`.add_files_${file_id}`)[0].remove();
+                }                    
+                else{
+                    target.classList.add("file_selected");
+                    (async ()=> {
+                        add_files.insertAdjacentHTML("beforeend",await request(`/add_file_data/${file_id}`));  
+                    })();
+                }                
+                
+                if(document.querySelectorAll(".new_analysis_div.file_selected").length > 0){
+                    add_files.querySelectorAll(".empty_nest").forEach(div => {
+                        div.remove();
+                    });
+                } else {
+                    add_files.innerHTML = `{% include 'partials/empty_nest_new_analysis.html' %}`;
+                }
+                document.getElementById("columns_selected_analysis").innerHTML = document.querySelectorAll(".header_cell.column_selected").length;
+            } else if(event.target.closest(".add_cell")){
+                let target = event.target.matches(".add_cell") ? event.target : event.target.closest(".add_cell");
+                let parent = target.closest(".add_files")
+                let index = target.dataset.index;                
+
+                if(target.classList.contains("column_selected")){
+                    parent.querySelectorAll(`.add_cell_${index}`).forEach(div => {
+                        div.classList.remove("column_selected");
+                        div.classList.remove("main-theme-fill-1");
+                    });
+                } else {
+                    parent.querySelectorAll(`.add_cell_${index}`).forEach(div => {
+                        div.classList.add("column_selected");
+                        div.classList.add("main-theme-fill-1");
+                    });
+                }          
+                document.getElementById("columns_selected_analysis").innerHTML = document.querySelectorAll(".header_cell.column_selected").length;
+            } else if(event.target.closest(".analysis_div")){
+                let target = event.target.matches(".analysis_div") ? event.target : event.target.closest(".analysis_div");
+                let analysis_id = target.dataset.analysis_id;
+                document.querySelectorAll(".analysis_div.file_selected").forEach(div => {
+                    div.classList.remove("file_selected");
+                });
+                target.classList.add("file_selected");
+                (async ()=> {
+                    document.getElementById("analysis_details").innerHTML = await request(`/analysis_data/${analysis_id}`);
+                })();
+            } else if(event.target.closest(".file_click")){
+                if(!document.querySelectorAll(".files_panel")[0].classList.contains("shown"))
+                    document.getElementById("file_panel").click();
+            } else if(event.target.closest(".quick_click")){
+                let target = event.target.matches(".quick_click") ? event.target : event.target.closest(".quick_click");
+                let panel = target.dataset.panel;
+                if(panel === 'new' && !document.querySelectorAll(".new_panel")[0].classList.contains("shown"))
+                    document.getElementById("new_panel").click();
+                else if(panel === 'files' && !document.querySelectorAll(".files_panel")[0].classList.contains("shown"))
+                    document.getElementById("file_panel").click();
+            } else if(event.target.closest(".run-analysis")){
+                let $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...",false);
+            } else if(event.target.closest("#runAnalysis")){
+                let name = document.getElementById("analysisName").value;
+                let hasFiles = false;
+
+                if (name !== "") {
+                    let data = {};
+                    hasFiles = document.querySelectorAll(".header_cell.column_selected").length > 0;
+
+                    if (hasFiles) {
+                        document.querySelectorAll(".header_cell.column_selected").forEach(div => {
+                            let file_id = div.dataset.file_id;
+                            let index = div.dataset.index;
+                            if(!data[file_id])
+                                data[file_id] = {"columns":{}};
+                            
+                            data[file_id]["columns"][index] = {};
+                        });
+                        //let list_of_users = document.querySelectorAll(".list_of_users")[0].value.split(/\n/).join(",");
+                        postData("{{ url_for('new_analysis') }}",{ files: data, name: name, list_of_users:"" }).then(response => response.text()).then(result => {
+                            window.location = `{{ url_for('analyse') }}${result}`;
+                        });
+                    }
+                    else {
+                        let $notification = notify("<span class='quantext-alert'></span> Please select the files and columns you want to include in this analysis.", true);
+                        setTimeout(() => {
+                            animate($notification,"left",0,320,320, ()=>{ $notification.parentNode.removeChild($notification); });
+                        },5000);
+                    }
                 }
                 else {
-                    var $notification = notify("<span class='quantext-alert'></span> Please select at least one student file to analyse...", true);
-                    setTimeout(function () {
-                        $notification.animate({left: 320}, 300, function () {
-                            $notification.remove()
-                        });
-                    }, 3000);
+                    let $notification = notify("<span class='quantext-alert'></span> Please enter a name for this analysis.", true);
+                    setTimeout(() => {
+                        animate($notification,"left",0,320,320, ()=>{ $notification.parentNode.removeChild($notification); });
+                    },5000);
+                }
+            } else if(event.target.closest(".analysis_play")){
+                let id = event.target.getAttribute('data-id');
+                (async ()=> {
+                    let result = await request(`/get_deleted_files/${id}`);
+                    if(result === "deleted") {
+                        let popup = document.querySelectorAll(".quantext_popup")[0];
+                        popup.classList.add("fly_in");
+                        popup.setAttribute("data-id",id);
+                    }
+                    else
+                        window.location = `{{ url_for('analyse') }}${id}`;
+                })();
+            } else if(event.target.closest(".cancel_loading")){
+                document.querySelectorAll(".quantext_popup")[0].classList.remove("fly_in");
+            } else if(event.target.closest(".continue_loading_popup")){
+                let popup = document.querySelectorAll(".quantext_popup")[0];
+                let id = popup.dataset.id;
+                popup.classList.remove("fly_in");
+                window.location = `{{ url_for('analyse') }}${id}`;
+            } else if(event.target.closest(".delete_analysis_popup")){
+                let popup = document.querySelectorAll(".quantext_popup")[0];
+                let id = popup.dataset.id;
+                popup.classList.remove("fly_in");
+                postData("{{ url_for('delete_analysis') }}",{id:id}).then(response =>  {
+                    document.querySelectorAll(`.analysis_${id}`)[0].remove();
+                    let count = document.querySelectorAll("#analyses_list > .full_response_div").length;
+                    document.getElementById("my_analyses_count").innerHTML = count;
+                    document.getElementById("analysis_count").innerHTML = count;
+                });
+            } else if(event.target.closest(".deleteAnalysis")){
+                let id = event.target.dataset.id;
+                postData("{{ url_for('delete_analysis') }}",{id:id}).then(response => response.text()).then(result => {
+                    event.target.closest('.full_response_div').remove();
+                    document.querySelectorAll(".analysis_div.file_selected")[0].remove();
+                    let count = document.querySelectorAll("#analysis_list > .analysis_div").length;    
+                    document.getElementById("analysis_details").innerHTML = result;
+                    document.getElementById("my_analyses_count").innerHTML = count;
+                    document.getElementById("analysis_count").innerHTML = count;
+                });
+            } else if(event.target.closest(".deleteFile")){
+                let id = event.target.dataset.id;
+                let num = event.target.dataset.num;                
+                let parent = event.target.closest(".full_response_div");
+                postData("{{ url_for('delete_file') }}",{id:id}).then(response => response.text()).then(result => {
+                    event.target.closest('.full_response_div').remove();
+                    document.querySelectorAll(".file_manager_div.file_selected")[0].remove();
+                    let files_count = document.querySelectorAll("#files_list > .file_manager_div").length;    
+                    document.getElementById("file_details").innerHTML = result;
+                    document.getElementById("num_uploaded_files").innerHTML = files_count;
+                    document.getElementById("quantext_files_count").innerHTML = files_count;                    
+
+                    let analyse_files_list = document.getElementById("add_files_list");
+                    analyse_files_list.querySelectorAll(`.add_file_${id}`)[0].remove();
+                    document.getElementById("num_uploaded_files_new").innerHTML = document.querySelectorAll("#add_files_list > .new_analysis_div").length; 
+
+                    if(files_count == 0){
+                        document.getElementById("files_list").innerHTML = `{% include 'partials/empty_files.html' %}`;                        
+                        analyse_files_list.innerHTML = `{% include 'partials/empty_files.html' %}`; 
+                    }
+                });               
+            } else if(event.target.closest(".removeFile")){
+                let id = event.target.getAttribute("data-id");
+                event.target.closest('.full_response_div').remove();
+                let parent = document.getElementById("files_list_to_analyse");
+                let tba_count = parent.querySelectorAll(".quantext_file_analysis").length;
+                document.getElementById("to_be_analysed_count").innerHTML = tba_count;
+
+                if(tba_count === 0)
+                    parent.querySelectorAll(".empty_nest").forEach(div => {
+                        div.style.display = "block";
+                    });
+
+                document.querySelectorAll(`.file_div_${id}`)[0].classList.remove("to_be_analysed");
+            } else if(event.target.matches(".close_help")) {
+                postData("{{ url_for('close_help') }}",{"help":"control_help"}).then(response => {
+                    event.target.closest(".help_box").remove();
+                });
+            }
+    });
+
+    document.addEventListener("change", event => {
+        if(event.target)
+            if(event.target.type === "file"){
+                let studentFile = event.target.getAttribute("id") === "student_file_input";
+                let ext = event.target.value.match(/\.([^\.]+)$/);
+                if(ext) {
+                    ext = ext[1];
+                    if(studentFile) {
+                        switch (ext) {
+                            case 'xls':
+                            case 'xlsx':
+                            case 'pdf':
+                            case 'csv':
+                                let e = document.createEvent("Event");
+                                e.initEvent('fileselect',true,true);
+                                e.customData = [studentFile];
+                                event.target.dispatchEvent(e);
+                                break;
+                            default:
+                                let $notification = notify("<span class='quantext-alert'></span> Sorry, files must be of type .xls, .xlsx. or .pdf",true);
+                                setTimeout(() => {
+                                    animate($notification,"left",0,320,320, ()=>{ $notification.parentNode.removeChild($notification); });
+                                },5000);
+                                event.target.value = "";
+                        }
+                    }
+                } else {
+                    let $notification = notify("<span class='quantext-alert'></span> Sorry, this type of file is not allowed.",true);
+                    setTimeout(() => {
+                        animate($notification,"left",0,320,320, ()=>{ $notification.parentNode.removeChild($notification); });
+                    },5000);
                 }
             }
-            else {
-                var $notification = notify("<span class='quantext-alert'></span> Please enter a name...", true);
-                setTimeout(function () {
-                    $notification.animate({left: 320}, 300, function () {
-                        $notification.remove()
+    });
+
+    document.addEventListener("fileselect", (event) => {
+        if(event.target)
+            if(event.target.type === "file"){
+                let customData = event.customData;
+                let isStudentFile = customData[0];
+
+                let files = event.target.files;
+                let formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
+                    formData.append('file',file,file.name);
+                }
+                if(isStudentFile){
+                    let student_file_input = document.getElementById("student_file_input");
+                    student_file_input.setAttribute("disabled","disabled");
+
+                    fetch("{{ url_for('upload_file_qs') }}", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        body: formData, // body data type must match "Content-Type" header
+                    }).then(response => response.json()).then($data => {
+
+                        let PollState = function(task_id) {
+                            postData("poll_state",{task_id:task_id}).then(response => response.json()).then($task => {
+                                if ($task.process_percent) {
+
+                                } else {
+                                    clearInterval(timeout);
+                                    event.target.value = "";
+                                    student_file_input.removeAttribute("disabled");
+                                    
+                                    fetch(`/single_file/${$data.f.id}`).then(response => response.json()).then(result => {
+                                        let files_list = document.getElementById("files_list");
+                                        files_list.querySelectorAll(".empty_nest").forEach(div => {
+                                            div.style.display = "none";
+                                        });
+
+                                        files_list.insertAdjacentHTML("afterbegin",result.file);
+
+                                        let analyse_files_list = document.getElementById("add_files_list");
+                                        analyse_files_list.querySelectorAll(".empty_nest").forEach(div => {
+                                            div.style.display = "none";
+                                        });
+
+                                        analyse_files_list.insertAdjacentHTML("afterbegin",result.new_file);
+
+                                        files_list.querySelectorAll(".file_manager_div")[0].click();
+                                        document.getElementById("num_uploaded_files").innerHTML = document.querySelectorAll("#files_list > .file_manager_div").length;
+                                        document.getElementById("quantext_files_count").innerHTML = document.querySelectorAll("#files_list > .file_manager_div").length;
+                                        document.getElementById("num_uploaded_files_new").innerHTML = document.querySelectorAll("#add_files_list > .new_analysis_div").length;
+                                    });
+                                }
+                            });
+                        };
+
+                        let timeout = setInterval(function(){ PollState($data.job_id) },250);
                     });
-                }, 3000);
+                }
             }
-        }
     });
 
-    $(document).on("click",".deleteAnalysis", function(){
-        var self = $(this);
-        var id = self.data("id");
-        $.post("{{ url_for('delete_analysis') }}", {id:id}, function(){
-            window.location.reload();
-        });
+    document.addEventListener("keyup", event => {
+        if(event.target)
+            if(event.target.closest("#analysisName") && event.keyCode === 13)
+                document.getElementById("runAnalysis").click();
     });
 
-    $(document).on("click", ".deleteFile", function(){
-        var self = $(this);
-        var id = self.data("id");
-        $.post("{{ url_for('delete_file') }}", {id:id}, function(){
-            window.location.reload();
-        });
-    });
+    let popup = document.createElement("div");
+    popup.classList.add("quantext_popup");
+    let veil = document.createElement("div");
+    veil.classList.add("main-theme-fill-dark");
+    veil.style.opacity = .2;
+    veil.style.width = "100%";
+    veil.style.height = "100%";
+    popup.append(veil);
 
-    $(document).on("click", ".deleteReference", function(){
-        var self = $(this);
-        var id = self.data("id");
-        $.post("{{ url_for('delete_reference') }}", {id:id}, function(){
-            window.location.reload();
-        });
-    });
+    let popup2 = document.createElement("div");
+    popup2.classList.add("quantext_popup");
+    let inner_div = document.createElement("div");
+    inner_div.classList.add("inner_popup","main-theme-color-dark","main-theme-border-dark");
+    let h = document.createElement("h6");
+    h.classList.add("p-4");
+    h.innerHTML = "Quack!";
+    let d = document.createElement("div");
+    d.classList.add("pl-4","pr-4","pb-4");
+    d.innerHTML = "This analysis references files that have been deleted. You can continue to load this analysis, but you will be unable to view any files which have been deleted. Would you like to continue to load this analysis, or delete it from your analysis list?";
 
-    $("#switch_files").on("click", function(){
-        if($("#files_list").is(":visible")){
-            $("#files_list").hide();
-            $("#refcorpus_list").show();
-        } else {
-            $("#files_list").show();
-            $("#refcorpus_list").hide();
-        }
-        var file_header = $("#file_header").text();
-        var switch_files = $("#switch_files").text();
-        $("#file_header").text(switch_files);
-        $("#switch_files").text(file_header);
-    });
+    let buttons = document.createElement("div");
+    buttons.classList.add("centerFlex","p-4");
+
+    let b1 = document.createElement("button");
+    b1.classList.add("btn","btn-quantext","main-theme-fill-1","continue_loading_popup");
+    b1.innerHTML = "Continue loading";
+    b1.style.fontWeight = 500;
+
+    let b2 = document.createElement("button");
+    b2.classList.add("btn","btn-quantext","main-theme-fill-1","ml-4","delete_analysis_popup");
+    b2.innerHTML = "Delete analysis";
+    b2.style.fontWeight = 500;
+
+    let b3 = document.createElement("button");
+    b3.classList.add("btn","btn-quantext","main-theme-fill-dark","cancel_loading");
+    b3.innerHTML = "Cancel";
+    b3.style.marginLeft = "auto";
+    b3.style.fontWeight = 500;
+
+    buttons.append(b1,b2,b3);
+    inner_div.append(h,d,buttons);
+    popup2.append(inner_div);
+    document.querySelectorAll('body')[0].append(popup,popup2);
 
 </script>
 
     {% else %}
     <div class="pt-4">
         <div style="text-align:center">
-            <img src="/static/img/quantext_duck_v4.svg" style="height:200px;max-width:100%" /><br/>
+            <img src="{{ url_for('static', filename='img/quantext_duck_v4.svg') }}" style="height:200px;max-width:100%" /><br/>
             <br/>
             <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='twitter') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Twitter <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div><br/>
             <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='google') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Google <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div>

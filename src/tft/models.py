@@ -19,17 +19,26 @@ from tft import db, lm
 import datetime
 
 class User(db.Document, UserMixin):
-    social_id = db.StringField()
-    nickname = db.StringField()
+    username = db.StringField()
+    password = db.StringField()
     email = db.StringField()
+    confirmed = db.StringField()
+
+    first_name = db.StringField()
+    last_name = db.StringField()
+
+    google_id = db.StringField()
+    twitter_id = db.StringField()
+    canvas_id = db.StringField()
+    display_name = db.StringField()
+
     theme = db.StringField(default="original")
     plan = db.StringField(default="free")
-    isAdmin = db.StringField(default="false")
+    beta = db.StringField(default="False")
+    institution = db.StringField()
 
-    def save(self, *args, **kwargs):
-        if not self.theme:
-            self.theme = "original"
-        return super(User,self).save(*args, **kwargs)
+    isAdmin = db.StringField(default="false")
+    config = db.DictField()
 
 @lm.user_loader
 def load_user(id):
@@ -40,36 +49,33 @@ def load_user(id):
 
     return user
 
-class Question(db.EmbeddedDocument):
-    qNum = db.IntField()
-    qTitle = db.StringField()
-    qText = db.StringField()
-    numResponses = db.IntField()
-    referenceAnswers = db.ListField(db.StringField())
-    categories = db.ListField(db.StringField())
-    blist = db.ListField(db.StringField())
-    wlist = db.ListField(db.StringField())
-    qSettings = db.DictField()
-
 class File(db.Document):
     owner = db.ReferenceField(User)
     filename = db.StringField(unique=False)
-    questions = db.ListField(db.EmbeddedDocumentField(Question))
     created = db.DateTimeField(default=datetime.datetime.now)
     status = db.StringField()
-
-class RefCorpus(db.Document):
-    owner = db.ReferenceField(User)
-    filename = db.StringField(unique=False)
-    created = db.DateTimeField(default=datetime.datetime.now)
-    status = db.StringField()
+    file_type = db.StringField()
+    columns = db.ListField()
+    rows = db.IntField()
+    filesize = db.IntField()
 
 class Analysis(db.Document):
     owner = db.ReferenceField(User)
     created = db.DateTimeField(default=datetime.datetime.now)
     lastrun = db.DateTimeField(default=datetime.datetime.now)
-    files = db.ListField(db.ReferenceField(File))
-    refcorpus = db.ListField(db.ReferenceField(RefCorpus))
+    files = db.DictField()
     name = db.StringField()
     status = db.StringField()
     laststate = db.StringField()
+    type = db.StringField()
+
+    shared = db.ListField(db.ReferenceField(User))
+    to_share = db.ListField(db.StringField())
+
+class URL(db.Document):
+    key = db.StringField()
+    analysis_id = db.StringField()
+    file_id = db.StringField()
+    question_number = db.StringField()
+
+

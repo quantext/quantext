@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}">
+<div class="pt-4">
+    <div class="row" style="text-align:center">
+        <div class="col-md-12">
+            <img src="{{ url_for('static', filename='img/quantext_title.svg') }}" style="height:100px;max-width:100%" />
+        </div>
+        <div class="col-md-12" style="text-align: center;margin-top: .5rem;margin-bottom: -1rem;">
+            <div style="display: inline-flex;border-radius: 100px;">
+                <img src="{{ url_for('static', filename='img/quantext_duck_4_solo.svg') }}" style="height: 80px;max-width:100%;">
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="index_question_box">
+                {{ question['text'] }}<br/>
+                <input data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}" placeholder="Type your answer here and press enter" type="text" class="form-control kwic_bar response_list main-theme-fill-dark mt-4" style="text-align:center">
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="index_keywords_top_features" class="row index_keywords pl-4">
+                {% include 'index_keywords.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener("keypress",(event) => {
+        if (event.target.matches(".kwic_bar")) {
+            if (event.keyCode === 13) {
+                if(event.target.value !== "") {
+                    let analysis_id = "{{ analysis['id'] }}";
+                    let file_id = "{{ file['id'] }}";
+                    let question_number = event.target.dataset.question_number;
+                    let response = event.target.value;
+                    event.target.value = "";
+                    postData("/save_live_response", {
+                        analysis_id: analysis_id,
+                        file_id: file_id,
+                        question_number: question_number,
+                        response: response
+                    }).then(response => response.text()).then(result => {
+                        document.querySelectorAll(".index_keywords")[0].innerHTML = result;
+                    });
+                }
+            }
+        }
+    });
+
+    setInterval(function(){
+        fetch(`/poll_live_responses/{{ key }}/user`).then(response => response.json()).then(result => {
+            document.getElementById("index_keywords_top_features").innerHTML = result.top;
+            document.getElementById("all_responses_admin").innerHTML = result.right;
+        })
+    },2000);
+
+   /* $("#display_responses").on("click", function(){
+        $(".index_keywords").show();
+    });
+*/
+</script>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% if list == "analysis_files" %}
+<div class="empty_nest mt-4 pl-2 pr-2">Empty nest... try adding some files</div>
+{% elif list == "files" %}
+<div class="empty_nest mt-4 pl-2 pr-2">Empty nest... try uploading some files</div>
+{% elif list == "analyses" %}
+<div class="empty_nest mt-4 pl-2 pr-2">Empty nest... try creating a new analysis</div>
+{% elif list == "shared" %}
+<div class="empty_nest mt-4 pl-2 pr-2">Empty nest... no analyses shared with you yet</div>
+{% endif %}
+<div class="quantext-nest empty_nest" style="font-size:4rem!important"></div>

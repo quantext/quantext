@@ -1,0 +1,18 @@
+<div class="row centerFlex m-0 full_response_div main-theme-color-dark quantext_file_div">
+    <div class="col-md-11">
+        <div class="row">
+            <div class="col-md-9 p-0 centerFlex">
+                <div class="centerFlex">
+                    <div class="small_text-8">{{ f['filename'] }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 pr-0 centerFlex" style="color:#888;font-weight:400;text-align:right">{{ f['created'].strftime('%d.%m.%Y %H:%M') }}</div>
+            <div class="col-md-12 p-0 small_text-8" style="color: #aaa;">{{ f['columns']|length }} columns x {{ f['rows'] }} rows</div>
+        </div>
+    </div>
+    <div class="col-md-1 p-0 centerFlex" style="justify-content: flex-end;line-height:1">
+        <a href="#" class="index-font">
+            <span class="quantext-delete main-theme-color-1 deleteFile" data-id="{{ f['id'] }}" style="font-size:2rem;"></span>
+        </a>
+    </div>
+</div>

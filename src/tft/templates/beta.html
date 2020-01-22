@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/themes/original.css">
+<style>
+    .container-fluid{ padding-top:0!important }
+    a{ color:#57b0c2;font-weight:600 }
+</style>
+{% include 'nav.html' %}
+<div class="index_background" style="background:url(static/img/background-blue.jpg);background-size:cover;background-position:0 -500px;position: fixed;top:0;left:0;right:0;bottom:0;z-index:-1"></div>
+
+<div class="pt-4">
+    <div class="row">
+        <div class = "col-md-12 pl-4 pr-4">
+            <h1 class="top_title main-theme-color-1 m-0 quantext_info_box">Beta signup</h1>
+            <div class="col-md-12 p-0 mt-4 quantext_info_box main-theme-color-dark" style="text-transform: uppercase;font-size:1.2rem;font-weight:600;line-height: 1;">Below are details of the beta signup for Quantext</div>
+            <div class="col-md-12 p-0 mt-4 quantext_info_box">
+                <p>There are 2 ways to experience Quantext, depending on your needs.</p>
+                <p>The <b>free</b> tier is the default tier for new signups. There are no costs associated with this tier (and never will be!)... perfect for trying out the core functionality of Quantext. This tier is has some limited functionality,
+                but the good news is you can upgrade your plan at any time!</p>
+                <p>The <b>beta signup</b> tier is the first of our paid plans. It comes with advanced metrics, and some additional functionality such as basic reporting and data export options. Please email <a href="mailto:info@quantext.co.nz?subject=Beta enquiry">info@quantext.co.nz</a> to sign up to the beta.</p>
+                <p>More plans to be announced!</p>
+            </div>
+        </div>
+        <div class="col-md-6 pl-4 pr-4">
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4"></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4"><img src="/static/img/quantext_beta_icon.svg" style="height:200px;max-width:100%"></div>
+            </div>
+            <div class="row m-0" style="text-align:center;font-weight:bold;text-transform:uppercase">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">Free</div>
+                <div class="col-md-4">Beta</div>
+            </div>
+            <div class="row m-0" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Monthly fee</div>
+                <div class="col-md-4">$0</div>
+                <div class="col-md-4">$12</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Annual fee</div>
+                <div class="col-md-4">$0</div>
+                <div class="col-md-4">$125</div>
+            </div>
+            <div class="row pt-2 pb-3 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-4"></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4" style="font-weight:bold"><a href="mailto:info@quantext.co.nz?subject=Beta enquiry">Enquire about the beta!</a></div>
+            </div>
+            <div class="row pb-2 pt-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">File limits</div>
+                <div class="col-md-4">2</div>
+                <div class="col-md-4">10</div>
+            </div>
+            <div class="row pt-2 m-0" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Readability metrics</div>
+                <div class="col-md-4">Basic</div>
+                <div class="col-md-4">Advanced</div>
+            </div>
+            <div class="row m-0" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Word frequencies</div>
+                <div class="col-md-4">Basic</div>
+                <div class="col-md-4">Advanced</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Visualisations</div>
+                <div class="col-md-4">Yes</div>
+                <div class="col-md-4">Yes</div>
+            </div>
+            <div class="row pt-2 m-0" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Reporting</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4">Basic</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Data export</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4">Yes</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">LTI integration</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4">Yes (coming soon)</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Auto labelling</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Keyness comparisons</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Quantext Live</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Student dashboard</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Custom models</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-4" style="color: crimson;font-weight: bold;">No</div>
+            </div>
+            <div class="row pt-2 ml-0 mr-0 mb-4" style="text-align:center">
+                <div class="col-md-4" style="text-align:left;font-weight:bold;text-transform:uppercase">Themes</div>
+                <div class="col-md-4">Base themes only</div>
+                <div class="col-md-4">Base +1 exclusive beta theme</div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</div>
+
+{% endblock %}
+

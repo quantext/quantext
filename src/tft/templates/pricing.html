@@ -1,121 +1,174 @@
 {% extends "base.html" %}
 {% block content %}
-
+<link rel="stylesheet" href="/static/css/themes/original.css">
+<style>
+    .container-fluid{ padding-top:0!important }
+    a{ color:#57b0c2 }
+</style>
 {% include 'nav.html' %}
+<div class="index_background" style="background:url(static/img/background-blue.jpg);background-size:cover;background-position:0 -500px;position: fixed;top:0;left:0;right:0;bottom:0;z-index:-1"></div>
 
 <div class="pt-4">
-    <div class="row mt-5 pl-5 pr-5">
-        <div class="col-md-12 pl-0 pr-0">
-            <h1 class="top_title">Pricing</h1>
-        </div>
-        <div class="col-md-4">
-            <div class="centerFlex" style="flex-flow: column;">
-                <img src="/static/img/quantext_egg.svg" style="height:200px;max-width:100%">
-                <h2>Egg tier</h2>
-                <table width="100%" style="margin-top: 2rem;">
-                    <tbody>
-                        <tr>
-                            <td class="pricing_left">Price</td>
-                            <td class="pricing_right">Free</td>
-                        </tr>
-                        <tr>
-                            <td class="pricing_left">Student file limits</td>
-                            <td class="pricing_right">2 active files at a time</td>
-                        </tr>
-                        <tr>
-                            <td class="pricing_left">Reference material limits</td>
-                            <td class="pricing_right">2 active files at a time</td>
-                        </tr>
-                        <tr>
-                            <td class="pricing_left">Analysis limits</td>
-                            <td class="pricing_right">1 active analysis at a time</td>
-                        </tr>
-                        <tr>
-                            <td class="pricing_left">Export options</td>
-                            <td class="pricing_right">.pdf only</td>
-                        </tr>
-                        <tr>
-                            <td class="pricing_left">Reporting</td>
-                            <td class="pricing_right">Standard options only</td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="row">
+        <div class = "col-md-12 pl-4 pr-4">
+            <h1 class="top_title main-theme-color-1 m-0 quantext_info_box">Pricing</h1>
+            <div class="col-md-12 p-0 mt-4 quantext_info_box main-theme-color-dark" style="text-transform: uppercase;font-size:1.2rem;font-weight:600;line-height: 1;">Below are the pricing plans for Quantext</div>
+            <div class="col-md-12 p-0 mt-4 quantext_info_box">
+                <p>There are 5 Quantext tiers to choose from, depending on your needs.</p>
+                <p>The <b>free</b> tier is the default tier for new signups. There are no costs associated with this tier (and never will be!)... perfect for trying out the core functionality of Quantext. This tier is has some limited functionality,
+                but the good news is you can upgrade your plan at any time!</p>
+                <p>The <b>egg</b> tier is the first of our paid plans. It comes with advanced metrics, and some additional functionality such as basic reporting and data export options.</p>
+                <p>For those who want to explore even more, the <b>hatchling</b> tier offers a labelling interface for automatically classifying response data, as well as some advanced reporting features.</p>
+                <p>For those who really want to spread their wings, our <b>full flight</b> tier offers an impressive array of functionality and some
+                    unique interfaces such as Quantext Live and the student dashboard. We also offer custom modelling services to full flighters (at a negotiable extra charge).</p>
+                <p>Finally, institutions may want to consider signing up to the <b>flock</b> tier - unlimited full flight licenses for your staff (excellent savings for institutions with more than 10 users!)</p>
+                <p>A full breakdown of the different plans is shown below.</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="centerFlex" style="flex-flow: column;">
-                <img src="/static/img/quantext_hatchling.svg" style="height:200px;max-width:100%">
-                <h2>Hatchling tier</h2>
-                <table width="100%" style="margin-top: 2rem;">
-                    <tbody>
-                    <tr>
-                        <td class="pricing_left">Price</td>
-                        <td class="pricing_right">$7/month</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Student file limits</td>
-                        <td class="pricing_right">5 active files at a time</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Reference material limits</td>
-                        <td class="pricing_right">5 active files at a time</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Analysis limits</td>
-                        <td class="pricing_right">5 active analyses at a time</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Export options</td>
-                        <td class="pricing_right">.pdf, .xlsx</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Reporting</td>
-                        <td class="pricing_right">Customisable reporting options</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Additional themes</td>
-                        <td class="pricing_right">Harlequin, Ruddy Duck</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="col-md-12 pl-4 pr-4">
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2"></div>
+                <div class="col-md-2"></div>
+                <div class="col-md-2"><img src="/static/img/quantext_egg.svg" style="height:200px;max-width:100%"></div>
+                <div class="col-md-2"><img src="/static/img/quantext_hatchling.svg" style="height:200px;max-width:100%"></div>
+                <div class="col-md-2"><img src="/static/img/quantext_full_flight.svg" style="height:200px;max-width:100%"></div>
+                <div class="col-md-2"><img src="/static/img/quantext_flock.svg" style="height:200px;max-width:100%"></div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="centerFlex" style="flex-flow: column;">
-                <img src="/static/img/quantext_full_flight.svg" style="height:200px;max-width:100%">
-                <h2>Full flight tier</h2>
-                <table width="100%" style="margin-top: 2rem;">
-                    <tbody>
-                    <tr>
-                        <td class="pricing_left">Price</td>
-                        <td class="pricing_right">$25/month</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Student file limits</td>
-                        <td class="pricing_right">Unlimited</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Reference material limits</td>
-                        <td class="pricing_right">Unlimited</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Analysis limits</td>
-                        <td class="pricing_right">Unlimited</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Export options</td>
-                        <td class="pricing_right">.pdf, .xlsx</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Reporting</td>
-                        <td class="pricing_right">Customisable reporting options</td>
-                    </tr>
-                    <tr>
-                        <td class="pricing_left">Additional themes</td>
-                        <td class="pricing_right">Harlequin, Ruddy Duck, Darkwing, Rubber Ducky, Mighty I, Mighty II</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="row m-0" style="text-align:center;font-weight:bold;text-transform:uppercase">
+                <div class="col-md-2"></div>
+                <div class="col-md-2">Free</div>
+                <div class="col-md-2">Egg</div>
+                <div class="col-md-2">Hatchling</div>
+                <div class="col-md-2">Full flight</div>
+                <div class="col-md-2">Flock</div>
+            </div>
+            <div class="row m-0" style="text-align:center;">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Monthly fee</div>
+                <div class="col-md-2">$0</div>
+                <div class="col-md-2">$12</div>
+                <div class="col-md-2">$60</div>
+                <div class="col-md-2">$300</div>
+                <div class="col-md-2">By negotiation</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Annual fee</div>
+                <div class="col-md-2">$0</div>
+                <div class="col-md-2">$125</div>
+                <div class="col-md-2">$600</div>
+                <div class="col-md-2">$3000</div>
+                <div class="col-md-2">By negotiation</div>
+            </div>
+            <div class="row pt-2 pb-3 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-2"></div>
+                <div class="col-md-2"></div>
+                <div class="col-md-2" style="font-weight:bold"><a href="mailto:info@quantext.co.nz?subject=Egg tier enquiry">Enquire about this plan!</a></div>
+                <div class="col-md-2" style="font-weight:bold"><a href="mailto:info@quantext.co.nz?subject=Hatchling tier enquiry">Enquire about this plan!</a></div>
+                <div class="col-md-2" style="font-weight:bold"><a href="mailto:info@quantext.co.nz?subject=Full tier enquiry">Enquire about this plan!</a></div>
+                <div class="col-md-2" style="font-weight:bold"><a href="mailto:info@quantext.co.nz?subject=Flock tier enquiry">Enquire about this plan!</a></div>
+            </div>
+            <div class="row pb-2 pt-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">File limits</div>
+                <div class="col-md-2">2</div>
+                <div class="col-md-2">10</div>
+                <div class="col-md-2">Unlimited</div>
+                <div class="col-md-2">Unlimited</div>
+                <div class="col-md-2">Unlimited</div>
+            </div>
+            <div class="row pt-2 m-0" style="text-align:center;">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Readability metrics</div>
+                <div class="col-md-2">Basic</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+            </div>
+            <div class="row m-0" style="text-align:center;">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Word frequencies</div>
+                <div class="col-md-2">Basic</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Visualisations</div>
+                <div class="col-md-2">Basic</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+            </div>
+            <div class="row pt-2 m-0" style="text-align:center;">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Reporting</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Basic</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+                <div class="col-md-2">Advanced</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Data export</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">LTI integration</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Auto labelling</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Keyness comparisons</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Limited</div>
+                <div class="col-md-2">Unlimited</div>
+                <div class="col-md-2">Unlimited</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Quantext Live</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+            </div>
+            <div class="row m-0" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Student dashboard</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes</div>
+                <div class="col-md-2">Yes</div>
+            </div>
+            <div class="row pb-2 m-0" style="text-align:center;border-bottom:2px solid #57b0c2!important">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Custom models</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2" style="color: crimson;font-weight: bold;">No</div>
+                <div class="col-md-2">Yes*</div>
+                <div class="col-md-2">Yes*</div>
+            </div>
+            <div class="row pt-2 ml-0 mr-0 mb-4" style="text-align:center">
+                <div class="col-md-2" style="text-align:left;font-weight:bold;text-transform:uppercase">Themes</div>
+                <div class="col-md-2">Base themes only</div>
+                <div class="col-md-2">Base +1 bonus theme</div>
+                <div class="col-md-2">Base +3 bonus themes</div>
+                <div class="col-md-2">Base +5 bonus themes</div>
+                <div class="col-md-2">All themes plus custom institutional branded theme</div>
             </div>
         </div>
     </div>

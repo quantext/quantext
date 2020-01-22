@@ -1,0 +1,11 @@
+{% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "always" %}
+{% if top_features and top_features["top_words"] %}
+    {% include 'index_keywords_top_features.html' %}
+{% endif %}
+
+{% elif analysis['files'][file['id']|string]['columns']["0"]['settings']['show_freq'] == "never" %}
+<div class="pl-4 pr-4 w-100" style="font-size:.9rem;font-style:italic">
+    Sorry, viewing responses has been disabled for this question.
+</div>
+
+{% endif %}

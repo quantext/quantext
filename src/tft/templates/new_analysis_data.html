@@ -1,0 +1,13 @@
+<div class="full_response_div normal_response main-theme-color-dark" style="display: flex;position: relative;flex-direction: column;padding: 2rem 0 0;border: 1px solid #ddd;">            
+    <div style="margin-left: 2rem;margin-right: 2rem;">
+        <input id="analysisName" type="text" class="form-control main-theme-fill-dark" style="padding:1rem" value="" />
+        <div class="mb-4 helper_text_white" style="color: #aaa;">Enter a name for this analysis here</div>
+    </div>  
+    <div class="text_div main-theme-color-dark" style="align-items:baseline;display:flex;flex-direction:row;margin-top:0!important;font-size:.9rem;font-weight: 400;padding-bottom: 1.5rem;color:#666!important;margin-top:0;padding: 0 2rem 2rem;">
+        <span id="columns_selected_analysis">0</span>&nbsp;columns selected for analysis
+        <a href="#" id="runAnalysis" style="margin-left: auto;">Click to run analysis</a>
+    </div>                                                                                
+    <div id="add_files" style="font-size:.8rem;font-weight:600;display:flex;align-items: center;position: relative;padding:0 1rem 1rem;border-top:1px solid #ddd;background:#fbfbfb;flex-wrap: wrap;">
+        {% include 'partials/empty_nest_new_analysis.html' %}
+    </div>
+</div>

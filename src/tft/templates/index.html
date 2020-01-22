@@ -1,56 +1,115 @@
 {% extends "base.html" %}
 {% block content %}
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}">
+<style>
+    .container-fluid{ padding:0!important }
+    a{ color:#57b0c2 }
+</style>
 {% include 'nav.html' %}
-
-<div class="pt-4">
-    <div style="text-align:center">
-        <img src="/static/img/quantext_duck_v4.svg" style="height:200px;max-width:100%" /><br/>
-        <br/>
-        <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='twitter') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Twitter <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div><br/>
-        <div style="width:400px;margin:auto;max-width:100%"><a href="{{ url_for('oauth_authorize', provider='google') }}" style="text-decoration:none!important"><h5 style="font-weight:400;justify-content: space-between" class="card-header card-header-1 centerFlex">Login with Google <div class="quantext quantext-login" style="margin-top: -2px;margin-bottom: -8px;"></div></h5></a></div>
+<div style="position:relative;width:100%;height:500px;background:url('/static/img/quantext_feather_background.jpg');background-size: cover;background-position: top;">
+    <div class="centerFlex p-4 main_duck">
+        <img src="{{ url_for('static', filename='img/quantext_title_white.svg') }}" style="height: 60px;max-width:100%;"><div class="quantext-chunky-duck" style="color: white;font-size: 3rem;margin-bottom:-.5rem;margin-left: .5rem;"></div>
     </div>
-    <div class="row mt-5">
-        <div class="col-md-4 pl-5 pr-5">
-            <div class="centerFlex" style="margin-bottom:-1rem">
-                <div class="big-quantext quantext-book"></div>
-                <h2>Why Quantext?</h2>
+    <div style="position:absolute;top:0;bottom:0;right:0;left:0;display:flex;align-items:center;flex-direction:column">
+        <div id="big_index_title" style="margin-top:auto">Text analytics for higher education</div>
+        <div id="big_index_subtitle" style="margin-bottom:auto">Analyse student writing in context</div>
+    </div>
+</div>
+<div class="pt-4">
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/smiling_girl.jpg');color:white;position: relative;opacity: 1;background-size:cover;background-position:top right">
+            <div class="col-md-6 pl-5 pr-5 pb-5 mt-0 mb-5 pt-5" style="z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#57b0c2;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-user" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Quantext for teachers</h2>
+                </div>
+                <div style="border-bottom:10px solid #57b0c2;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Helps you to understand your students:<br/><br/>
+                    <ul>
+                        <li>Address common misconceptions.</li>
+                        <li>Identify and fix ambiguous or confusing material.</li>
+                        <li>Identify changes in student learning.</li>
+                        <li>Compare learning within and between student cohorts.</li>
+                    </ul>
+                </div>
             </div>
-            <div style="border-bottom:10px solid #EF8928;margin-bottom:2rem"></div>
-            <div>
-                Quantext quickly extracts insights from student responses to short answer questions or mini-essays to help you assess when and in what ways you could enhance your teaching.
-                <br/><br/>
-                By using Quantext, material which is routinely uploaded to your institutional Learning Management Systems (LMS) for assessment or plagiarism checks can be systematically analysed to improve teaching and inform learning design. Use Quantext to illuminate student learning and your teaching.
-            </div>
+            <div class="col-md-6" style="background: #193e45;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
         </div>
-        <div class="col-md-4 pl-5 pr-5">
-            <div class="centerFlex" style="margin-bottom:-1rem">
-                <div class="big-quantext quantext-user"></div>
-                <h2>Who is Quantext for?</h2>
+    </div>
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/whiteboard.jpg');color:white;position: relative;opacity: 1;background-size:cover;background-position:top right">
+            <div class="col-md-6 pl-5 pr-5 pb-5 mt-0 mb-5 pt-5" style="z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#a2367c;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-user" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Quantext for course coordinators</h2>
+                </div>
+                <div style="border-bottom:10px solid #a2367c;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Helps you to design better courses:
+                    <br><br>
+                    <ul>
+                        <li>Analyse curriculum documents and teaching materials.</li>
+                        <li>Align and design courses and assessment.</li>
+                        <li>Prepare for course and quality audits.</li>
+                        <li>Compare learning outcomes with learning objectives.</li>
+                    </ul>
+                </div>
             </div>
-            <div style="border-bottom:10px solid #2B47A2;margin-bottom:2rem"></div>
-            <div>
-                Quantext is for educators.
-                <br/><br/>
-                Quantext has been designed by teachers for teachers working across a wide range of disciplines, class sizes and teaching modes. Quantext can help you to quickly and simply identify and fix ambiguous or confusing questions, address common misconceptions before summative assessments and track how well your students are learning the language of your discipline. Quantext also has potential for analysing student evaluation responses and discussion forum posts.
-            </div>
+            <div class="col-md-6" style="background: #220c1a;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
         </div>
-        <div class="col-md-4 pl-5 pr-5">
-            <div class="centerFlex" style="margin-bottom:-1rem">
-                <div class="big-quantext quantext-share"></div>
-                <h2>Who is using Quantext?</h2>
+    </div>
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/institution.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-6 pl-5 pr-5 pb-5 mt-0 mb-5 pt-5" style="z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#20a949;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-user" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Quantext for tertiary institutions</h2>
+                </div>
+                <div style="border-bottom:10px solid #20a949;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Helps you to compete effectively:
+                    <br><br>
+                    <ul>
+                        <li>Analyse student evaluations of teaching.</li>
+                        <li>Identify areas for systemic improvement.</li>
+                        <li>Track student experience.</li>
+                        <li>Compare experience within and between student cohorts.</li>
+                    </ul>
+                </div>
             </div>
-            <div style="border-bottom:10px solid #1EB53F;margin-bottom:2rem"></div>
-            <div>
-                Tertiary educators and academic developers.
-                <br/><br/>
-                Quantext is in the early stages of development. It is currently being trialled by teachers at several tertiary institutions in NZ and their feedback and input is informing ongoing development. If you would like to contribute to early trials <a href="/contact">please get in touch</a> - we’d love to hear from you. If you’d just like to see how Quantext works, login using your Google or Twitter account. You can use the demonstration data set supplied or upload your own data. We have prepared some basic <link to documentation page>documentation</link> to help get you started. We hope to release Quantext as a cloud-based service in 2018.
-            </div>
+            <div class="col-md-6" style="background: #0a3718;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
         </div>
     </div>
 
     {% include 'footer.html' %}
 </div>
+
+<script>
+
+    /*$(".kwic_bar").on("keyup", function(e){
+        if(e.keyCode == 13)
+        {
+            var self = $(this);
+            var id = self.data("id");
+            var response = self.val();
+            $.post("/save_index_response",{id:id,response:response},function(response){
+                $(".index_keywords").empty().append(response);
+                self.val("");
+            });
+        }
+    });*/
+
+</script>
 
 {% endblock %}
 

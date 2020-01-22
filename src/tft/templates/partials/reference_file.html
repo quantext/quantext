@@ -1,0 +1,23 @@
+<div class="full_response_div main-theme-color-dark reference_file_div">
+    <div class="row w-100 centerFlex m-0">
+        <div class="col-md-8 p-0 centerFlex" style="font-weight:bold;">
+            <div class="centerFlex" style="padding-bottom:.8rem!important;font-size:.8rem">
+                <div class="w-100 m-0 p-0 pretty p-default p-round p-thick p-setting">
+                    <input data-id="{{ f['id'] }}" data-filename="{{ f['filename'] }}"
+                           class="reference_file"  id="checkbox_{{ f['id'] }}" type="checkbox" />
+                    <div class="state" style="text-overflow: ellipsis;overflow: hidden;">
+                        <label class="small_text-8" style="margin-left: .2rem;font-weight:500">
+                            {{ f['filename'] }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 pr-0 centerFlex" style="font-weight:500;text-align:right">{{ f['created'].strftime('%d.%m.%Y %H:%M') }}</div>
+        <div class="col-md-2 p-0 centerFlex" style="display:flex;justify-content: flex-end;line-height:1">
+            <a href="#" class="index-font">
+                <span class="quantext-delete main-theme-color-1 deleteFile" data-id="{{ f['id'] }}" style="font-size:2rem;"></span>
+            </a>
+        </div>
+    </div>
+</div>

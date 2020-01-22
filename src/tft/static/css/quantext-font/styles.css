@@ -143,20 +143,11 @@
 .quantext-hamburger:before {
   content: "\49";
 }
-.quantext-card:before {
-  content: "\4a";
-}
 .quantext-book-1:before {
   content: "\4b";
 }
 .quantext-star:before {
   content: "\4c";
-}
-.quantext-side-by-side:before {
-  content: "\4d";
-}
-.quantext-top-and-bottom:before {
-  content: "\4e";
 }
 .quantext-graduate:before {
   content: "\4f";
@@ -181,4 +172,25 @@
 }
 .quantext-check-full:before {
   content: "\56";
+}
+.quantext-tag:before {
+  content: "\57";
+}
+.quantext-visualisation:before {
+  content: "\58";
+}
+.quantext-live:before {
+  content: "\4a";
+}
+.quantext-qlive:before {
+  content: "\4e";
+}
+.quantext-nest:before {
+  content: "\4d";
+}
+.quantext-cog:before {
+  content: "\59";
+}
+.quantext-trash:before {
+  content: "\5a";
 }

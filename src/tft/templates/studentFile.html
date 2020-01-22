@@ -1,671 +1,213 @@
-{% macro checkbox(name, text, tipText,student_file,size,which,padLR,disabled) -%}
+{% import "macros.html" as macros %}
 
-    <div class="col-md-{{size}} centerFlex p-0 {{ padLR }}">
-        <input id="settings_{{ name }}_{{ student_file.file.id }}_{{ student_file.q.qNum }}" class="form-check-input setting-control" type="checkbox" name="{{ name }}" data-id="{{ student_file.file.id }}" data-which="{{ which }}" data-question="{{ student_file.q.qNum }}"
-            {% if student_file.q.qSettings[name] %}
-                checked="checked"
+{% for question in columns %}
+<div class="parent_{{ question['number'] }} p-4 pt-5 parentContainer col-md-12 file_{{ file['id'] }}" data-question="{{ question['number'] }}">
+    <div class="row m-0">
+        <div class="col-md-12 p-0 main-theme-color-menu" style="text-transform: uppercase;font-size:1rem;font-weight:500;line-height: 1">
+            <div class="main_question_title centerFlex">
+                <div class="main_title_text">{{ question['text'] }}</div>
+                <input type="text" class="form-control main_title_text_input main-theme-fill-dark" style="margin: 0.5rem 0;padding:1rem;display:none" data-question_number="{{ question['number'] }}" value="{{ question['text'] }}">
+                <div class="quantext-edit title_edit_icon main-theme-color-dark" style="font-size:2rem;margin-bottom:-.3rem;opacity:0.5;margin-left:.5rem;cursor:pointer"></div>
+                <div class="quantext-check title_success_icon main-theme-color-dark" style="font-size:2rem;margin-bottom:-.3rem;opacity:0.5;margin-left:.5rem;cursor:pointer;display:none"></div>
+            </div>
+            {% if current_user['plan'] == "full" or current_user['plan'] == "flock" %}
+                <div class="live_link mt-2">Live link:&nbsp;<a href="{{ url_for('live',key=total_urls[loop.index0]) }}" target="_blank">/live/{{ total_urls[loop.index0] }}</a></div>
+            {% else %}
+                <div class="live_link notAvailable mt-2">Live link:&nbsp;<span>/live/{{ total_urls[loop.index0] }}</span></div>
             {% endif %}
-            {% if disabled %}
-                disabled="disabled"
-            {% endif %}
-        />
-        <label for="settings_{{ name }}_{{ student_file.file.id }}_{{ student_file.q.qNum }}" class="centerFlex">
-            <span class="setting_checkbox mr-1"></span> {{ text }}
-        </label><sup class="toolt quantext-info" title="{{ tipText }}"></sup>
-    </div>
-
-{%- endmacro %}
-
-{% macro select(name, title, array, tipText,student_file,size,which,padLR) -%}
-
-    <div class="col-md-{{ size }} p-0 {{ padLR }}">
-        <h6 style="display:inline-block">{{ title }}</h6><sup class="toolt quantext-info" title="{{ tipText }}"></sup>
-        <select id="settings_{{ name }}_{{ student_file['file']['id'] }}_{{ student_file['q']['qNum'] }}" class="form-control setting-control" name="{{ name }}" data-id="{{ student_file.file.id }}" data-question="{{ student_file.q.qNum }}" data-which="{{ which }}">
-            {% for k in array %}
-            <option value="{{ k }}"
-                    {% if student_file['q']['qSettings'][name] == k %}
-                    selected="selected"
-                    {% endif %}
-            >{{ k }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-{%- endmacro %}
-
-{% set total = student_file['total'] %}
-{% set q = student_file['q'] %}
-{% set file_id = student_file['file']['id'] %}
-{% set left_or_right = student_file['left_or_right'] %}
-{% set idx = student_file['index'] %}
-
-    <div id="file_{{ file_id }}_{{ left_or_right }}" class="parent-{{ idx + 1 }} parentContainer col-md-6 file_{{ file_id }} {{ left_or_right }}" data-fileid="{{ file_id }}" data-question="{{ q['qNum'] }}" data-index="{{ idx }}" data-total="{{ total }}">
-        <div class="row m-0 stickme">
-            <div class="col-md-12 p-4 card-header-{{ idx + 1 }}">
-                <div class="row mb-4 centerFlex">
-                    <h5 class="col-md-6" style="overflow: hidden;text-overflow: ellipsis;">{{ student_file['file']['filename'] }}</h5>
-                    <div class="col-md-6 centerFlex">
-                        <select class="form-control changeFile" data-id="{{ file_id }}">
-                            <option value="0">Change file</option>
-                            {% for file in student_file['an']['files'] %}
-                                {% if student_file['left_or_right'] == 'sLeft' %}
-                                    {% set file_ids = file['id'] if student_files|length == 1 else [file['id']|string,student_files[1]['file']['id']|string]|join('+') %}
-                                    {% set question_numbers = 1|string if student_files|length == 1 else [1|string,student_files[1]['q']['qNum']|string]|join('+') %}
-                                {% else %}
-                                    {% set file_ids = [student_files[0]['file']['id']|string,file['id']|string]|join('+') %}
-                                    {% set question_numbers = [student_files[0]['q']['qNum']|string,1|string]|join('+') %}
-                                {% endif %}
-                                <option value="/analyse/{{ analysis_id }}/{{ file_ids }}/{{ question_numbers }}">{{ file['filename'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class = "col-md-2">Questions</div>
-                    <div class = "col-md-2">Total characters</div>
-                    <div class = "col-md-2">Total words</div>
-                    <div class = "col-md-2">Unique words</div>
-                    <div class = "col-md-2">Total sentences</div>
-                </div>
-                <div class = "row" style="font-weight:600">
-                    <div class = "col-md-2">{{ student_file['file']['questions']|length }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Characters'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Words'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Unique'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Sentences'] }}</div>
-                </div>
-                <div class="row advanced pt-4">
-                    <div class = "col-md-2">TTR<sup class="toolt quantext-info" title="Lexical diversity: a number between 0-1 which gives the type to token ratio (TTR) - the number of unique words divided by the total number of words. For example, ‘The cat sat on the mat’ has a TTR of 5/6 = 0.83."></sup></div>
-                    <div class = "col-md-2">LD<sup class="toolt quantext-info" title="Lexical density: a number between 0-1 which indicates the ratio of content words to the total number of words. Content words are nouns, verbs, adjectives and adverbs."></sup></div>
-                    <div class = "col-md-2">SMOG<sup class="toolt quantext-info" title="Roughly correlates with the level of educational attainment in years of education. Like all readability indices listed, it is only valid where responses are a reasonable length - at least 30 words. It is commonly used to assess the readability of important health information materials. SMOG stands for ‘Simple Measure of Gobbledygook’ and the range of values is typically between 5 - 18."></sup></div>
-                    <div class = "col-md-2">Gunning fog<sup class="toolt quantext-info" title="Similar to Flesch reading ease, it is calculated based on the number of words in a sentence and the number of multi-syllable or complex words."></sup></div>
-                    <div class = "col-md-2">Flesch ease<sup class="toolt quantext-info" title="Produces a score between 0-100 where a high score indicates the text is easier to read. It is calculated based on the number of words in a sentence and the number of syllables per word."></sup></div>
-                    <div class = "col-md-2">F-K<sup class="toolt quantext-info" title="Flesch-Kincaid: roughly correlates with educational attainment. Flesch-Kincaid converts the Flesh reading ease index to an approximation of US grade school level 0-12."></sup></div>
-                </div>
-                <div class="row advanced" style="font-weight:bold">
-                    <div class = "col-md-2">{{ student_file['full_corpus']['TTR'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['LD'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['SMOG'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Gunning'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['Flesch'] }}</div>
-                    <div class = "col-md-2">{{ student_file['full_corpus']['FK'] }}</div>
-                </div>
+        </div>
+        <div class="col-md-12 p-0 mt-3 button_group" style="display:flex;align-items:baseline">
+            <div data-number="{{ loop.index0 }}" class="overview_button main_buttons btn btn-quantext main-theme-fill-dark mr-2" style="border: none;box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;font-size:.9rem;cursor:pointer">
+                Overview
+            </div>
+            <div data-number="{{ loop.index0 }}" class="explore_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                Explore
+            </div>
+            <div data-number="{{ loop.index0 }}" class="visualise_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                Visualise
+            </div>
+            <div data-number="{{ loop.index0 }}" class="indices_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                Indices
+            </div>
+            <div data-number="{{ loop.index0 }}" class="label_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                Label
+            </div>
+            <div data-number="{{ loop.index0 }}" class="settings_button main_buttons btn mr-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;position:relative;border:none;font-size:.9rem;cursor:pointer">
+                Settings
+            </div>
+            <div class="search_container_div" style="position:relative;margin-left: auto;">
+                <div class="quantext-search perform_search main-theme-color-dark" style="z-index:2;cursor:pointer;position: absolute;right: .8rem;font-size: 2rem;margin-top: .3rem;opacity: .5;"></div>
+                <input type="text" class="form-control kwic_bar question_list main-theme-fill-dark" style="background: white!important;border: 1px solid #ccc;border-radius: 5rem;color: inherit!important;">
+                <div class="mb-0 perform_search helper_text_white main-theme-color-dark" style="text-align: right;margin-top: .5rem;margin-right: .5rem;opacity: .75;">Search for a keyword</div>
             </div>
         </div>
-        <div class="col-md-12 pt-4 pl-4 pr-4 pb-0 mt-4 card-header-{{ idx + 1 }}">
+        <div class="col-md-12 p-0 overview_panel overview_panel_{{ loop.index0 }}">
             <div class="row m-0">
-                <div class="col-md-9 p-0">
-                    <h5 class="m-0 pr-4">Q{{ q['qNum'] }} {{ q['qText'] }}</h5>
+                <div class="col-md-2 mt-4 p-0">
+                    <div class="histogramChart first_chart p-4 main-theme-fill-1">
+                        <div id="responsecount" class="mean_text">{{ responses[loop.index0]|length }}</div>
+                        <div style="word-break: break-word;">Responses</div>
+                    </div>
                 </div>
-                <div class="col-md-3 p-0">
-                    <select class="form-control changeQuestion" data-id="{{ file_id }}">
-                        <option value="0">Change question</option>
-                        {% for ques in student_file['file']['questions'] %}
-                            {% if student_file['left_or_right'] == 'sLeft' %}
-                                {% set file_ids = student_file['file']['id']|string if student_files|length == 1 else [student_file['file']['id']|string,student_files[1]['file']['id']|string]|join('+') %}
-                                {% set question_numbers = ques['qNum']|string if student_files|length == 1 else [ques['qNum']|string,student_files[1]['q']['qNum']|string]|join('+') %}
-                            {% else %}
-                                {% set file_ids = [student_files[0]['file']['id']|string,student_file['file']['id']|string]|join('+') %}
-                                {% set question_numbers = [student_files[0]['q']['qNum']|string,ques['qNum']|string]|join('+') %}
-                            {% endif %}
-                            <option value="/analyse/{{ analysis_id }}/{{ file_ids }}/{{ question_numbers }}">{{ ques['qNum'] }} {{ ques['qText'] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="row mt-4">
-                <h5 class="col-md-12" style="background:none;border:none;font-weight:600">
-                    <span id="responsecount">{{ student_file['sumq']['qcount'] }}</span>&nbsp;responses
-                </h5>
-            </div>
-            <div class="row histogramRow">
-                <div class = "col-xs-6 col-md-6">
-                    Mean response length (words)
-                </div>
-                <div class="col-md-2">
-                    <strong>{{ student_file['sumq']['means']['Words'] }}</strong>
-                </div>
-                <div class="col-md-4 histogramChart p-0">
-                    <div class="wordsChart"></div>
-                </div>
-            </div>
-            <div class="row histogramRow">
-                <div class = "col-xs-6 col-md-6">
-                    Mean sentences/response
-                </div>
-                <div class="col-md-2">
-                    <strong>{{ student_file['sumq']['means']['Sentences'] }}</strong>
-                </div>
-                <div class="col-md-4 histogramChart p-0">
-                    <div class="sentenceChart"></div>
-                </div>
-            </div>
-        </div>
+                <div class="col-md-2 mt-4 p-0">
+                    <div class="histogramChart p-4 main-theme-fill-2">
+                        <div class="inner-banner"></div>
+                        <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                            {% set vals = histograms[loop.index0]['Words'][0][0] %}
+                            {% set bins = histograms[loop.index0]['Words'][0][1] %}
+                            {% set _step = histograms[loop.index0]['Words'][2] %}
 
-        <div class="row">
-            <div class="col-md-12">
-                <h5 class="card-header card-header-{{ idx + 1 }} centerFlex p-4" style="margin-bottom:-1.5rem">Most frequent words & ngrams ({{ student_file['anaq']['top_kwords']|length }})
-                    <div id="keywords_{{ file_id }}_{{ left_or_right }}" data-id="{{ file_id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#keyword_settings_{{ file_id }}_{{ left_or_right }}"></div>
-                </h5>
-                <div id="keyword_settings_{{ file_id }}_{{ left_or_right }}" class="collapse">
-                    <div class="card-block p-4 pt-5 card-block-{{ idx + 1 }}">
-                        <div class="row pb-4 m-0">
-                            {{ select("nkey", "Number of words/ngrams to display", [10,15,20,25,30], "Select from 10 to 30 words and ngrams (bigrams & trigrams) to display. This is currently available in steps of 5. i.e. 10, 15, 20 etc.",student_file,6,"keywords","pr-3") }}
-                            {{ select("trigram", "Display bigrams or trigrams", ["Bigram","Trigram"], "Bigrams are groups of two words. Trigrams are groups of three words. Collectively, they are called ngrams. You can select whether to display either key bigrams or key trigrams. i.e. these are groups of two or three words that occur together more often than expected by chance.",student_file,6,"keywords","pl-3") }}
+                            {% set max = histograms[loop.index0]['Words'][1] %}
+                            {% for item in vals %}
+                            {% set height = item/max*40 if item != 0 and item/max*40 > 1 else 1 %}
+                            <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" 
+                            style="height:{{ height }}px;
+                            {% if height == 1 %}
+                                opacity:0.5;
+                            {% endif %}
+                            "></div>
+                            {% endfor %}
                         </div>
-                        <div class="row m-0 pb-4">
-                            <div class="col-md-6 p-0">
-                                <button type="button" class="btn btn-quantext dark mr-4 centerFlex" data-toggle="modal" data-target="#blackList_{{ file_id }}"><span class="index-font quantext-edit mr-1"></span>Edit blacklist</button>
+                        <div style="display:flex;flex-direction:column">
+                            <div class="mean_text" style="display: flex;flex-direction: column;">
+                                <div style="font-size: .9rem;font-weight: 400;line-height:1.5">WORDS</div>
+                                <div style="line-height:1">{{ "{:,}".format(total_WS[loop.index0]['Words_total']|int) if total_WS[loop.index0] else "" }}</div>                                 
+                                <div style="font-size: .9rem;font-weight: 400;line-height:1;margin-top:1rem">MIN: {{ "{:,}".format(total_WS[loop.index0]['Words_min']|int) if total_WS[loop.index0] else "" }}</div>
+                                <div style="font-size: .9rem;font-weight: 400;line-height:1">MAX: {{ "{:,}".format(total_WS[loop.index0]['Words_max']|int) if total_WS[loop.index0] else "" }}</div>
+                                <div style="font-size: .9rem;font-weight: 400;line-height:1">MEAN: {{ "{0:.0f}".format(total_means[loop.index0]['Words']) if total_means[loop.index0] else "" }}</div>
                             </div>
                         </div>
-                        <div class="row m-0">
-                            {{ checkbox("kblack","Exclude blacklist words from words/ngrams","Exclude blacklist words from student responses. Blacklist words are typically function words like a, the, my, your etc. The default Quantext blacklist contains more than 1000 common function words. Use Edit blacklist to add or remove words from the default blacklist.",student_file,6,"keywords","pr-3") }}
-                            {{ checkbox("spell","Correct spelling","Apply spelling correction to student responses.",student_file,6,"keywords","pl-3","disabled") }}
+                    </div>
+                </div>
+                <div class="col-md-2 mt-4 p-0">
+                    <div class="histogramChart p-4 main-theme-fill-2">
+                        <div class="inner-banner"></div>
+                        <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                            {% set vals = histograms[loop.index0]['Sentences'][0][0] %}
+                            {% set bins = histograms[loop.index0]['Sentences'][0][1] %}
+                            {% set _step = histograms[loop.index0]['Sentences'][2] %}
+
+                            {% set max = histograms[loop.index0]['Sentences'][1] %}
+                            {% for item in vals %}
+                            {% set height = item/max*40 if item != 0 and item/max*40 > 1 else 1 %}
+                            <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" 
+                            style="height:{{ height }}px;
+                            {% if height == 1 %}
+                                opacity:0.5;
+                            {% endif %}
+                            "></div>
+                            {% endfor %}
                         </div>
-                        <div class="row m-0">
-                            {{ checkbox("punct","Filter punctuation","Remove punctuation.",student_file,6,"keywords","pr-3") }}
-                            {{ checkbox("nums","Filter numbers","Filter numbers from student responses.",student_file,6,"keywords","pl-3") }}
-                        </div>
-                        <div class="row m-0 pb-4">
-                            {{ checkbox("ncontractions","Normalise contractions","Convert contractions like, don’t, can’t to their normal form. i.e. do not, cannot.  This can be useful when you want to combine word or ngram counts. For example, some students might write don’t, others might write do not. You are probably interested in the combined frequency of these expressions rather than having them separated. In this case, it makes sense to select normalise contractions.",student_file,6,"keywords","pr-3") }}
-                            {{ checkbox("lcase","Transform to lowercase","Convert all responses to lowercase. This is recommended to count for example The and the in the frequency count of the.",student_file,6,"keywords","pl-3") }}
-                        </div>
-                        <div class="row m-0 pb-4">
-                            {{ select("measure", "Ngram measure", ["STUDT","LR","PMI","CHISQ","RAW"], "Select the algorithm to calculate the key ngrams to display - in other words, ngrams which occur more often than expected by chance given their individual word frequencies. Depending on the size and nature of the text some measures may yield more useful results than others. The default setting is Likelihood Ratio (LR). However, Raw Frequency will always be used if there is a problem calculating any selected statistic.",student_file,6,"keywords","pr-3") }}
-                            {{ select("window", "Window", [1,2,3,4,5,6,7,8,9,10,11,12], "Relates to a collocation graph of responses.",student_file,6,"keywords","pl-3") }}
-                        </div>
-                        <div class="row m-0">
-                            {{ select("cgcutoff", "CG cutoff", [0,1,2,3,4,5,6], "Relates to a collocation graph of responses.",student_file,6,"keywords","pr-3") }}
-                        </div>
+                        <div style="display:flex;flex-direction:column">
+                                <div class="mean_text" style="display: flex;flex-direction: column;">
+                                    <div style="font-size: .9rem;font-weight: 400;line-height:1.5">SENTENCES</div>
+                                    <div style="line-height:1">{{ "{:,}".format(total_WS[loop.index0]['Sentences_total']|int) if total_WS[loop.index0] else "" }}</div>                                 
+                                    <div style="font-size: .9rem;font-weight: 400;line-height:1;margin-top:1rem">MIN: {{ "{:,}".format(total_WS[loop.index0]['Sentences_min']|int) if total_WS[loop.index0] else "" }}</div>
+                                    <div style="font-size: .9rem;font-weight: 400;line-height:1">MAX: {{ "{:,}".format(total_WS[loop.index0]['Sentences_max']|int) if total_WS[loop.index0] else "" }}</div>
+                                    <div style="font-size: .9rem;font-weight: 400;line-height:1">MEAN: {{ "{0:.0f}".format(total_means[loop.index0]['Sentences']) if total_means[loop.index0] else "" }}</div>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="response_summary_{{ file_id }}_{{ left_or_right }}">
-            <div class = "row m-0 card-header-{{ idx + 1 }} word_list">
-                {% include 'keywords.html' %}
-            </div>
-        </div>
-
-        <div class="row m-0 mt-4 card-header-{{ idx + 1 }} advanced">
-            <div class="col-md-12 m-0 p-0">
-                <h5 class="centerFlex card-header card-header-{{ idx + 1 }} p-4">Readability indices</h5>
-                <div class="row histogramRow pt-0 pl-4 pr-4">
-                    <div class = "col-md-8">
-                        Lexical diversity (TTR)<sup class="toolt quantext-info" title="A number between 0-1 which gives the type to token ratio (TTR) - the number of unique words divided by the total number of words. For example, ‘The cat sat on the mat’ has a TTR of 5/6 = 0.83"></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="ttrChart"></div>
-                    </div>
+            <h5 class="card-header centerFlex pl-0 pr-0 pb-0 mb-0 pt-4 small_text-9" style="background:#fff;">
+                Most frequent words, bigrams and trigrams
+                <div id="keywords_{{ file['id'] }}" data-id="{{ file['id'] }}" class="setting-switch" data-toggle="collapse" data-target="keyword_settings_{{ file['id'] }}_{{ question['number'] }}">
+                    <div class="inner-icon quantext-settings" style="font-size:1.6rem;padding-top:.5rem"></div>
                 </div>
-                <div class="row histogramRow pt-0 pl-4 pr-4">
-                    <div class = "col-md-8">
-                        Lexical density (LD)<sup class="toolt quantext-info" title="A number between 0-1 which indicates the ratio of content words to the total number of words. Content words are nouns, verbs, adjectives and adverbs."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="ldChart"></div>
-                    </div>
-                </div>
-                <div class="row histogramRow pt-0 pl-4 pr-4">
-                    <div class = "col-md-8">
-                        SMOG index<sup class="toolt quantext-info" title="Roughly correlates with the level of educational attainment in years of education. Like all readability indices listed, it is only valid where responses are a reasonable length - at least 30 words. It is commonly used to assess the readability of important health information materials. SMOG stands for ‘Simple Measure of Gobbledygook’ and the range of values is typically between 5 - 18."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="smogChart"></div>
-                    </div>
-                </div>
-                <div class="row histogramRow pt-0 pl-4 pr-4">
-                    <div class = "col-md-8">
-                        Gunning fog index<sup class="toolt quantext-info" title="Similar to Flesch reading ease, it is calculated based on the number of words in a sentence and the number of multi-syllable or complex words."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="gunningChart"></div>
-                    </div>
-                </div>
-                <div class="row histogramRow pt-0 pl-4 pr-4">
-                    <div class = "col-md-8">
-                        Flesch reading ease<sup class="toolt quantext-info" title="Produces a score between 0-100 where a high score indicates the text is easier to read. It is calculated based on the number of words in a sentence and the number of syllables per word."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="fleschChart"></div>
-                    </div>
-                </div>
-                <div class="row histogramRow pt-0 pl-4 pr-4 pb-4">
-                    <div class = "col-md-8">
-                        Flesch-Kincaid grade level<sup class="toolt quantext-info" title="Flesch-Kincaid grade level roughly correlates with educational attainment. Flesch-Kincaid converts the Flesh reading ease index to an approximation of US grade school level 0-12."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="fkChart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row m-0 mt-4">
-            <div class="col-md-12 m-0 p-0">
-                <h5 class="centerFlex card-header card-header-{{ idx + 1 }} p-4" style="margin-bottom:-1.5rem">Similarity
-                    <div id="similarity_{{ file_id }}_{{ left_or_right }}" data-which="similarity" data-id="{{ file_id }}" style="margin-bottom: -10px;margin-left: auto;margin-top: -4px;" class="quantext quantext-settings" data-toggle="collapse" data-target="#similarity_settings_{{ file_id }}_{{ left_or_right }}"></div>
-                </h5>
-                <div id="similarity_settings_{{ file_id }}_{{ left_or_right }}" class="collapse">
-                    <div class="card-block p-4 pt-5 card-block-{{ idx + 1 }}">
-                        <div class="row pb-4 m-0">
-                            {{ select("simalgorithm", "Similarity algorithm", ["Cosine similarity"], "Currently not selectable. Cosine similarity is the default. Text is converted to an average vector representation using word embeddings (Word2vec) and the cosine similarity between text vectors is calculated and returned as the similarity. Other options yet to be implemented.",student_file,6,"readability","pr-3") }}
-                        </div>
-                    </div>
-                </div>
-                <div class="row m-0 p-4 card-header-{{ idx + 1 }}">
-                    <div class="col-md-12 p-0">
-                        <h6 style="display:inline-block">Current reference answer</h6><sup class="toolt quantext-info" title="The currently selected reference answer for the question. By default there are no reference answers. You can add as many reference answers as you like using the Edit answers dialogue box. The current reference answer is then selected from the list you have created."></sup>
-                        <div class="centerFlex">
-                            <select id="reference_answer_{{ file_id }}_{{ q['qNum'] }}" class="form-control" name="modelanswer" data-id="{{ file_id }}" data-question="{{ q['qNum'] }}" data-which="question_settings_button">
-                                {% for k in [""] + student_file["q"]["referenceAnswers"] %}
-                                <option value="{{ k }}"
-                                        {% if q["qSettings"]["modelanswer"] == k %}
-                                        selected="selected"
+            </h5>
+            <div id="keyword_settings_{{ file['id'] }}_{{ question['number'] }}" class="collapse mb-0" style="position:relative">
+                <div class="row m-0 p-0 pb-4 centerFlex">
+                    <div class="col-md-2 p-0">
+                        <div class="row m-0 centerFlex">
+                            {{ macros.settings_select("settings_nkey_"+file['id']|string+"_"+question['number']|string,"nkey", "Show", [("10","10"),("25","25"),("50","50"),("100","100"),("all","all")], "Select from 10 to 30 words and ngrams (bigrams & trigrams) to display. This is currently available in steps of 5. i.e. 10, 15, 20 etc.",6,"pr-4", file, analysis['files'][file['id']|string]['columns'][question['number']]['settings'], question['number']) }}
+                            <div class="col-md-5 p-0">
+                                <div class="row m-0 mt-3 centerFlex" style="/* padding-bottom:.8rem; */font-size:.8rem;">
+                                    <div class="col-md-12 m-0 p-0 pretty p-default p-round p-thick p-setting">
+                                        <input data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}"
+                                               {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['reverse_lists'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']['reverse_lists'] == 'True' %}
+                                        checked="checked"
                                         {% endif %}
-                                >{{ k }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="btn btn-quantext centerFlex ml-4 p-0" style="background:transparent!important" data-toggle="modal" data-target="#referenceAnswers_{{ file_id }}">
-                                <span class="index-font quantext-edit"></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row m-0 histogramRow pt-0 pl-4 pr-4 pb-4 card-header-{{ idx + 1 }}">
-                    <div class = "col-md-8 p-0">
-                        Similarity<sup class="toolt quantext-info" title="Similarity to reference answer."></sup>
-                    </div>
-                    <div class="col-md-4 histogramChart p-0">
-                        <div class="similarityChart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="all_responses_{{ file_id }}_{{ left_or_right }}">
-            <div class="row m-0 mt-4 card-block-{{ idx + 1 }}">
-                <div class="col-md-12 p-4">
-                    <div class="card-block p-0">
-                        <table id="table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}" class="wstable display compact ws-{{ idx + 1 }}"
-                               cellspacing="0"
-                               width="100%" style="table-layout: fixed">
-                            <thead>
-                            <tr>
-                                <th data-sortable="false"></th>
-                                <th data-sortable="true">ID</th>
-                                <th>Response</th>
-                                <th data-sortable="true">Words</th>
-                                <th data-sortable="true">Similarity<sup class="toolt iris-info-2" title="Similarity measure (between 0-1) to reference answer."></sup></th>
-                                <th data-sortable="true">Categories</th>
-                                <th data-sortable="false"></th>
-                                <th data-sortable="false"></th>
-                                <th data-sortable="false"></th>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <div id="visualisation_{{ file_id }}_{{ left_or_right }}" class="col-md-12 p-4">
-                    <h5>Visualisation</h5>
-                    <div id="wordtree_{{ file_id }}_{{ left_or_right }}" class="wordtree_div">
-                        <span class="vis_text">Please select a word or ngram from the responses to see the visualisation.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal blacklist -->
-        <div class="modal fade" id="blackList_{{ file_id }}" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Blacklist for Q{{ q.qNum }}</h5>
-                        <div class="close index-font quantext-delete" data-dismiss="modal"></div>
-                    </div>
-                    <div class="modal-body">
-                        <div id="blist_{{ file_id }}_{{ left_or_right }}" class="row">
-                            <div class="col-md-12">
-                                <span><b>Blacklist words</b></span>
-                            </div>
-                            {% if q['blist'] %}
-                                {% for item in q['blist'] %}
-                                    {% include 'blist.html' %}
-                                {% endfor %}
-                            {% else %}
-                            <div class="col-md-12 emptyBList">
-                                No blacklist defined
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-12">
-                                <div class="input-group">
-                                    <input id="bListText_{{ file_id }}" type="text" class="form-control" />
-                                    <span class="input-group-btn">
-                                        <button id="saveBList_{{ file_id }}" class="btn btn-quantext dark addBList" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}" type="button">
-                                            <div class="index-font quantext-add"></div>
-                                        </button>
-                                    </span>
+                                        class="setting-control" name="reverse_lists" id="settings_reverse_lists_{{ file['id']|string }}_{{ question['number']|string }}" type="checkbox" />
+                                        <div class="state">
+                                            <label class="small_text-8" style="margin-left: .2rem;font-weight:500">Reverse</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer" style="border-top:none!important">
-                        <button type="button" class="btn btn-quantext green saveBList w-100" data-dismiss="modal" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}">
-                            <div class="index-font quantext-check"></div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal reference answers -->
-        <div class="modal fade" id="referenceAnswers_{{ file_id }}" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Reference answers</h5>
-                        <div class="close index-font quantext-delete" data-dismiss="modal"></div>
-                    </div>
-                    <div class="modal-body">
-                        <strong>Enter reference answer for this question</strong><br/>
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="modelanswer" placeholder="" />
-                            <span class="input-group-btn">
-                        <button data-id="{{ file_id }}" data-question="{{ q['qNum'] }}" class="btn btn-secondary process_model_answer" type="button">Submit</button>
-                    </span>
+                    <div class="col-md-5 p-0">
+                        <div class="row m-0">
+                            {{ macros.settings_select("settings_measure_"+file['id']|string+"_"+question['number']|string,"measure", "Measure", [("STUDT","STUDT"),("LR","LR"),("PMI","PMI"),("CHISQ","CHISQ"),("RAW","RAW")], "Select the algorithm to calculate the key ngrams to display - in other words, ngrams which occur more often than expected by chance given their individual word frequencies. Depending on the size and nature of the text some measures may yield more useful results than others. The default setting is Student's t (STUDT). However, RAW frequency will always be used if there is a problem calculating any selected statistic.",3,"pr-4", file, analysis['files'][file['id']|string]['columns'][question['number']]['settings'],question['number']) }}
+                            {{ macros.settings_select("settings_window_"+file['id']|string+"_"+question['number']|string,"window", "Window", [("2","2"),("3","3"),("4","4"),("5","5"),("6","6"),("7","7"),("8","8"),("9","9"),("10","10"),("11","11"),("12","12")], "Relates to a collocation graph of responses.",2,"pr-4", file, analysis['files'][file['id']|string]['columns'][question['number']]['settings'], question['number']) }}
+                            {{ macros.settings_select("settings_kblack_"+file['id']|string+"_"+question['number']|string,"filter_stops", "Blacklist", [("stops","Exclude blacklist words"),("none","Include blacklist words"),("ngstops","Include blacklist words (trigram only)")], "Exclude blacklist words from student responses. Blacklist words are typically function words like a, the, my, your etc. The default Quantext blacklist contains more than 1000 common function words. Use Edit blacklist to add or remove words from the default blacklist.",4,"pr-4", file, analysis['files'][file['id']|string]['columns'][question['number']]['settings'],question['number']) }}
+                            {{ macros.settings_select("settings_lcase_"+file['id']|string+"_"+question['number']|string,"lcase", "Transform words", [("lcase","Lowercase words"),("lemma","Lemmatise words"),("none","None")], "Transform words to lowercase, or lemmatise words to affect word counts.",3,"pr-4", file, analysis['files'][file['id']|string]['columns'][question['number']]['settings'],question['number']) }}
                         </div>
                     </div>
-                    <div class="modal-footer"></div>
-                </div><!--end modal content -->
-            </div><!-- end modal dialog -->
-        </div><!-- end modal -->
-
-        <!-- Modal blacklist -->
-        <div class="modal fade" id="categories_{{ file_id }}" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Categories for Q{{ q['qNum'] }}</h5>
-                        <div class="close index-font quantext-delete" data-dismiss="modal"></div>
-                    </div>
-                    <div class="modal-body">
-                        <div id="categories_{{ file_id }}_{{ left_or_right }}" class="row">
-                            <div class="col-md-12">
-                                <span><b>Categories</b></span>
+                    <div class="col-md-5 p-0">
+                        <div class="row m-0 mt-3" style="font-size:.8rem">
+                            <div class="col-md-4 m-0 p-0 pretty p-default p-round p-thick p-setting">
+                                <input data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}"
+                                       {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['filter_punct'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']['filter_punct'] == 'True' %}
+                                checked="checked"
+                                {% endif %}
+                                class="setting-control" name="filter_punct" id="settings_punct_{{ file['id']|string }}_{{ question['number']|string }}" type="checkbox" />
+                                <div class="state">
+                                    <label class="small_text-8" style="margin-left: .2rem;font-weight:500">Filter punctuation</label>
+                                </div>
                             </div>
-                            {% if q['categories'] %}
-                                {% for item in q['categories'] %}
-                                    {% include 'category.html' %}
-                                {% endfor %}
-                            {% else %}
-                            <div class="col-md-12 emptyCatList">
-                                No categories defined
+                            <div class="col-md-4 m-0 p-0 pretty p-default p-round p-thick p-setting">
+                                <input data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}"
+                                       {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['filter_nums'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']['filter_nums'] == 'True' %}
+                                checked="checked"
+                                {% endif %}
+                                class="setting-control" name="filter_nums" id="settings_nums_{{ file['id']|string }}_{{ question['number']|string }}" type="checkbox" />
+                                <div class="state">
+                                    <label class="small_text-8" style="margin-left: .2rem;font-weight:500">Filter numbers</label>
+                                </div>
                             </div>
-                            {% endif %}
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-12">
-                                <div class="input-group">
-                                    <input id="category_{{ file_id }}" type="text" class="form-control" name="category" />
-                                    <span class="input-group-btn">
-                                        <button id="saveCategory_{{ file_id }}" class="btn btn-quantext dark process_category" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}" type="button">
-                                            <div class="index-font quantext-add"></div>
-                                        </button>
-                                    </span>
+                            <div class="col-md-4 m-0 p-0 pretty p-default p-round p-thick p-setting">
+                                <input data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}"
+                                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['norm_contractions'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']['norm_contractions'] == 'True' %}
+                                        checked="checked"
+                                    {% endif %}
+                                    class="setting-control" name="norm_contractions" id="settings_norm_contractions_{{ file['id']|string }}_{{ question['number']|string }}" type="checkbox" />
+                                <div class="state">
+                                    <label class="small_text-8" style="margin-left: .2rem;font-weight:500">Normalise contractions</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer" style="border-top:none!important">
-                        <button type="button" class="btn btn-quantext green save_categories w-100" data-dismiss="modal" data-question="{{ q['qNum'] }}" data-id="{{ file_id }}">
-                            <div class="index-font quantext-check"></div>
-                        </button>
-                    </div>
                 </div>
             </div>
+            <div id="response_summary_{{ file['id'] }}">
+                <div id="word_list_{{ question['number'] }}" class="row m-0 pt-2 word_list" style="font-size:.9rem">
+                    {% set features = top_features[question['number']] %}
+                    {% if features %}
+                        {% include 'keywords.html' %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% set tuples = responses[loop.index0] %}
+        <div class="explore_panel mt-2 hiddenNotHidden w-100 explore_panel_{{ loop.index0 }}" style="display:flex">
+            {% include 'question_response_explorer.html' %}
+        </div>
+        <div class="viz_panel mt-2 hiddenNotHidden w-100 viz_panel_{{ loop.index0 }}" data-question="{{ question['number'] }}">
+            {% include 'partials/no_visual.html' %}
+        </div>
+        <div class="indices_panel hiddenNotHidden w-100 indices_panel_{{ loop.index0 }}" data-question="{{ question['number'] }}">
+            {% include 'indices.html' %}
+        </div>
+        <div class="label_panel mt-3 pt-2 hiddenNotHidden w-100 label_panel_{{ loop.index0 }}" data-question="{{ question['number'] }}">
+            {% include 'labeller.html' %}
+        </div>
+        <div class="row m-0 pt-4 settings_panel hiddenNotHidden w-100 settings_panel_{{ loop.index0 }}" data-question="{{ question['number'] }}">
+            {% include 'question_settings.html' %}
         </div>
     </div>
+</div>
 
-    <script type="text/javascript">
-        var sumq = {{ student_file["sumq"]|safe }};
-        var wordData = sumq.chartdata['Words'];
-        var sentData = sumq.chartdata['Sentences'];
-        var ttrData = sumq.chartdata['TTR'];
-        var ldData = sumq.chartdata['LD'];
-        var smogData = sumq.chartdata['SMOG'];
-        var gunningData = sumq.chartdata['Gunning'];
-        var fleschData = sumq.chartdata['Flesch'];
-        var fkData = sumq.chartdata['FK'];
-        var similarityData = sumq.chartdata['Similarity'];
-        var left_or_right = "{{ left_or_right }}";
 
-        drawBarChart(wordData, ".wordsChart", "." + left_or_right);
-        drawBarChart(sentData, ".sentenceChart", "." + left_or_right);
-        drawBarChart(ttrData, ".ttrChart", "." + left_or_right);
-        drawBarChart(ldData, ".ldChart", "." + left_or_right);
-        drawBarChart(smogData, ".smogChart", "." + left_or_right);
-        drawBarChart(gunningData, ".gunningChart", "." + left_or_right);
-        drawBarChart(fleschData, ".fleschChart", "." + left_or_right);
-        drawBarChart(fkData, ".fkChart", "." + left_or_right);
-        drawBarChart(similarityData, ".similarityChart", "." + left_or_right);
-
-        var tOpts = new function(){
-            this.retrieve = true;
-            this.search = { smart:false };
-            this.mark = { separateWordSearch:false };
-            this.select = { style:'multi' };
-            this.language = { search: "" };
-            this.dom = 'f<".worksheet-title"><".categories">tBp';
-            this.iDisplayLength = 10;
-            this.columns = [];
-            this.buttons = [ 'excel', 'pdf' ];
-            this.ajax = "/datatables/{{ file_id }}/{{ q['qNum'] }}";
-            this.order = [[ 1, "asc" ]];
-            this.deferRender = true;
-            this.autoWidth = false;
-        };
-
-        tOpts.columns.push({
-            name:"cardview",
-            data:null,
-            defaultContent:"<div title='Click for card view' class='quantext-card centerFlex index-font'></div>",
-            sortable:false,
-            className:"card-cell"
-        });
-
-        tOpts.columns.push({ data: "StudentID", name:"id", className:"id-cell" });
-        tOpts.columns.push({
-            data: "Response",
-            name:"response" ,
-            className:"response-cell",
-            render: function(data, type, row) {
-                if (Array.isArray(data)){
-                    data = data[0];
-                    return "<div class='centerFlex'><div class='left-kwic'>" + data[0] + "</div><div class='mid-kwic'>" + data[1] + "</div><div class='right-kwic'>" + data[2] + "</div></div>";
-                }
-                else
-                {
-                    var esc = function ( t ) {
-                        return t.replace( /&/g, '&amp;' )
-                                .replace( /</g, '&lt;' )
-                                .replace( />/g, '&gt;' )
-                                .replace( /"/g, '&quot;' );
-                    };
-
-                    return '<div title="'+esc(data)+'"><div class="no-kwic">' + esc(data) + '</div></div>';
-                }
-            }
-        });
-
-        tOpts.columns.push({
-            data:"Words",
-            name:"Words",
-            className:"word-cell",
-            render: function(data,type,row,meta){
-                var table = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable();
-                var total = table.columns(meta.col).data()[0].sort(function(v1, v2){
-                    if(parseInt(v1) > parseInt(v2)) return -1;
-                    else if (parseInt(v2) > parseInt(v1)) return 1;
-                    else return 0;
-                })[0];
-                return "<table style='width:100%'>" +
-                        "<tr style='background:transparent'>" +
-                            "<td style='position:relative;padding:0'>" +
-                                "<div class='mini-chart' style='width:" + (data/total*100) + "%'></div>" +
-                                "<div style='position:relative;z-index:3'>" + data + "</div>" +
-                            "</td>" +
-                        "</tr>" +
-                       "</table>"
-            }
-        });
-        tOpts.columns.push({data:"Similarity",name:"similarity", className:"sim-cell"});
-
-        tOpts.columns.push({
-            data: "Category",
-            name:"category",
-            className:"category-cell",
-            render: function(data){ return data; }
-        });
-
-        tOpts.columns.push({
-            data:"PostID",
-            name:"postID",
-            visible:false,
-            render: function(data){ return data; }
-        });
-
-        tOpts.columns.push({
-            data:"children",
-            name:"children",
-            visible:false,
-            render: function(data){ return data; }
-        });
-
-        tOpts.columns.push({ data: "Notes", name:"hiddenNotes", visible:false });
-
-        var categories = {{ q['categories']|safe }};
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable(tOpts);
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().on('select', function(e, dt, type, indexes){
-            var self = $(this);
-            var selectedRows = self.DataTable().rows({selected:true});
-            iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper"));
-            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', false);
-            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', false);
-            $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").removeAttr("disabled");
-        }).on('deselect', function(){
-            var self = $(this);
-            var selectedRows = self.DataTable().rows({selected:true});
-            if(selectedRows.count() == 0) {
-                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('loadOptions', [{}]);
-                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', true);
-                $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', true);
-                $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").attr("disabled","disabled");
-            } else {
-                iterateCategories(selectedRows, $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper"));
-            }
-        }).on('page', function(){
-            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'all' }).deselect();
-        });
-
-        var div = $("<div class='centerFlex'></div>");
-        var options = "<select data-question='{{ student_file.q.qNum }}' data-id='{{ file_id }}' name='select_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' class='form-control' multiple></select>";
-        var selectAll = "<button id='selectAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' type='button' class='btn btn-quantext dark'>Select all rows</button>";
-        var clearAll = "<button id='clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}' type='button' class='btn btn-quantext dark ml-4 mr-4' disabled='disabled'>Clear rows</button>";
-        div.append(selectAll, clearAll, options);
-        var maxHeight = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").height() * .8;
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .categories").append(div);
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .categories").data("categories",categories.toString());
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .dataTables_filter").append("<span class='quantext-search'></span>");
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .dataTables_filter input").attr("placeholder","Search");
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper .worksheet-title").append("<h5>Responses ({{ student_file['sumq']['qcount'] }})</h5>");
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect({
-            columns : 2,
-            selectAll : false,
-            search : true,
-            maxHeight:maxHeight,
-            texts : {
-                placeholder: 'Click responses to add category labels',
-                search: 'Type new categories here and press enter'
-            }
-        });
-
-        $("#selectAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on("click", function(){
-            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'current' }).select();
-        });
-
-        $("#clearAll_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on("click", function(){
-            $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().rows({ page: 'current' }).deselect();
-        });
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('.ms-search').append("<div class='quantext-edit' style='position:absolute;right:.5rem;top:0;font-size:2rem;color:#ccc'></div>");
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").on( 'click', 'tbody td .quantext-card', function (e) {
-            e.stopImmediatePropagation();
-            var currTr = $(this).closest('tr');
-            var currRow = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().row(currTr);
-            var prevTr = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").find(".shown");
-            var prevRow = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable().row(prevTr);
-            var openLength = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").find(".shown").length;
-
-            openHiddenRow(currRow,currTr, "{{ file_id }}", "{{ q['qNum'] }}");
-            if(openLength > 0){
-                prevRow.child.hide();
-                prevRow.deselect();
-                prevTr.removeClass('shown');
-            }
-        });
-
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').multiselect('disable', true);
-        $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}_wrapper").find('select[multiple]').attr('disabled', true);
-        $('input[type=search], .dataTables_wrapper select, .ms-options-wrap button').addClass("form-control");
-
-        $(".stickme").each(function(){
-            var self = $(this);
-            var sticky = new Waypoint.Sticky({ element: self[0], handler:function(){  }});
-        });
-
-        $(".switch input").on("change", function(){
-            var self = $(this);
-            if(self.is(":checked")){
-                $(".advanced").css("display","flex");
-                $(".simple-view").css("font-weight","normal");
-                $(".advanced-view").css("font-weight","bold");
-            }else{
-                $(".advanced").css("display","none");
-                $(".simple-view").css("font-weight","bold");
-                $(".advanced-view").css("font-weight","normal");
-            }
-        });
-
-        $("#reference_answer_{{ file_id }}_{{ q['qNum'] }}").on("change", function(){
-            var self = $(this);
-            var reference_answer = self.val();
-            var $notification = notify("Getting your ducks in a row...");
-            $.post("{{ url_for('similarity', file_id=file_id, question_number=q['qNum']) }}",
-                    { reference_answer:reference_answer },
-                    function(response) {
-                        var $response = JSON.parse(response);
-                        var $table = $("#table_{{ file_id }}_{{ left_or_right }}_{{ q['qNum'] }}").DataTable();
-                        $table.ajax.url("/datatables/{{ file_id }}/{{ q['qNum'] }}").load(function(data){
-                            var similarityData = $response.chartdata['Similarity'];
-                            drawBarChart(similarityData, ".similarityChart", ".{{ left_or_right }}");
-                            $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                        });
-                    });
-        });
-
-        $("#bListText_{{ file_id }}").on("keyup", function(e){
-            if(e.keyCode == 13)
-                $("#saveBList_{{ file_id }}").click();
-        });
-    </script>
+{% endfor %}

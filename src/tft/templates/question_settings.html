@@ -1,0 +1,35 @@
+<div class="col-md-6 p-0 pr-3">
+    <h5 class="card-header centerFlex pl-0 pr-0 pb-3 mb-0 pt-0 small_text-9" style="background:#fff;">Custom Blacklist</h5>
+    <div class="pt-0 pb-4" style="font-size:.9rem;line-height:1.3">
+        The blacklist is a collection of words you would like to <i>exclude</i> from analysis. Add your own custom blacklist words here, one per line.
+        Click 'Reprocess responses' to save your blacklist and regenerate the most frequent word and bigram counts, with your custom blacklist words now excluded.
+    </div>
+    <textarea class="form-control custom_blacklist" style="padding: 1rem;width:100%;min-height: 8rem;line-height:1.5;font-size:.9rem">{% for blist in analysis['files'][file['id']|string]['columns'][question['number']]['settings']['blacklist'] %}{% if loop.last %}{{ blist }}{% else %}{{ blist }}&#13;&#10;{% endif %}{% endfor %}</textarea>
+    <div class="mb-2 helper_text_white" style="color: #aaa!important;">Enter custom blacklist words here, one per line</div>
+    <div class="pt-3 centerFlex settings_button_holder">
+        <div style="padding:.5rem 1rem;cursor: pointer;font-size:.9rem;color: white;font-weight:400;" class="blacklist_question main-theme-fill-dark">
+            Exclude all question text
+        </div>
+        <div style="margin-left:auto;padding:.5rem 1rem;cursor: pointer;font-size:.9rem;color: white;font-weight:400;" class="reprocess_blacklist main-theme-fill-1">
+            Reprocess responses
+        </div>
+    </div>
+</div>
+<div class="col-md-6 p-0 pl-3">
+    <h5 class="card-header centerFlex pl-0 pr-0 pb-3 mb-0 pt-0 small_text-9" style="background:#fff;">Custom Whitelist</h5>
+    <div class="pt-0 pb-4" style="font-size:.9rem;line-height:1.3">
+        The whitelist is a collection of words you would like to <i>include</i> in the analysis. Add your own custom whitelist words here, one per line.
+        Click 'Reprocess responses' to save your whitelist and regenerate the most frequent word and bigram counts, with your custom whitelist words now included.
+        (Note: the whitelist will take precedence over the blacklist).
+    </div>
+    <textarea class="form-control custom_whitelist" style="padding: 1rem;width:100%;min-height: 8rem;line-height:1.5;font-size:.9rem">{% for wlist in analysis['files'][file['id']|string]['columns'][question['number']]['settings']['whitelist'] %}{% if loop.last %}{{ wlist }}{% else %}{{ wlist }}&#13;&#10;{% endif %}{% endfor %}</textarea>
+    <div class="mb-2 helper_text_white" style="color: #aaa!important;">Enter custom whitelist words here, one per line</div>
+    <div class="pt-3 centerFlex settings_button_holder">
+        <div style="padding:.5rem 1rem;cursor: pointer;font-size:.9rem;color: white;font-weight:400;" class="whitelist_question main-theme-fill-dark">
+            Include all question text
+        </div>
+        <div style="margin-left:auto;padding:.5rem 1rem;cursor: pointer;font-size:.9rem;color: white;font-weight:400;" class="reprocess_whitelist main-theme-fill-1">
+            Reprocess responses
+        </div>
+    </div>
+</div>

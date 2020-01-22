@@ -1,0 +1,183 @@
+<div class="row m-0 w-100">
+    <div class="col-md-2 mt-4 p-0">
+        <div class="first_chart histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['LD'][0][0] %}
+                {% set bins = histograms[loop.index0]['LD'][0][1] %}
+                {% set _step = histograms[loop.index0]['LD'][2] %}
+
+                {% set max = histograms[loop.index0]['LD'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" 
+                    style="height:{{ height }}px;
+                    {% if height == 1 %}
+                        opacity:0.5;
+                    {% endif %}
+                    "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_ld" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['LD']) if total_means else "" }}</div>
+            LD
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['TTR'][0][0] %}
+                {% set bins = histograms[loop.index0]['TTR'][0][1] %}
+                {% set _step = histograms[loop.index0]['TTR'][2] %}
+
+                {% set max = histograms[loop.index0]['TTR'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" 
+                style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_ttr" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['TTR']) if total_means else "" }}</div>
+            TTR
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['SMOG'][0][0] %}
+                {% set bins = histograms[loop.index0]['SMOG'][0][1] %}
+                {% set _step = histograms[loop.index0]['SMOG'][2] %}
+
+                {% set max = histograms[loop.index0]['SMOG'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" 
+                style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_smog" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['SMOG']) if total_means else "" }}</div>
+            SMOG
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['Gunning'][0][0] %}
+                {% set bins = histograms[loop.index0]['Gunning'][0][1] %}
+                {% set _step = histograms[loop.index0]['Gunning'][2] %}
+
+                {% set max = histograms[loop.index0]['Gunning'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_gunning" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['Gunning']) if total_means else "" }}</div>
+            Gunning Fog
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['Flesch'][0][0] %}
+                {% set bins = histograms[loop.index0]['Flesch'][0][1] %}
+                {% set _step = histograms[loop.index0]['Flesch'][2] %}
+
+                {% set max = histograms[loop.index0]['Flesch'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_flesch" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['Flesch']) if total_means else "" }}</div>
+            Flesch reading ease
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="last_chart histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['FK'][0][0] %}
+                {% set bins = histograms[loop.index0]['FK'][0][1] %}
+                {% set _step = histograms[loop.index0]['FK'][2] %}
+
+                {% set max = histograms[loop.index0]['FK'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_fk" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['FK']) if total_means else "" }}</div>
+            Flesch-Kincaid
+        </div>
+    </div>
+</div>
+<div class="row m-0 w-100">
+    <div class="col-md-2 mt-4 p-0">
+        <div class="first_chart histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['MTLD'][0][0] %}
+                {% set bins = histograms[loop.index0]['MTLD'][0][1] %}
+                {% set _step = histograms[loop.index0]['MTLD'][2] %}
+
+                {% set max = histograms[loop.index0]['MTLD'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_mtld" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['MTLD']) if total_means else "" }}</div>
+            MTLD
+        </div>
+    </div>
+    <div class="col-md-2 mt-4 p-0">
+        <div class="histogramChart p-4 main-theme-fill-3">
+            <div class="inner-banner"></div>
+            <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set vals = histograms[loop.index0]['HDD'][0][0] %}
+                {% set bins = histograms[loop.index0]['HDD'][0][1] %}
+                {% set _step = histograms[loop.index0]['HDD'][2] %}
+
+                {% set max = histograms[loop.index0]['HDD'][1] %}
+                {% for item in vals %}
+                {% set height = item/max*40 if item != 0 or item/max*40 > 1 else 1 %}
+                <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" title="{{ bins[ loop.index0 ] }}-{{ bins[ loop.index0 ] + _step }} : {{ item }}" style="height:{{ height }}px;
+                {% if height == 1 %}
+                    opacity:0.5;
+                {% endif %}
+                "></div>
+                {% endfor %}
+            </div>
+            <div id="mean_hdd" class="mean_text">{{ "{0:.2f}".format(total_means[loop.index0]['HDD']) if total_means else "" }}</div>
+            HD-D
+        </div>
+    </div>
+</div>

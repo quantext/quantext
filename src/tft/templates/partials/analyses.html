@@ -1,0 +1,27 @@
+{% for a in analyses %}
+    <div class="row centerFlex m-0 analysis_{{ a['id'] }} full_response_div main-theme-color-dark quantext_file_div" style="cursor:unset">
+        <div class="col-md-1 p-0 centerFlex" style="line-height:1;margin-top:.4rem;justify-content: center;padding-right: 1rem!important;">
+            <a href="#" class="index-font">
+                <span class="quantext-play main-theme-color-1 analysis_play" data-id="{{ a['id'] }}" style="font-size:2rem;"></span>
+            </a>
+        </div>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-9 p-0 centerFlex" style="text-overflow: ellipsis;overflow: hidden;">
+                    <div data-id="{{ a['id'] }}" class="analysis_play main-theme-color-1 centerFlex small_text-8">{{ a['name'] }}</div>
+                </div>
+                <div class="col-md-3 pr-0 centerFlex" style="color:#888;font-weight:400;text-align:right">{{ a['created'].strftime('%d.%m.%Y %H:%M') }}</div>
+            </div>
+            <div class="row" style="line-height: 1.2;margin-top: .1rem;">
+                <div class="col-md-12 p-0 small_text-8" style="color: #aaa;">
+                    {{ a["files"]|length }} files
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1 p-0 centerFlex" style="justify-content: flex-end;line-height:1;margin-top:.4rem">
+            <a href="#" class="index-font">
+                <span class="quantext-delete main-theme-color-1 deleteAnalysis" data-id="{{ a['id'] }}" style="font-size:2rem;"></span>
+            </a>
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}">
+<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+
+<div id="qrcode"></div>
+
+<script>
+    let qrcode = new QRCode("qrcode",{
+        text: "{{ qrcode }}",
+        width: 400,
+        height: 400,
+        colorDark : "#000000",
+        colorLight : "#ffffff"
+    });
+</script>
+{% endblock %}

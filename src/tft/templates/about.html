@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/themes/original.css">
+<style>
+    .container-fluid{ padding:0!important }
+    a{ color:#57b0c2; }
+</style>
+{% include 'nav.html' %}
+<div style="position:relative;width:100%;height:500px;background:url('/static/img/quantext_feather_background2.jpg');background-size: cover;background-position: bottom;">
+    <div class="centerFlex p-4 main_duck">
+        <img src="/static/img/quantext_title_white.svg" style="height: 60px;max-width:100%;"><div class="quantext-chunky-duck" style="color: white;font-size: 3rem;margin-bottom:-.5rem;margin-left: .5rem;"></div>
+    </div>
+    <div style="position:absolute;top:0;bottom:0;right:0;left:0;display:flex;align-items:center;flex-direction:column">
+        <div id="big_index_title" style="margin-top:auto;margin-bottom:auto">About Quantext</div>
+    <!--<div style="text-align: center;color: white;font-size: 1.6rem;font-weight: 300;padding-top:0;text-shadow: 1px 1px #333;">Analyse student responses in context</div>-->
+    </div>
+</div>
+<div class="pt-4">
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/hands_computer.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#126ba8;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-chunky-duck" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">What is Quantext?</h2>
+                </div>
+                <div style="border-bottom:10px solid #126ba8;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Simply put, Quantext is text analysis software for teachers. Quantext is designed to quickly extract insights from student text data, be it responses to short answer questions or student evaluation and feedback data.
+                    <br><br>
+                    To register your interest in Quantext or to find out more, please email <a style="color:#fff;text-decoration:underline!important" href="mailto:info@quantext.co.nz">info@quantext.co.nz</a>.
+                </div>
+            </div>
+            <div class="col-md-6" style="background: #08304c;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/code.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#126ba8;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-code" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Quantext development</h2>
+                </div>
+                <div style="border-bottom:10px solid #126ba8;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Quantext is under active development and the latest source code, released under a GPL 3.0 license, is available at <a style="color:#fff;text-decoration:underline!important" href="https://github.com/quantext/quantext" target="_blank">http://github.com/quantext/quantext</a>.
+                </div>
+            </div>
+            <div class="col-md-6" style="background: #08304c;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    <div class="index_box">
+        <div class="row pt-0 pb-0" style="color:white;position: relative;opacity: 1;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#126ba8;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-user" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Jenny McDonald</h2>
+                </div>
+                <div style="border-bottom:10px solid #126ba8;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Jenny is our founder and chief text wrangler. She's a teacher, academic developer and computer scientist who has worked in the tertiary sector for more than 18 years. She holds an honorary academic role at the University of Auckland's Centre for Learning and Research in Higher Education and is an Adjunct Research Fellow at the Centre for Academic Development at Victoria University of Wellington. Supporting educators to better understand their students is what rocks her boat. She’s also fond of ducks.
+                    <br/><br/>
+                    Email <a style="color:#fff;text-decoration:underline!important" href="mailto:jenny@quantext.co.nz">jenny@quantext.co.nz</a>.
+                </div>
+            </div>
+            <div class="col-md-6" style="text-align: right;">
+                <img src="/static/img/jenny_square.jpg" width="500"/>
+            </div>
+            <div class="col-md-6" style="background: #08304c;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    <div class="index_box">
+        <div class="row pt-0 pb-0" style="color:white;position: relative;opacity: 1;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#126ba8;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-user" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Adon Moskal</h2>
+                </div>
+                <div style="border-bottom:10px solid #126ba8;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight: 300;">
+                    Adon is the principal designer and developer of Quantext. As well as helping captain the Quantext ship, Adon is a senior lecturer in Information Technology at Otago Polytechnic. He's spent 8 years in teaching and learning, and has a keen interest in learning analytics, student evaluation, and academic development. He is also quite fond of ducks (he thinks they are delicious...)
+                    <br/><br/>
+                    Email <a style="color:#fff;text-decoration:underline!important" href="mailto:adon@quantext.co.nz">adon@quantext.co.nz</a>.<br/>
+                </div>
+            </div>
+            <div class="col-md-6" style="text-align: right;">
+                <img src="/static/img/adon_square.jpg" width="500"/>
+            </div>
+            <div class="col-md-6" style="background: #08304c;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+  {% include 'footer.html' %}
+
+</div>
+{% endblock %}

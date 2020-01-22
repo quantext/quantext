@@ -1,0 +1,96 @@
+{% macro checkbox(input_id, name, text, tipText, size, padLR, class, disabled, checked) -%}
+
+<div class="col-md-{{ size }} centerFlex p-0 {{ padLR }}" style="align-items:baseline">
+    <input id="{{ input_id }}" class="{{ class }}" type="checkbox" name="{{ name }}"
+           {% if disabled %}
+           disabled="disabled"
+           {% endif %}
+           {% if checked %}
+           checked="checked"
+           {% endif %}
+    />
+    <label for="{{ input_id }}" class="setting-label">{{ text }}</label>
+    {% if tipText != "" %}
+        <sup class="toolt quantext-info" title="{{ tipText }}"></sup>
+    {% endif %}
+</div>
+
+{%- endmacro %}
+
+{% macro select(select_id, name, title, array, tipText, size, padLR) -%}
+
+<div class="col-md-{{ size }} p-0 {{ padLR }}">
+    <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">{{ title }}</h6>
+    {% if tipText != "" %}
+        <sup class="toolt quantext-info" title="{{ tipText }}"></sup>
+    {% endif %}
+    <select id="{{ select_id }}" class="form-control setting-control" name="{{ name }}">
+        {% for k in array %}
+        <option value="{{ k }}">{{ k }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+{%- endmacro %}
+
+{% macro settings_checkbox(input_id, name, text, tipText, size, padLR, class, disabled, file, settings, number) -%}
+
+<div class="col-md-{{ size }} centerFlex p-0 {{ padLR }}" style="align-items:baseline">
+    <input id="{{ input_id }}" class="{{ class }}" type="checkbox" name="{{ name }}" data-file_id="{{ file['id'] }}" data-question_number="{{ number }}"
+        {% if settings[name] == True or settings[name] == 'True' %}
+            checked="checked"
+        {% endif %}
+        {% if disabled %}
+            disabled="disabled"
+        {% endif %}
+    />
+    <label for="{{ input_id }}" class="setting-label">{{ text }}</label>
+    {% if tipText != "" %}
+        <sup class="toolt quantext-info" title="{{ tipText }}"></sup>
+    {% endif %}
+</div>
+
+{%- endmacro %}
+
+{% macro settings_select(select_id, name, title, array, tipText, size, padLR, file, settings,number, disabled) -%}
+
+<div class="col-md-{{ size }} p-0 {{ padLR }}">
+    <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">{{ title }}</h6><sup class="toolt quantext-info" title="{{ tipText }}"></sup>
+    <select id="{{ select_id }}" class="form-control setting-control" name="{{ name }}" data-file_id="{{ file['id'] }}" data-question_number="{{ number }}"
+            {% if disabled %}
+            disabled="disabled"
+            {% endif %}
+    >
+        {% for k in array %}
+        <option value="{{ k[0] }}"
+                {% if settings[name]|string == k[0]|string %}
+        selected="selected"
+        {% endif %}
+        >{{ k[1] }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+{%- endmacro %}
+
+{% macro advancedBox(name, long_name, histogram, mean, classes) -%}
+
+<div class="col-md-2 mt-4 p-0 advanced-div">
+    <div class="histogramChart p-4 main-theme-fill-3 {{ classes }}">
+        <div class="inner-banner"></div>
+        <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+            {% set vals = histogram[name][0][0] %}
+            {% set bins = histogram[name][0][1] %}
+
+            {% set max = histogram[name][1] %}
+            {% for item in vals %}
+            {% set height = item/max*40 if item == 0 or item/max*40 > 1 else 1 %}
+            <div class="histo_bar {{ bins[ loop.index0 ] }}" data-bin="{{ bins[ loop.index0 ] }}" style="height:{{ height }}px;"></div>
+            {% endfor %}
+        </div>
+        <div id="mean_{{ name }}" class="mean_text">{{ mean[name] if mean else "" }}</div>
+        {{ long_name }}
+    </div>
+</div>
+
+{%- endmacro %}

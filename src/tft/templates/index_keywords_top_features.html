@@ -1,0 +1,92 @@
+{% if top_features and top_features["top_words"] %}
+<h5 class="card-header centerFlex pl-0 pr-0 pb-0 mb-0 pt-4 small_text-9" style="background:white">
+    Most frequent words, bigrams and trigrams
+</h5>
+<div class="row m-0 w-100 pt-5">
+    <div class="col-md-4 p-0">
+        <div class="card">
+            <div class="card-block p-0">
+                {% set biggest = top_features["top_words"][0][1] %}
+                {% for i in top_features["top_words"] %}
+                {% set ngic = i[0] %}
+                {% set word_count = i[1] %}
+                <div class="row m-0" style="border-bottom:2px solid transparent">
+                    <div class = "col-md-4 keyword_container"><div class="keyword" title="{{ ngic }}">{{ ngic }}</div></div>
+                    <div class = "col-md-5 barchart_container" style="position:relative">
+                        {% if biggest|int != 0 %}
+                        {% set percent = word_count|int/biggest|int * 100 %}
+                        {% else %}
+                        {% set percent = 0 %}
+                        {% endif %}
+                        {% set left = ".3rem" %}
+                        {% set color = "white" %}
+                        {% if percent < 15 %}
+                        {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                        {% set color = "#193e45" %}
+                        {% endif %}
+                        <div style="display:flex;align-items:center;font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ word_count }}</div>
+                        <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-1"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 p-0">
+        <div class="card" style="background:transparent">
+            <div class="card-block p-0">
+                {% if top_features["top_bigrams"][0] %}
+                {% set biggest = top_features["top_bigrams"][0][0][1] %}
+                {% for bigram in top_features["top_bigrams"][0] %}
+                <div class="row m-0" style="border-bottom:2px solid transparent">
+                    <div class = "col-md-5 keyword_container"><div class="keyword" title="{{ bigram[0][0] }} {{ bigram[0][1] }}">{{ bigram[0][0] }} {{ bigram[0][1] }}</div></div>
+                    <div class = "col-md-5 barchart_container" style="position:relative">
+                        {% set percent = bigram[1]/biggest * 100 %}
+                        {% set left = ".3rem" %}
+                        {% set color = "white" %}
+                        {% if percent < 15 %}
+                        {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                        {% set color = "#193e45" %}
+                        {% endif %}
+                        <div style="display:flex;align-items:center;font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ bigram[1] }}</div>
+                        <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-1"></div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 p-0">
+        <div class="card" style="background:transparent">
+            <div class="card-block p-0">
+                {% if top_features["top_trigrams"][0] %}
+                {% set biggest = top_features["top_trigrams"][0][0][1] %}
+                {% for trigram in top_features["top_trigrams"][0] %}
+                <div class="row m-0" style="border-bottom:2px solid transparent">
+                    <div class = "col-md-6 keyword_container"><div class="keyword" title="{{ trigram[0][0] }} {{ trigram[0][1] }} {{ trigram[0][2] }}">{{ trigram[0][0] }} {{ trigram[0][1] }} {{ trigram[0][2] }}</div></div>
+                    <div class = "col-md-5 barchart_container" style="position:relative">
+                        {% set percent = trigram[1]/biggest * 100 %}
+                        {% set left = ".3rem" %}
+                        {% set color = "white" %}
+                        {% if percent < 15 %}
+                        {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                        {% set color = "#193e45" %}
+                        {% endif %}
+                        <div style="display:flex;align-items:center;font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ trigram[1] }}</div>
+                        <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

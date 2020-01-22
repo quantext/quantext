@@ -1,0 +1,69 @@
+<div class="row w-100 m-0 centerFlex mt-0">
+    <div class="col-md-6 mt-0 p-0">
+        <div class="main-theme-color-dark" style="font-size:1.5rem;font-weight:300;line-height:1">
+            <span class="marked_up_count">{{ marked_up[0] if marked_up else 0 }}</span>/{{ tuples|length }} responses labelled (<span class="marked_up_percent">{{ "{0:.0f}".format(percents[0]) if percents else 0 }}</span>%)
+        </div>
+        <div class="row ml-0 mr-0 mt-3 label_bars_div main-theme-color-menu" style="font-size:.9rem;">            
+            {% include 'label_bars.html' %}            
+        </div>
+    </div>
+    <div class="col-md-3 m-0 p-0 pr-4 sort_labelled_responses_div" style="font-size:.8rem">
+        <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Sort responses by</h6><sup class="toolt quantext-info" title=""></sup>
+        <select id="sort_labels_{{ question['number'] }}" class="form-control sort-label" name="" data-cat_col="{{ cat_col }}" data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}">
+            <optgroup label="">
+                <option value="">(Default order)</option>
+                <option value="random">Randomise</option>
+            </optgroup>
+            <optgroup label="METRICS">
+                <option value="asc_Words">Words (low-high)</option>
+                <option value="desc_Words">Words (high-low)</option>
+                <option value="asc_Sentences">Sentences (low-high)</option>
+                <option value="desc_Sentences">Sentences (high-low)</option>
+            </optgroup>
+            <optgroup label="COLUMNS">
+                {% for c in file['columns'] %}
+                    <option value="asc_{{ c }}">{{ c }} (low-high)</option>
+                    <option value="desc_{{ c }}">{{ c }} (high-low)</option>
+                {% endfor %}
+            </optgroup>
+        </select>        
+    </div>
+    <div class="col-md-3 m-0 p-0 pretty p-default p-round p-thick p-setting hide_labelled_responses_div" style="font-size:.8rem">
+        <input data-question_number="{{ question['number'] }}" data-col="{{ cat_col }}"
+               class="label_control hide_labels" name="hide_labels" id="settings_hide_{{ file['id']|string }}_{{ question['number']|string }}" type="checkbox"
+               {% if analysis['files'][file['id']|string]['columns'][question['number']]['label_settings'][cat_col]['hide_labels'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['label_settings'][cat_col]['hide_labels'] == 'True' %}
+                    checked='checked'
+                {% endif %}
+        />
+        <div class="state">
+            <label class="small_text-8" style="margin-left: .2rem;font-weight:500">Hide labelled responses</label>
+        </div>
+    </div>
+    <div class="col-md-6 p-0 mobile_hidden labeller_dashboard" style="display: flex;flex-direction: column;align-self: flex-start;">
+        <div style="padding: 0;border: 1px solid;margin: 1rem 2rem 1rem 0;text-align: center;font-size: 1rem;font-weight: 400;" class="labeller_text main-theme-border-1 main-theme-color-menu">
+            <div class="inner_text" style="line-height:1.3;padding:2rem"></div>
+            <div class="mt-0 label_categories" style="display:flex;padding:1rem;background:#fbfbfb;border-top:1px solid #eee">
+                <div style="width: 100%;display: flex;margin: -1rem;flex-wrap: wrap;padding-bottom: 1rem;">
+                {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'] %}
+                    <div class="category_label_{{ key }} label_category little_bar_{{ loop.index0 }} label_bar_{{ loop.index0%15 }}" data-key="{{ key }}">{{ analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'][key]['label'] }}</div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% if page == "user_label" %}
+            {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['add_new_labels'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']['add_new_labels'] == 'True' %}       
+            <input type="text" class="form-control main-theme-fill-dark category_input" style="color: white!important;padding: 1rem;margin-right: 2rem;margin-top: 1rem;width: auto!important;" data-question_number="{{ question['number'] }}"/>
+            <div class="mb-2 helper_text_white" style="color: #aaa!important;margin-right: 2rem;width: auto!important;">Enter a new category label here and press enter</div>
+            {% endif %}
+        {% else %}
+            <input type="text" class="form-control main-theme-fill-dark category_input" style="color: white!important;padding: 1rem;margin-right: 2rem;margin-top: 1rem;width: auto!important;" data-question_number="{{ question['number'] }}"/>
+            <div class="mb-2 helper_text_white" style="color: #aaa!important;margin-right: 2rem;width: auto!important;">Enter a new category label here and press enter</div>
+        {% endif %}
+    </div>
+    <div class="col-md-6 p-0 mt-3" style="display:flex;flex-direction:column;align-self:flex-start">
+        <div style="font-size: .8rem;font-style: italic;display:none" class="main-theme-color-dark sorting_info mb-2">*Currently <span class="sort_action" style="font-weight:bold">sorting</span> on <span class="sort_value" style="font-weight:bold">Words (low-high)</span></div>
+        <div class="all_responses_div parent_response_div" style="overflow-y:auto;max-height: 500px;padding-right:1rem;overflow-x: hidden;">
+            {% include 'partials/getting_ducks.html' %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="row centerFlex m-0 full_response_div main-theme-color-dark quantext_file_div quantext_file_analysis file_div_{{ f['id'] }}" style="cursor:pointer" data-id="{{ f['id'] }}">
+    <div class="col-md-11">
+        <div class="row">
+            <div class="col-md-9 p-0 centerFlex" style="font-weight:bold;">
+                <div class="centerFlex" style="font-size:.8rem">
+                    <div class="small_text-8" style="font-weight:500">{{ f['filename'] }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 pr-0 centerFlex" style="color:#888;font-weight:400;text-align:right">{{ f['created'].strftime('%d.%m.%Y %H:%M') }}</div>
+            <div class="col-md-12 p-0 small_text-8" style="color: #aaa;">{{ f['columns']|length }} columns x {{ f['rows'] }} rows</div>
+        </div>
+    </div>
+    <div class="col-md-1 p-0 centerFlex" style="display:flex;justify-content: flex-end;line-height:1">
+        <a href="#" class="index-font">
+            <span class="quantext-remove main-theme-color-1 removeFile" data-id="{{ f['id'] }}" style="font-size:2rem;"></span>
+        </a>
+    </div>
+    <div class="hidden_columns" style="display:none;flex-direction: column">
+        <div class="mt-2 mb-2 helper_text_white" style="color:#aaa">Please select the text columns you would like to analyse</div>
+        <select class="column_select form-control" multiple>
+        {% for c in f['columns'] %}
+        <option value="{{ loop.index0 }}">{{ c }}</option>
+        {% endfor %}
+        </select>
+    </div>
+</div>

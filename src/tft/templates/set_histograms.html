@@ -1,0 +1,47 @@
+{% for c in cat_cols %}
+    <div class="col-md-2 mt-5 p-0">
+        <h6 class="histogramChart main-theme-color-dark
+        {% if loop.index0 == 0 %}
+        first_chart
+        {% endif %}
+        " style="font-weight:500">{{ aliases[c] }} set</h6>
+        <div class="histogramChart
+        {% if loop.index0 == 0 %}
+        first_chart
+        {% endif %}
+        p-4 main-theme-fill-1">
+            <div style="height:40px;margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                {% set t = [0] %}
+                {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'] %}
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['categories'][c][key] %}
+                        {% if t.append(analysis['files'][file['id']|string]['columns'][question['number']]['categories'][c][key]) %}{% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% set t = t|sort(reverse=True) %}
+                {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'] %}
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['categories'][c][key] %}
+                        {% set value = analysis['files'][file['id']|string]['columns'][question['number']]['categories'][c][key] %}
+                        {% if t[0] != 0 %}
+                            {% set width = value/t[0]*100 %}
+                        {% else %}
+                            {% set width = 0 %}
+                        {% endif %}
+                    {% else %}
+                        {% set value = 0 %}
+                        {% set width = 0 %}
+                    {% endif %}
+                <div title="{{ analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'][key]['label'] }} : {{ value }}" data-key="{{ key }}" data-value="{{ value }}" style="margin-right:.2rem;background:white;width:calc(100%/{{ analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all']|length }});height:{{ width }}%" class="label_bar"></div>
+                {% endfor %}
+            </div>
+            <div style="font-size: 2.5rem;font-weight: 300;line-height: 1;">{{ "{0:.0f}".format(percents[loop.index0]) }}%</div>
+            Labelled
+        </div>
+        <div class="mt-2 histogramChart
+        {% if loop.index0 == 0 %}
+        first_chart
+        {% endif %}
+        live_link" style="text-transform: none;flex-direction: row;">
+            Label URL:&nbsp;<a href="{{ url_for('label',key=key+alpha[c.split('_')[1]|int]) }}" target="_blank">label/{{ key }}{{ alpha[c.split('_')[1]|int] }}</a>
+        </div>
+    </div>
+{% endfor %}

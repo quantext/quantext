@@ -1,0 +1,124 @@
+<div class="col-md-6 p-0" style="display:flex;flex-direction:column">
+    <div class="row w-100 m-0 pb-3 centerFlex pl-0 pr-0">
+        <div class="search_button_group" style="margin-top:1rem">
+            <div class="all_responses btn btn-quantext search_button search_selected" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">All responses (<span class="all_responses_count">{{ tuples|length }}</span>)</div>
+            <div class="kwic_results btn btn-quantext search_button ml-2" style="box-shadow: 0 2px 3px 0 #dedede;border-radius: 0;background: #fefefe;">KWIC/Search results</div>
+        </div>
+    </div>
+    <div class="four_panels">
+        {% include 'four_panels.html' %}
+    </div>
+</div>
+<div class="col-md-6 p-0 mobile_hidden" style="flex-direction: column;">
+    <div class="pos_controls row ml-5 mt-4 mb-4 mr-0 p-3 main-theme-fill-dark">
+        <h6 class="small_text-8">Part-of-speech tags</h6>
+        <div class="centerFlex w-100" style="justify-content: space-between;flex-wrap: wrap;">
+            <div class="ADJ pos_control pos_disabled" title="adjective" data-pos="ADJ">ADJ</div>
+            <div class="ADP pos_control pos_disabled" title="adposition" data-pos="ADP">ADP</div>
+            <div class="ADV pos_control pos_disabled" title="adverb" data-pos="ADV">ADV</div>
+            <div class="CCONJ pos_control pos_disabled" title="coordinating conjunction" data-pos="CCONJ">CCONJ</div>
+            <div class="DET pos_control pos_disabled" title="determiner" data-pos="DET">DET</div>
+            <div class="INTJ pos_control pos_disabled" title="interjection" data-pos="INTJ">INTJ</div>
+            <div class="NOUN pos_control pos_disabled" title="noun" data-pos="NOUN">NOUN</div>
+            <div class="NUM pos_control pos_disabled" title="numeral" data-pos="NUM">NUM</div>
+            <div class="PART pos_control pos_disabled" title="particle" data-pos="PART">PART</div>
+            <div class="PRON pos_control pos_disabled" title="pronoun" data-pos="PRON">PRON</div>
+            <div class="PROPN pos_control pos_disabled" title="proper noun" data-pos="PROPN">PROPN</div>
+            <div class="PUNCT pos_control pos_disabled" title="punctuation" data-pos="PUNCT">PUNCT</div>
+            <div class="SYM pos_control pos_disabled" title="symbol" data-pos="SYM">SYM</div>
+            <div class="VERB pos_control pos_disabled" title="punctuation" data-pos="VERB">VERB</div>
+            <div class="X pos_control pos_disabled" title="other" data-pos="X">X</div>
+        </div>
+    </div>
+    <div class="row w-100 m-4 p-0">
+        <h6 style="width: 100%;" class="small_text-8 mb-4 ml-4">Filters</h6>
+        <div class="col-md-6 mt-0 p-0">
+            <div class="histogramChart_edit pl-4 pr-4">
+                <div id="slider_words_{{ question['number'] }}" class="main-theme-color-dark" style="position:absolute;bottom:calc(2.5rem - 2px);left:1.5rem;right:1.5rem"></div>
+                <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                    {% set vals = histograms[loop.index0]['Words'][0][0] %}
+                    {% set word_bins = histograms[loop.index0]['Words'][0][1] %}
+                    {% set max = histograms[loop.index0]['Words'][1] %}
+                    {% for item in vals %}
+                    {% set height = item/max*40 if item == 0 or item/max*40 > 1 else 1 %}
+                    <div class="histo_bar main-theme-fill-dark {{ word_bins[ loop.index0 ] }}" data-bin="{{ word_bins[ loop.index0 ] }}" style="height:{{ height }}px;"></div>
+                    {% endfor %}
+                </div>
+                <div class="helper_text_white" style="color:#aaa!important">Response length (words)</div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-0 p-0">
+            <div class="pl-4 pr-4 histogramChart_edit">
+                <div id="slider_sents_{{ question['number'] }}" class="main-theme-color-dark" style="position:absolute;bottom:calc(2.5rem - 2px);left:1.5rem;right:1.5rem"></div>
+                <div style="margin-bottom:1rem;display:flex;align-items:baseline;justify-content:space-between">
+                    {% set vals = histograms[loop.index0]['Sentences'][0][0] %}
+                    {% set sent_bins = histograms[loop.index0]['Sentences'][0][1] %}
+                    {% set max = histograms[loop.index0]['Sentences'][1] %}
+                    {% for item in vals %}
+                    {% set height = item/max*40 if item == 0 or item/max*40 > 1 else 1 %}
+                    <div class="histo_bar main-theme-fill-dark {{ sent_bins[ loop.index0 ] }}" data-bin="{{ sent_bins[ loop.index0 ] }}" style="height:{{ height }}px;"></div>
+                    {% endfor %}
+                </div>
+                <div class="helper_text_white" style="color:#aaa!important">Sentences per response</div>
+            </div>
+        </div>
+    </div>
+    <div class="row w-100 ml-4 mr-4 mt-0 p-0 centerFlex">
+        <div class="col-md-6 pl-4 p-0 pr-4">
+            <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Sort responses by</h6><sup class="toolt quantext-info" title=""></sup>
+            <select id="sort_responses_{{ loop.index0 }}" class="form-control sort-control" name="" data-file_id="{{ file['id'] }}" data-question_number="{{ question['number'] }}">
+                    <optgroup label="">
+                        <option value="">(Default order)</option>
+                    </optgroup>
+                    <optgroup label="METRICS">
+                        <option value="asc_Words">Words (low-high)</option>
+                        <option value="desc_Words">Words (high-low)</option>
+                        <option value="asc_Sentences">Sentences (low-high)</option>
+                        <option value="desc_Sentences">Sentences (high-low)</option>
+                    </optgroup>
+                    <optgroup label="COLUMNS">
+                        {% for c in file['columns'] %}
+                            <option value="asc_{{ c }}">{{ c }} (low-high)</option>
+                            <option value="desc_{{ c }}">{{ c }} (high-low)</option>
+                        {% endfor %}
+                    </optgroup>
+            </select>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    slider_configs["slider_{{ question['number'] }}"] = {
+        "word_bins":{{ word_bins|list|safe }},
+        "sent_bins":{{ sent_bins|list|safe }},
+        "slider_words":document.getElementById("slider_words_{{ question['number'] }}"),
+        "slider_sents":document.getElementById("slider_sents_{{ question['number'] }}")
+    }
+
+    noUiSlider.create(slider_configs["slider_{{ question['number'] }}"]["slider_words"], {
+        start: [slider_configs["slider_{{ question['number'] }}"]["word_bins"][0], slider_configs["slider_{{ question['number'] }}"]["word_bins"][slider_configs["slider_{{ question['number'] }}"]["word_bins"].length-1]],
+        step:parseInt("{{ histograms[loop.index0]['Words'][2] }}"),
+        tooltips:[true,true],
+        connect: true,
+        range: {
+            'min': slider_configs["slider_{{ question['number'] }}"]["word_bins"][0],
+            'max': slider_configs["slider_{{ question['number'] }}"]["word_bins"][slider_configs["slider_{{ question['number'] }}"]["word_bins"].length-1]
+        }
+    });
+
+    slider_configs["slider_{{ question['number'] }}"]["slider_words"].noUiSlider.on('update',updateHistogram_words);
+
+    noUiSlider.create(slider_configs["slider_{{ question['number'] }}"]["slider_sents"], {
+        start: [slider_configs["slider_{{ question['number'] }}"]["sent_bins"][0], slider_configs["slider_{{ question['number'] }}"]["sent_bins"][slider_configs["slider_{{ question['number'] }}"]["sent_bins"].length-1]],
+        connect: true,
+        tooltips:[true,true],
+        step:parseInt("{{ histograms[loop.index0]['Sentences'][2] }}"),
+        range: {
+            'min': slider_configs["slider_{{ question['number'] }}"]["sent_bins"][0],
+            'max': slider_configs["slider_{{ question['number'] }}"]["sent_bins"][slider_configs["slider_{{ question['number'] }}"]["sent_bins"].length-1]
+        }
+    });
+
+    slider_configs["slider_{{ question['number'] }}"]["slider_sents"].noUiSlider.on('update',updateHistogram_sents);
+
+</script>

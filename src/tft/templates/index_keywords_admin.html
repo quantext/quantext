@@ -1,0 +1,125 @@
+{% if responses|length > 0 %}
+<div class="row m-0">
+    <div class="col-md-8 p-0 pr-4">
+        <div class="pt-5">
+            <div class="col-md-12 p-0 main-theme-color-menu" style="text-transform: uppercase;font-size:1rem;font-weight:500;line-height: 1">
+                <div class="main_question_title centerFlex">
+                    <div class="main_title_text">{{ question['text'] }}</div>
+                    <input type="text" class="form-control main_title_text_input main-theme-fill-dark" style="margin: 0.5rem 0;padding:1rem;width: 50%;display:none" data-question_number="{{ question['number'] }}" value="{{ question['text'] }}">
+                    <div class="quantext-edit title_edit_icon" style="color:#aaa;margin-left:.5rem;cursor:pointer"></div>
+                    <div class="quantext-check title_success_icon" style="color:#aaa;margin-left:.5rem;cursor:pointer;display:none"></div>
+                </div>
+                <div class="live_link mt-2">live link:&nbsp;<a href="{{ url_for('live',key=key) }}" target="_blank">/live/{{ key }}</a></div>
+                <div class="live_link mt-2" style="text-transform: none;">QR code:&nbsp;<a href="{{ url_for('qrcode',key=key) }}" target="_blank">click to view</a></div>
+            </div>
+
+            <div class="row m-0">
+                <div class="col-md-6 pl-0 pr-4 pt-4">
+                    <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Show frequent words to users</h6><sup class="toolt quantext-info" title="When should users be able to see frequent word counts on this Quantext Live?"></sup>
+                    <select class="form-control setting-control live_control" name="show_freq" data-file_id="{{ file['id'] }}" data-analysis_id="{{ analysis['id'] }}">
+                        <option value="always"
+                                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "always" %}
+                        selected="selected"
+                        {% endif %}
+                        >Always</option>
+                        <option value="after"
+                                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "after" %}
+                        selected="selected"
+                        {% endif %}
+                        >After responding</option>
+                        <option value="never"
+                                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "never" %}
+                        selected="selected"
+                        {% endif %}
+                        >Never</option>
+                    </select>
+                </div>
+                <div class="col-md-6 pl-0 pr-4 pt-4">
+                    <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Is this Live public or private?</h6><sup class="toolt quantext-info" title="Should this Quantext Live be public (anyone can respond and responses are anonymous) or private (participants need to login to respond)"></sup>
+                    <select class="form-control setting-control live_control" name="public" data-file_id="{{ file['id'] }}" data-analysis_id="{{ analysis['id'] }}">
+                        <option value="public"
+                                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['public'] == "public" %}
+                        selected="selected"
+                        {% endif %}
+                        >Public</option>
+                        <option value="private"
+                                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['public'] == "private" %}
+                        selected="selected"
+                        {% endif %}
+                        >Private</option>
+                    </select>
+                </div>
+            </div>
+            <div id="index_keywords_top_features">
+            {% include 'index_keywords_top_features.html' %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 p-0 mt-5">
+        <h5 class="card-header centerFlex mt-5 pl-0 pr-0 pb-3 mb-0 pt-0 small_text-9" style="background:#fff;">Live responses ({{ responses|length }})</h5>
+        <div id="all_responses_admin">
+            {% include 'all_responses_admin.html' %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row m-0">
+    <div class="col-md-12 p-0">
+        <div class="pt-5">
+            <div class="col-md-12 p-0 main-theme-color-menu" style="text-transform: uppercase;font-size:1rem;font-weight:500;line-height: 1">
+                <div class="main_question_title centerFlex">
+                    <div class="main_title_text">{{ question['text'] }}</div>
+                    <input type="text" class="form-control main_title_text_input main-theme-fill-dark" style="margin: 0.5rem 0;padding:1rem;width: 50%;display:none" data-question_number="{{ question['number'] }}" value="{{ question['text'] }}">
+                    <div class="quantext-edit title_edit_icon" style="color:#aaa;margin-left:.5rem;cursor:pointer"></div>
+                    <div class="quantext-check title_success_icon" style="color:#aaa;margin-left:.5rem;cursor:pointer;display:none"></div>
+                </div>
+                <div class="live_link mt-2">live link:&nbsp;<a href="{{ url_for('live',key=key) }}" target="_blank">/live/{{ key }}</a></div>
+                <div class="live_link mt-2" style="text-transform: none;">QR code:&nbsp;<a href="{{ url_for('qrcode',key=key) }}" target="_blank">click to view</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row m-0">
+    <div class="col-md-4 pl-0 pr-4 pt-4">
+        <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Show frequent words to users</h6><sup class="toolt quantext-info" title="When should users be able to see frequent word counts on this Quantext Live?"></sup>
+        <select class="form-control setting-control live_control" name="show_freq">
+            <option value="always"
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "always" %}
+                    selected="selected"
+                    {% endif %}
+            >Always</option>
+            <option value="after"
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "after" %}
+                    selected="selected"
+                    {% endif %}
+            >After responding</option>
+            <option value="never"
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['show_freq'] == "never" %}
+                    selected="selected"
+                    {% endif %}
+            >Never</option>
+        </select>
+    </div>
+    <div class="col-md-4 pl-0 pr-4 pt-4">
+        <h6 style="margin-bottom:0!important;font-size: .8rem;text-transform: uppercase;font-weight: 500;display:inline-block">Is this Live public or private?</h6><sup class="toolt quantext-info" title="Should this Quantext Live be public (anyone can respond and responses are anonymous) or private (participants need to login to respond)"></sup>
+        <select class="form-control setting-control live_control" name="public">
+            <option value="public"
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['public'] == "public" %}
+                    selected="selected"
+                    {% endif %}
+            >Public</option>
+            <option value="private"
+                    {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']['public'] == "private" %}
+                    selected="selected"
+                    {% endif %}
+            >Private</option>
+        </select>
+    </div>
+</div>
+<div class="row m-0 pt-4">
+    <div class="col-md-12">
+        <div class="empty_nest mt-2 pl-2 pr-2 main-theme-color-dark">Empty nest... no responses received yet</div>
+        <div class="quantext-nest empty_nest main-theme-color-dark" style="font-size:4rem!important"></div>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% from 'macros.html' import checkbox %}
+
+<style>
+    .main-theme-fill-dark:disabled { color:#aaa!important }
+</style>
+
+<div id="themeDiv">
+    <!-- theme css -->
+    {% if current_user.theme %}
+        <link rel="stylesheet" href="/static/css/themes/{{ current_user.theme }}.css"/>
+    {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}"/>
+    {% endif %}
+</div>
+
+<!-- panels -->
+<div class="quantext_sidebar main-theme-fill-dark">
+    <div class="inner-banner" style="opacity:.3"></div>
+    <div class="sidebar-div">
+        <div class="inner-icon quantext-chunky-duck" style="margin-top:.2rem"></div>
+    </div>
+    <div class="sidebar-div left_div mobile_hidden centerFlex pt-0" data-panel="menu">
+        <div class="inner-icon quantext-hamburger" style="margin-bottom: -.5rem;"></div>
+        <div class="sidebar-div-text">MENU</div>
+    </div>
+
+    <div class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="theme" style="margin-left:auto">
+        <div style="position:relative;display:block;margin-top:.5rem">
+            <div class="inner-icon quantext-circle" style="position:absolute;top:0;bottom:0;z-index:2"></div>
+            <div class="inner-icon theme-color-1 quantext-circle-half-left" style="position:absolute;top:0;bottom:0;"></div>
+            <div class="inner-icon theme-color-2 quantext-circle-half-right" style="position:absolute;top:0;bottom:0;"></div>
+        </div>
+        <div class="sidebar-div-text" style="margin-left:2.1rem">THEMES</div>
+    </div>
+    <div id="user_panel" class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="user">
+        <div class="main-theme-fill-menu" style="padding: .9rem .7rem;border-radius: 10rem;">
+            <div class="inner-icon quantext-user" style="margin-bottom: -.5rem;"></div>
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    <div class="row pl-4 pr-4" style="padding-top: 3.5rem;">
+        <div class="col-md-12 p-0 pb-4">
+            <h1 class="top_title main-theme-color-1 m-0" style="font-weight:300">Please wait, just getting your ducks in a row...</h1>
+        </div>
+        <div class="col-md-12 p-0 main-theme-color-menu" style="text-transform: uppercase;font-size:.9rem;font-weight:500;line-height: 1">
+            <span id="current_task" class="main-theme-color-dark"></span>
+            <span id="task_percent"></span>
+        </div>
+    </div>
+</div>
+
+{% include 'menus/menu.html' %}
+{% include 'menus/themes.html' %}
+
+<script type="text/javascript">
+
+    fetch("{{ url_for('analyse_task',analysis_id=analysis['id']) }}", {
+        method: 'GET'
+    }).then(response => response.json()).then($data => {
+        let current_task = document.getElementById("current_task");
+        current_task.innerHTML = "";
+        current_task.style.display = "block";
+
+        let task_percent = document.getElementById("task_percent");
+        task_percent.innerHTML = "";
+        task_percent.style.display = "block";
+
+        let PollState = function(task_id) {
+            postData("{{ url_for('poll_analysis') }}",{task_id:task_id}).then(response => response.json()).then($task => {
+                if ($task.process_percent) {
+                    current_task.innerHTML = $task.current_task;
+                    task_percent.innerHTML = Math.round($task.process_percent)+"%";
+                } else {
+                    clearInterval(timeout);
+                    window.location = "{{ url_for('analyse_files',analysis_id=analysis['id'],file_id=file_id) }}";
+                }
+            });
+        };
+
+        let timeout = setInterval(function(){ PollState($data.job_id) },250);
+    });
+
+</script>
+
+
+{% endblock %}
+

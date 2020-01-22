@@ -1,42 +1,196 @@
-<div class="col-xs-6 col-md-6 p-0">
-    <div class="card card-header-{{ (student_file.index+1)|string }}">
-        <div class="card-block p-4">
-            {% set biggest = student_file.anaq.top_kwords[0][1] %}
-            {% for i in student_file.anaq.top_kwords %}
-            {% set ngic=i[0] %}
-            {% set word_count = i[1] %}
-            <div class="row">
-                <div class = "col-md-6"><div class="keyword">{{ ngic }}</div></div>
-                <div class = "col-md-1 centerFlex">{{ word_count }}</div>
-                <div class = "col-md-5" style="position:relative">
-                    {% set percent = word_count/biggest * 100 %}
-                    <div class="barchart barchart-{{ (student_file.index+1)|string }}" style="width:{{ percent }}%;"></div>
-                </div>
-            </div>
-            {% endfor %}
+<div class="col-md-4 p-0">
+    <div class="card">
+        <div class="card-block p-0">
+            {% if features["top_words"] %}
+                {% set biggest = features["top_words"][0][1] %}
+                {% set tw = features["top_words"] %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == 'True' %}
+                    {% set tw = tw|reverse %}
+                {% endif %}
+                {% for i in tw %}
+                    {% set ngic = i[0] %}
+                    {% set word_count = i[1] %}
+                    <div class="row m-0 screen_only keyword_row" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-4 keyword_container" style="display: flex;justify-content: flex-end;"><div class="keyword main-theme-color-dark" title="{{ ngic }}">{{ ngic }}</div></div>
+                        <div class = "col-md-5 barchart_container" style="position:relative">
+                            {% if biggest|int != 0 %}
+                                {% set percent = word_count|int/biggest|int * 100 %}
+                            {% else %}
+                                {% set percent = 0 %}
+                            {% endif %}
+                            {% set left = ".3rem" %}
+                            {% set color = "white" %}
+                            {% if percent < 15 %}
+                                {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                                {% set color = "#193e45" %}
+                            {% endif %}
+                            <div class="centerFlex" style="font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ word_count }}</div>
+                            <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="quantext-remove blacklist_word" data-question_number="{{ question['number'] }}" data-word="{{ ngic }}" title="Add '{{ ngic }}' to custom blacklist"></div>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                    <div class="row m-0 phone_only" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-5 barchart_container p-0" style="position:relative">
+                            {% if biggest|int != 0 %}
+                                {% set percent = word_count|int/biggest|int * 100 %}
+                            {% else %}
+                                {% set percent = 0 %}
+                            {% endif %}
+                            <div class="main-theme-color-dark" style="position:absolute;top:0;bottom:0;left:0;z-index:2;font-weight:500;">{{ ngic }} <span style="font-weight:600" class="main-theme-color-1">{{ word_count }}</span></div>
+                            <div class="main-theme-color-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>
-<div class="col-xs-6 col-md-6 p-0">
-    <div class="card card-header-{{ (student_file.index+1)|string }}">
-        <div class="card-block p-4">
-            {% if student_file.anaq.top_bgs[0] %}
-                {% set (obj,biggest) = student_file.anaq.top_bgs[0] %}
-                {% for (bg,c) in student_file.anaq.top_bgs %}
-                <div class="row">
-                    {% if student_file.q.qSettings["trigram"] == "Bigram" %}
-                        <div class = "col-md-6"><div class="keyword">{{ bg[0] }} {{ bg[1] }}</div></div>
-                    {% else %}
-                        <div class = "col-md-6"><div class="keyword">{{ bg[0] }} {{ bg[1] }} {{ bg[2] }}</div></div>
-                    {% endif %}
-                    <div class = "col-md-1 centerFlex">{{ c }}</div>
-                    <div class = "col-md-5" style="position:relative">
-                        {% set percent = c/biggest * 100 %}
-                        <div class="barchart barchart-{{ (student_file.index+1)|string }}" style="width:{{ percent }}%;"></div>
+<div class="col-md-4 p-0 phone_block">
+    <div class="card">
+        <div class="card-block p-0">
+            {% if features["top_bigrams"] and features["top_bigrams"][0] %}
+                {% set biggest = features["top_bigrams"][0][0][1] %}
+                {% set tb = features["top_bigrams"][0] %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == 'True' %}
+                    {% set tb = tb|reverse %}
+                {% endif %}
+                {% for bigram in tb %}
+                    <div class="row m-0 screen_only keyword_row" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-5 keyword_container" style="display: flex;justify-content: flex-end;"><div class="keyword main-theme-color-dark" title="{{ bigram[0][0] }} {{ bigram[0][1] }}">{{ bigram[0][0] }} {{ bigram[0][1] }}</div></div>
+                        <div class = "col-md-5 barchart_container" style="position:relative">
+                            {% set percent = bigram[1]/biggest * 100 %}
+                            {% set left = ".3rem" %}
+                            {% set color = "white" %}
+                            {% if percent < 15 %}
+                                {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                                {% set color = "#193e45" %}
+                            {% endif %}
+                            <div class="centerFlex" style="font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ bigram[1] }}</div>
+                            <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-2"></div>
                     </div>
+                    <div class="row m-0 phone_only" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-5 barchart_container p-0" style="position:relative">
+                            {% set percent = bigram[1]/biggest * 100 %}
+                            <div class="main-theme-color-dark" style="position:absolute;top:0;bottom:0;left:0;z-index:2;font-weight:500">{{ bigram[0][0] }} {{ bigram[0][1] }} <span style="font-weight:600" class="main-theme-color-1">{{ bigram[1] }}</span></div>
+                            <div class="main-theme-color-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-md-4 p-0 phone_block">
+    <div class="card">
+        <div class="card-block p-0">
+            {% if features["top_trigrams"] and features["top_trigrams"][0] %}
+                {% set biggest = features["top_trigrams"][0][0][1] %}
+                {% set tt = features["top_trigrams"][0] %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == 'True' %}
+                    {% set tt = tt|reverse %}
+                {% endif %}
+                {% for trigram in tt %}
+                <div class="row m-0 screen_only keyword_row" style="border-bottom:2px solid #fff">
+                    <div class = "col-md-6 keyword_container" style="display: flex;justify-content: flex-end;"><div class="keyword main-theme-color-dark" title="{{ trigram[0][0] }} {{ trigram[0][1] }} {{ trigram[0][2] }}">{{ trigram[0][0] }} {{ trigram[0][1] }} {{ trigram[0][2] }}</div></div>
+                    <div class = "col-md-5 barchart_container" style="position:relative">
+                        {% set percent = trigram[1]/biggest * 100 %}
+                        {% set left = ".3rem" %}
+                        {% set color = "white" %}
+                        {% if percent < 15 %}
+                            {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                            {% set color = "#193e45" %}
+                        {% endif %}
+                        <div class="centerFlex" style="font-size:.8rem;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ trigram[1] }}</div>
+                        <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row m-0 phone_only" style="border-bottom:2px solid #fff">
+                    <div class = "col-md-5 barchart_container p-0" style="position:relative">
+                        {% set percent = trigram[1]/biggest * 100 %}
+                        <div class="main-theme-color-dark" style="position:absolute;top:0;bottom:0;left:0;z-index:2;font-weight:500">{{ trigram[0][0] }} {{ trigram[0][1] }} {{ trigram[0][2] }} <span style="font-weight:600" class="main-theme-color-1">{{ trigram[1] }}</span></div>
+                        <div class="main-theme-color-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                    </div>
+                    <div class="col-md-2"></div>
                 </div>
                 {% endfor %}
             {% endif %}
         </div>
     </div>
 </div>
+
+{% if current_user['plan'] != "free" %}
+<h6 style="border-top: 1px solid #eee;background:#fff;text-transform: uppercase;font-weight: 500;font-size: .9rem;" class="col-md-12 card-header mt-4 mb-4 pl-0 pr-0 pb-2 pt-4 advanced-div">Most frequent noun phrases and named entities</h6>
+
+<div class="col-md-4 p-0 advanced-div">
+    <div class="card">
+        <div class="card-block p-0">
+            {% if features["top_noun_phrases"] %}
+                {% set biggest = features["top_noun_phrases"][0][1] %}
+                {% set tn = features["top_noun_phrases"] %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == 'True' %}
+                    {% set tn = tn|reverse %}
+                {% endif %}
+                {% for i in tn %}
+                    {% set ngic = i[0] %}
+                    {% set word_count = i[1] %}
+                    <div class="row m-0 screen_only keyword_row" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-4 keyword_container" style="display: flex;justify-content: flex-end;"><div class="keyword main-theme-color-dark" title="{{ ngic }}">{{ ngic }}</div></div>
+                        <div class = "col-md-5 barchart_container" style="position:relative">
+                            {% set percent = word_count/biggest * 100 %}
+                            {% set left = ".3rem" %}
+                            {% set color = "white" %}
+                            {% if percent < 15 %}
+                            {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                            {% set color = "#193e45" %}
+                            {% endif %}
+                            <div style="font-size:.8rem;display:flex;align-items:center;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ word_count }}</div>
+                            <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-md-4 p-0 advanced-div">
+    <div class="card">
+        <div class="card-block p-0">
+            {% if features["top_named_entities"] %}
+                {% set biggest = features["top_named_entities"][0][1] %}
+                {% set te = features["top_named_entities"] %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == True or analysis['files'][file['id']|string]['columns'][question['number']]['settings']["reverse_lists"] == 'True' %}
+                    {% set te = te|reverse %}
+                {% endif %}
+                {% for i in te %}
+                    {% set ngic = i[0] %}
+                    {% set word_count = i[1] %}
+                    <div class="row m-0 screen_only keyword_row" style="border-bottom:2px solid #fff">
+                        <div class = "col-md-4 keyword_container" style="display: flex;justify-content: flex-end;"><div class="keyword main-theme-color-dark" title="{{ ngic }}">{{ ngic }}</div></div>
+                        <div class = "col-md-5 barchart_container" style="position:relative">
+                            {% set percent = word_count/biggest * 100 %}
+                            {% set left = ".3rem" %}
+                            {% set color = "white" %}
+                            {% if percent < 15 %}
+                            {% set left = "calc(" + percent|string + "% + .5rem)" %}
+                            {% set color = "#193e45" %}
+                            {% endif %}
+                            <div style="font-size:.8rem;display:flex;align-items:center;position:absolute;top:0;bottom:0;left:{{ left }};z-index:2;font-weight:400;color:{{ color }}">{{ word_count }}</div>
+                            <div class="main-theme-fill-dark barchart barchart-1" style="width:{{ percent }}%;"></div>
+                        </div>
+                        <div class="col-md-3"></div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}

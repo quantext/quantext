@@ -1,857 +1,1745 @@
 {% extends "base.html" %}
 {% block content %}
 
-<script type="text/javascript" src="/static/js/jquery.mark.js"></script>
-<script type="text/javascript" src="/static/js/datatables.mark.js"></script>
-<script type="text/javascript" src="/static/js/wordtree.js"></script>
+{% import "macros.html" as macros %}
 
-<script type="text/javascript" src="/static/js/waypoints/lib/jquery.waypoints.min.js"></script>
-<script type="text/javascript" src="/static/js/waypoints/lib/shortcuts/sticky.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"></script>
 
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/select/1.2.2/js/dataTables.select.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+<!-- PDF stuff -->
+<!-- <script type="text/javascript" src="/static/js/pdfjs/system.js"></script>
+<script type="text/javascript" src="/static/js/pdfjs/systemjs.config.js"></script> -->
+<!--<script type="text/javascript" src="/static/js/pdfjs/pdf.js"></script>-->
+<!-- end PDF stuff -->
 
-<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/dataRender/ellipsis.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/labeller.js') }}"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='js/nouislider.min.css') }}"/>
+<script type="text/javascript" src="{{ url_for('static', filename='js/nouislider.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/xlsx.full.min.js') }}"></script>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
-<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
-<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.38/pdfmake.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.38/vfs_fonts.js"></script>
 
-<link rel="stylesheet" href="/static/css/dataTables_custom.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='js/choices/choices.min.css') }}">
+<script src="{{ url_for('static', filename='js/choices/choices.min.js') }}"></script>
 
 <div id="themeDiv">
     <!-- theme css -->
-    {% if user.theme %}
-        <link rel="stylesheet" href="/static/css/themes/{{ user.theme }}.css"/>
+    {% if current_user.theme %}
+        <link rel="stylesheet" href="/static/css/themes/{{ current_user.theme }}.css"/>
     {% else %}
-        <link rel="stylesheet" href="/static/css/themes/original.css"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}"/>
     {% endif %}
 </div>
+<!--
+<div id="new_column" class="sidebar-div right_div mobile_hidden centerFlex pt-0 main-theme-fill-2" data-panel="file_settings">
+    <div class="" style="padding: .9rem .7rem;border-radius: 10rem;">
+        <div class="inner-icon quantext-add" style="margin-bottom: -.5rem;"></div>
+    </div>
+</div>
+-->
 
-<div class="quantext_sidebar">
+<div class="quantext_sidebar main-theme-fill-dark">
+    <div class="inner-banner" style="opacity:.3!important"></div>
     <div class="sidebar-div">
-        <div class="inner-icon quantext-chunky-duck"></div>
-        <div class="inner-text">
-            <a href="{{ url_for('index') }}"><div>Home</div></a>
-            <a href="{{ url_for('control_panel') }}"><div>Control panel</div></a>
-            <a href="{{ url_for('documentation') }}"><div>Documentation</div></a>
-            <a href="{{ url_for('development') }}"><div>Development journal</div></a>
-            <a href="{{ url_for('contact') }}"><div>Contact</div></a>
-            <a href="{{ url_for('logout') }}"><div>Logout</div></a>
+        <div class="inner-icon quantext-chunky-duck" style="margin-top:.2rem"></div>
+    </div>
+    <div class="sidebar-div left_div mobile_hidden centerFlex pt-0" data-panel="menu">
+        <div class="inner-icon quantext-hamburger" style="margin-bottom: -.5rem;"></div>
+        <div class="sidebar-div-text">MENU</div>
+    </div>
+    <div class="banner-text">{{ analysis['name'] }}&nbsp;&nbsp;|<span style="font-weight:400;opacity:.5;font-size:.9rem">&nbsp;&nbsp;created {{ analysis['created'].strftime('%d.%m.%Y') }}</span></div>
+    <div class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="reporting" style="margin-left:auto">
+        <div class="inner-icon quantext-chart" style="margin-bottom: -.5rem;"></div>
+        <div class="sidebar-div-text">REPORT</div>
+    </div>
+    <div class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="theme">
+        <div style="position:relative;display:block;margin-top:.5rem">
+            <div class="inner-icon quantext-circle" style="position:absolute;top:0;bottom:0;z-index:2"></div>
+            <div class="inner-icon theme-color-1 quantext-circle-half-left" style="position:absolute;top:0;bottom:0;"></div>
+            <div class="inner-icon theme-color-2 quantext-circle-half-right" style="position:absolute;top:0;bottom:0;"></div>
+        </div>
+        <div class="sidebar-div-text" style="margin-left:2.1rem">THEMES</div>
+    </div>
+    <div id="settings_panel" class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="file_settings">
+        <div class="" style="padding: .9rem .7rem;border-radius: 10rem;">
+            <div class="inner-icon quantext-cog" style="margin-bottom: -.5rem;"></div>
         </div>
     </div>
+    <div id="user_panel" class="sidebar-div right_div mobile_hidden centerFlex pt-0" data-panel="user">
+        <div class="main-theme-fill-menu" style="padding: .9rem .7rem;border-radius: 10rem;">
+            <div class="inner-icon quantext-user" style="margin-bottom: -.5rem;"></div>
+        </div>
+    </div>
+</div>
 
-    <div class="sidebar-div">
-        <div class="inner-icon quantext-book"></div>
-        <div class="inner-text">
-            <div>Open reference materials (not yet implemented)</div>
-        </div>
+<div class="quantext_mobile_bar">
+    <div class="mobile_bar_div" data-panel="menu">
+        <div class="inner-icon quantext-hamburger"></div>
     </div>
-    <div class="sidebar-div">
-        <div class="inner-icon quantext-report"></div>
-        <div class="inner-text">
-            {% for student_file in student_files %}
-                <div class="generate_report" style="word-break: break-word;" data-url="/report/{{ analysis_id }}/{{ student_file['file']['id'] }}/{{ student_file['q']['qNum'] }}">Generate report for {{ student_file["file"]["filename"] }} Q{{ student_file['q']['qNum'] }}</div>
-            {% endfor %}
-        </div>
+    <div class="mobile_bar_div" data-panel="reporting">
+        <div class="inner-icon quantext-chart"></div>
     </div>
-    <div class="sidebar-div" style="margin-bottom:0!important;position:absolute;bottom:0;left:0;right:0;">
+    <div class="mobile_bar_div" data-panel="theme">
         <div class="inner-icon quantext-circle" style="z-index:2"></div>
         <div class="inner-icon theme-color-1 quantext-circle-half-left"></div>
         <div class="inner-icon theme-color-2 quantext-circle-half-right"></div>
-        <div class="inner-text" style="top:auto!important;">
-            <div class="theme_item" data-theme="original">Quantext Original
-                <span>
-                    <span class="quantext-circle-full" style="color:#57b0c2"></span>
-                    <span class="quantext-circle-full" style="color:#307583"></span>
-                    <span class="quantext-circle-full" style="color:#ef8928"></span>
-                    <span class="quantext-circle-full" style="color:#52b9a9"></span>
-                    <span class="quantext-circle-full" style="color:#6496b4"></span>
-                </span>
-            </div>
-            <div class="theme_item" data-theme="drakemallard">Drake Mallard
-                <span>
-                    <span class="quantext-circle-full" style="color:#126ba8"></span>
-                    <span class="quantext-circle-full" style="color:#04865d"></span>
-                    <span class="quantext-circle-full" style="color:#f9b234"></span>
-                    <span class="quantext-circle-full" style="color:#f66723"></span>
-                    <span class="quantext-circle-full" style="color:#9f8e70"></span>
-                </span>
-            </div>
-            <div class="theme_item" data-theme="mandarin">Mandarin
-                <span>
-                    <span class="quantext-circle-full" style="color:#953272"></span>
-                    <span class="quantext-circle-full" style="color:#fd722d"></span>
-                    <span class="quantext-circle-full" style="color:#ef1047"></span>
-                    <span class="quantext-circle-full" style="color:#4d7ee7"></span>
-                    <span class="quantext-circle-full" style="color:#e99e4d"></span>
-                </span>
-            </div>
-            <div class="theme_item" data-theme="torrent">Torrent
-                <span>
-                    <span class="quantext-circle-full" style="color:#6f7a84"></span>
-                    <span class="quantext-circle-full" style="color:#ce893e"></span>
-                    <span class="quantext-circle-full" style="color:#da5a2b"></span>
-                    <span class="quantext-circle-full" style="color:#575f72"></span>
-                    <span class="quantext-circle-full" style="color:#758199"></span>
-                </span>
-            </div>
-            <div class="theme_item" data-theme="greenwingedteal">Green Winged Teal
-                <span>
-                    <span class="quantext-circle-full" style="color:#20a949"></span>
-                    <span class="quantext-circle-full" style="color:#e1723d"></span>
-                    <span class="quantext-circle-full" style="color:#06cada"></span>
-                    <span class="quantext-circle-full" style="color:#b5917b"></span>
-                    <span class="quantext-circle-full" style="color:#00d67a"></span>
-                </span>
-            </div>
-            {% if current_user['plan'] == "hatchling" or current_user['plan'] == "full" %}
-                <div class="theme_item" data-theme="harlequin">Harlequin
-                    <span>
-                        <span class="quantext-circle-full" style="color:#c52d05"></span>
-                        <span class="quantext-circle-full" style="color:#848483"></span>
-                        <span class="quantext-circle-full" style="color:#4e4f53"></span>
-                        <span class="quantext-circle-full" style="color:#92786c"></span>
-                        <span class="quantext-circle-full" style="color:#65625f"></span>
-                    </span>
-                </div>
-                <div class="theme_item" data-theme="ruddyduck">Ruddy Duck
-                    <span>
-                        <span class="quantext-circle-full" style="color:#37b3df"></span>
-                        <span class="quantext-circle-full" style="color:#9c4615"></span>
-                        <span class="quantext-circle-full" style="color:#2a3d62"></span>
-                        <span class="quantext-circle-full" style="color:#4c5457"></span>
-                        <span class="quantext-circle-full" style="color:#bd5b2c"></span>
-                    </span>
-                </div>
-                {% if current_user['plan'] == "full" %}
-                    <div class="theme_item" data-theme="darkwing">Darkwing
-                        <span>
-                            <span class="quantext-circle-full" style="color:#775789"></span>
-                            <span class="quantext-circle-full" style="color:#605969"></span>
-                            <span class="quantext-circle-full" style="color:#5b2252"></span>
-                            <span class="quantext-circle-full" style="color:#2f7581"></span>
-                            <span class="quantext-circle-full" style="color:#b42d19"></span>
-                        </span>
-                    </div>
-                    <div class="theme_item" data-theme="rubberducky">Rubber Ducky
-                        <span>
-                            <span class="quantext-circle-full" style="color:#f9b234"></span>
-                            <span class="quantext-circle-full" style="color:#ddb30d"></span>
-                            <span class="quantext-circle-full" style="color:#fd722d"></span>
-                            <span class="quantext-circle-full" style="color:#ff9000"></span>
-                            <span class="quantext-circle-full" style="color:#ffbb00"></span>
-                        </span>
-                    </div>
-                    <div class="theme_item" data-theme="mighty1">Mighty I
-                        <span>
-                            <span class="quantext-circle-full" style="color:#068c95"></span>
-                            <span class="quantext-circle-full" style="color:#8e2543"></span>
-                            <span class="quantext-circle-full" style="color:#014e5e"></span>
-                            <span class="quantext-circle-full" style="color:#ed9033"></span>
-                            <span class="quantext-circle-full" style="color:#8a8782"></span>
-                        </span>
-                    </div>
-                    <div class="theme_item" data-theme="mighty2">Mighty II
-                        <span>
-                            <span class="quantext-circle-full" style="color:#547840"></span>
-                            <span class="quantext-circle-full" style="color:#853f61"></span>
-                            <span class="quantext-circle-full" style="color:#583c55"></span>
-                            <span class="quantext-circle-full" style="color:#e39236"></span>
-                            <span class="quantext-circle-full" style="color:#75a453"></span>
-                        </span>
-                    </div>
-                {% endif %}
-            {% endif %}
-        </div>
     </div>
 </div>
 
 <style>
-    .advanced{ display:none }
+    svg { cursor:move }
+    text { cursor:pointer!important }
 </style>
 
 <script type="text/javascript">
 
-    function drawBarChart(data,divId, parent) {
-        var barMargin = {top: 0, right: 20, bottom: 0, left: 0},
-                w = $(".histogramChart").width() - barMargin.left - barMargin.right,
-                h = 30 - barMargin.top - barMargin.bottom;
+    const _analysis_id = "{{ analysis['id'] }}";
+    const _file_id = "{{ file['id'] }}";
 
-        var x = d3.scaleBand().rangeRound([0, w]);
+    function drawPDF(url,id) {
 
-        // Scales. Note the inverted domain fo y-scale: bigger is up!
-        var y = d3.scaleLinear().range([h, 0]);
+        // Asynchronous download of PDF
+        let loadingTask = pdfjsLib.getDocument(url);
+        loadingTask.promise.then(function (pdf) {
+            console.log('PDF loaded');
 
-        var pr = d3.precisionRound(0.1, 1.1),
-                ft = d3.format("." + pr + "r");
+            // Fetch the first page
+            let pageNumber = 1;
+            pdf.getPage(pageNumber).then(function (page) {
+                console.log('Page loaded');
 
-        if($(divId,parent).length > 0) {
-            var arr = [];
-            var keys = [];
-            $.each(data, function (i, e) {
-                var fl = parseFloat(i);
-                keys.push(fl);
+                let viewport = page.getViewport({scale: 1});
+                let scale = 150 / viewport.width;
+                let scaledViewport = page.getViewport({scale: scale});
+
+                // Prepare canvas using PDF page dimensions
+                let canvas = document.getElementById('the-canvas_' + id);
+                let context = canvas.getContext('2d');
+                canvas.height = scaledViewport.height;
+                canvas.width = scaledViewport.width;
+
+                // Render PDF page into canvas context
+                let renderContext = {
+                    canvasContext: context,
+                    viewport: scaledViewport
+                };
+                let renderTask = page.render(renderContext);
+                renderTask.promise.then(function () {
+                    console.log('Page rendered');
+                });
             });
-            keys.sort(function (a, b) { return a - b; });
-
-            for (var i = 0; i < keys.length; i++) {
-                var k = keys[i];
-                var obj = {key: k, value: data[k]};
-                arr.push(obj);
-            }
-
-            var tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([-10, 0])
-                    .html(function (d) {
-                        return "<strong>" + ft(d.key) + "</strong><br/><span style='color:#fff'>" + d.value + "</span>";
-                    });
-
-            var maxVal = d3.max(arr, function (d) { return +d.value; });
-
-            var el = d3.select(parent).select(divId);
-            var svg = el.html(null).append("svg")
-                    .attr("width", w + barMargin.left + barMargin.right)
-                    .attr("height", h + barMargin.top + barMargin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + barMargin.left + "," + barMargin.top + ")");
-
-            svg.selectAll(".bar")
-                    .data(arr)
-                    .enter()
-                    .append("rect")
-                    .attr("class", "bar")
-                    .attr("x", function (d, i) { return w / arr.length * i; })
-                    .attr("width", ((1 / arr.length ) * w) - 5)
-                    .attr("y", function (d) {
-                        if(d.value) {
-                            var p = d.value / maxVal;
-                            return y(p);
-                        }
-                        else return 0;
-                    })
-                    .attr("height", function (d) {
-                        if(d.value) {
-                            var p = d.value / maxVal;
-                            return h - y(p);
-                        }
-                        else return 0;
-                    })
-                    .attr("fill", function (d) { return "#000" })
-                    .attr("fill-opacity", function(){ return ".59" })
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide);
-
-            svg.call(tip);
-        }
+        }, function (reason) {
+            // PDF loading error
+            console.error(reason);
+        });
     }
+
 </script>
 
-<div id="panel" class="pt-3">
-    <div class="row pb-4">
-        <div class="col-md-6 pl-4">
-            <h1 class="top_title">{{ an['name'] }}</h1>
-            <h4 class="top_title">created {{ an['created'].strftime('%d/%m/%Y') }}</h4>
-            <h4 class="top_title">{{ an['files']|length}} response files | {{ an['refcorpus']|length }} reference materials</h4>
+<div id="panel" class="mt-3">
+    <div class="row pb-4 main-theme-border-1 centerFlex" style="padding-top: 3.5rem;border-bottom-width: 1px;border-bottom-style: solid;">
+        <div class="col-md-6 pl-4 pr-4">
+            <select class="form-control changeFile">
+                {% for k in analysis['files'].keys() %}
+                        <option value="/analyse/{{ analysis['id'] }}/{{ k }}"
+                        {% if file['id']|string == k|string %}
+                            selected="selected"
+                        {% endif %}
+                        >{{ analysis['files'][k]['filename'] }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="col-md-3"></div>
-        <div class="col-md-3 pr-4">
-            <div class="row">
-                <div class="col-md-12 centerFlex" style="justify-content: flex-end">
-                    <div class="simple-view pr-4" style="font-weight:bold">Simple view</div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
-                    <div class="advanced-view pl-4">Advanced view</div>
+        <div class="col-md-6 pr-4 pl-3 top_stats">
+            <div class="row main-theme-color-dark header-row">
+                <div class = "col-md grey-border-right">Questions</div>
+                <div class = "col-md grey-border-right">Characters</div>
+                <div class = "col-md grey-border-right">Words</div>
+                <div class = "col-md">Sentences</div>
+            </div>
+            <div class = "row main-theme-color-1" style="font-weight:300;margin-top:-.5rem;font-size:1.5rem">
+                <div id="total_questions" class = "col-md grey-border-right">{{ "{:,}".format(columns|length) }}</div>
+                <div id="total_characters" class = "col-md grey-border-right">{{ "{:,}".format(statistics[0]|int) }}</div>
+                <div id="total_words" class = "col-md grey-border-right">{{ "{:,}".format(statistics[1]|int) }}</div>
+                <div id="total_sentences" class = "col-md">{{ "{:,}".format(statistics[2]|int) }}</div>
+            </div>
+        </div>
+    </div>
+    {% if current_user.config["console_help"] == "True" %}
+    <div class="help_box p-4 ml-2 mt-4 mr-4 main-theme-border-1 main-theme-color-dark">
+        <div class="main-theme-fill-1" style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;z-index: 0;opacity: .05;"></div>
+        <div style="position: relative;z-index: 1;margin-right: 1rem;">Welcome to the <b>Quantext analysis</b> screen. Here you can explore your text with a variety of metrics, readability indices and visualisations. Search for words of interest, or use the labeller to add category labels to your text.</div>
+        <div class="close_help quantext-delete main-theme-color-1" style="z-index: 20;cursor:pointer;font-size: 1.8rem;margin-right: -.8rem;margin-top: -1rem;"></div>
+    </div>
+    {% endif %}
+    <div class="row student_file_div">
+        <div class="mt-4 animate-flicker main-theme-color-dark" style="width:100%;font-size:2rem;text-align:center;font-weight:300">Getting your ducks in a row...</div>
+    </div>
+
+    <!-- panels -->
+    <div class="m-0 corpora_panel file_settings_panel panel_right main-theme-fill-menu">
+        <div class="scroll_inside">
+            <h1 class="top_title pt-4 pl-4 pb-4 mb-0">
+                Analysis settings
+                <div class="index-font close_corpora_panel"></div>
+            </h1>
+            <div class="row w-100 m-0 pb-4 centerFlex pl-4 pr-4" style="flex-direction: column;align-items: baseline;">
+                <h6 class="mb-2 mt-3 p-0 pl-0 small_text-9">Export options</h6>
+                <div class="w-100 m-0 pl-0 pr-0 mt-3 mb-4 pretty p-white p-default p-round p-thick p-setting" style="font-size:.8rem;">
+                    <input data-question_number="1" class="export_setting" name="include_labels" type="checkbox" checked="checked">
+                    <div class="state">
+                        <label class="small_text-8 main-theme-border-dark" style="margin-left: .2rem;font-weight:500">Include labels</label>
+                    </div>
+                </div>
+                <div id="exportXLSX" class="btn btn-quantext" style="font-weight:400;font-size:.9rem;margin-right:1px">Export data as xlsx</div>
+            </div>
+            <div class="col-md-12 p-0">
+                <h6 class="mb-2 mt-3 p-0 pl-4 small_text-9">Shared with</h6>
+                <div class="pt-0 pb-4 pl-4 pr-4" style="font-size:.9rem;line-height:1.3">You can share this analysis with other users. Add user emails to the list below, one per line - if they are already signed up to Quantext, this analysis will appear in their 'Shared with me' analyses list; if they are not yet signed up to Quantext, they will be sent an email with details on how to sign up.</div>
+                <div class="pl-4 pr-4">
+                    <textarea class="form-control custom_blacklist" style="padding: 1rem; width: 100%; min-height: 8rem; line-height: 1.5; font-size: 0.9rem; margin-top: 0; margin-bottom: 0;">{% for u in analysis['to_share'] %}{% if loop.last %}{{ u }}{% else %}{{ u }}&#13;&#10;{% endif %}{% endfor %}</textarea>
+                    <div class="mb-2 helper_text_white">Enter user emails, one per line</div>
+                    <div class="pt-3 centerFlex">
+                        <div style="margin-left:auto;padding:.5rem 1rem;cursor: pointer;font-size:.9rem;color: white;font-weight:400;" class="share_analysis main-theme-fill-1">Share analysis</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        {% for student_file in student_files %}
-            {% include 'studentFile.html' %}
-        {% endfor %}
-    </div>
 
-    <div class="row below m-0 corpora_panel">
-        <div class="scroll_inside" data-simplebar>
-            <h1 class="top_title pl-4 pt-4" style="display:flex;justify-content: space-between;width:100%">
-                Reference materials
+    <div class="m-0 corpora_panel panel_right reporting_panel main-theme-fill-menu">
+        <div class="scroll_inside" style="display:flex;flex-direction:column">
+            <h1 class="top_title pl-4 pt-4 pb-4 mb-0">
+                REPORT
                 <div class="index-font close_corpora_panel"></div>
             </h1>
-            <div class="inner_corpora w-100">
-                {% include 'kwic.html' %}
+            <div class="row w-100 pr-0 pb-0 pl-0 pt-3 m-0" style="display:flex;height:100%">
+                <div class="col-md-6 pl-0 pr-3" style="display:flex;flex-direction:column">
+                    <div class="row w-100 m-0 pl-3 pb-3 centerFlex">
+                        <div class="pt-0 pb-4" style="font-size:.9rem;line-height:1.3">
+                            This is some information about reporting... read it well.
+                        </div>
+                        <div class="search_button_group">
+                            <div class="search_button search_selected mobile_hidden pr-2">Questions</div>
+                        </div>
+                    </div>
+                    <div id="questions_to_report" class="mobile_hidden" style="overflow: auto;height: 100%;flex: 1 1 0;display: flex;flex-direction: column;">
+                        {% for q in columns %}
+                            <div class="row centerFlex m-0 full_response_div main-theme-color-dark question_report quantext_file_div" style="align-items: flex-start;" data-question_number="{{ q['number'] }}">
+                                <div class="col-md-6 p-0" style="flex-direction:column;font-weight:bold;">
+                                    <div style="font-size:.8rem">
+                                        <div class="small_text-8" style="font-weight:500">Q{{ q['number'] }}</div>
+                                    </div>
+                                    <div style="font-weight: 500;text-transform: uppercase;font-size: .8rem;color: #aaa;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
+                                        {{ q['text'] }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="">
+                                    <div class="w-100 m-0 p-0 pretty p-default p-round p-thick p-setting" style="font-size:.8rem;">
+                                        <input data-question_number="1" class="question_report_input" name="summary_statistics" type="checkbox" checked="checked">
+                                        <div class="state">
+                                            <label class="small_text-8 main-theme-border-dark" style="margin-left: .2rem;font-weight:500">Summary statistics</label>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 m-0 p-0 pretty p-default p-round p-thick p-setting" style="font-size:.8rem">
+                                        <input data-question_number="1" class="question_report_input" name="most_frequent" type="checkbox" checked="checked">
+                                        <div class="state">
+                                            <label class="small_text-8" style="margin-left: .2rem;font-weight:500">MOST FREQUENT WORDS/BIGRAMS/TRIGRAMS</label>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 m-0 p-0 pretty p-default p-round p-thick p-setting" style="font-size:.8rem">
+                                        <input data-question_number="1" class="question_report_input" name="indices" type="checkbox">
+                                        <div class="state">
+                                            <label class="small_text-8" style="margin-left: .2rem;font-weight:500">INDICES</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 pl-3 pr-0">
+                    <div class="row w-100 m-0 pb-3 centerFlex mt-0 pt-0 pl-0 pr-3" style="justify-content: flex-end;">
+                        <button class="btn btn-quantext main-theme-fill-1 centerFlex" id="generate_report" style="font-size:.9rem;font-weight:400">Generate PDF report</button>
+                    </div>
+                    <div class="search_button_group">
+                        <div class="search_button search_selected mobile_hidden pr-2">General report settings</div>
+                    </div>
+                    <div class="row w-100 m-0 pb-3 pl-0 centerFlex pt-4">
+                        <div class="col-md-12 p-0 pr-3">
+                            <div class="pb-4" style="font-size: .9rem;">
+                                Currently reporting&nbsp;<span id="num_questions_to_report">{{ columns|length }}</span>/{{ columns|length }}&nbsp;questions.
+                            </div>
+                            <input id="report_title" type="text" class="form-control report_title main-theme-fill-dark" style="padding:1rem">
+                            <div class="mb-3 perform_search helper_text_white" style="text-align: left;margin-right: .5rem;opacity: .75;">Enter a title for this report</div>
+
+                            <input id="report_author" type="text" class="form-control report_title main-theme-fill-dark" style="padding:1rem;">
+                            <div class="mb-4 perform_search helper_text_white" style="text-align: left;margin-right: .5rem;opacity: .75;">Enter an author for this report</div>
+
+                            <div class="w-100 m-0 p-0 pretty p-white p-default p-round p-thick p-setting" style="font-size:.8rem;">
+                                <input data-question_number="1" class="report_input" id="include_date" name="include_date" type="checkbox" checked="checked">
+                                <div class="state">
+                                    <label class="small_text-8 main-theme-border-dark" style="margin-left: .2rem;font-weight:500">Include date</label>
+                                </div>
+                            </div>
+                            <div class="w-100 m-0 p-0 pretty p-white p-default p-round p-thick p-setting" style="font-size:.8rem;">
+                                <input data-question_number="1" id="label_distributions" class="report_input" name="label_distributions" type="checkbox">
+                                <div class="state">
+                                    <label class="small_text-8 main-theme-border-dark" style="margin-left: .2rem;font-weight:500">Include label distributions</label>
+                                </div>
+                            </div>
+                            <div class="w-100 m-0 p-0 pretty p-white p-default p-round p-thick p-setting" style="font-size:.8rem;">
+                                <input data-question_number="1" id="label_examples" class="report_input" name="label_examples" type="checkbox">
+                                <div class="state">
+                                    <label class="small_text-8 main-theme-border-dark" style="margin-left: .2rem;font-weight:500">Include label examples</label>
+                                </div>
+                            </div>
+                            {{ macros.select("report_keywords","nkey_report", "MOST FREQUENT WORDS TO REPORT", ["10","15","20","25","30"], "Select from 10 to 30 words and ngrams (bigrams & trigrams) to report. This is currently available in steps of 5. i.e. 10, 15, 20 etc.",6,"pr-4 pt-4") }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row" style="visibility: hidden">
-        <div class="col-md-12">
-            <div id="ttr-chart-gauge" style="float:left"></div>
-            <div id="ld-chart-gauge" style="float:left"></div>
-            <div id="smog-chart-gauge" style="float:left"></div>
+    {% include 'menus/menu.html' %}
+    {% include 'menus/themes.html' %}
+    {% include 'menus/user.html' %}
+
+    <div id="loading_messages"></div>
+
+</div>
+
+
+<div id="tooltip_users" style="display:none">
+    <div style="width:400px;text-align:left">
+        <h6 class="small_text-9">Invite others to this analysis</h6>
+        <div class="small_text-8 mb-3" style="text-transform: none;font-weight: 400;">
+            You can invite others to this analysis by entering their email address in the box below (one per line).
+            When you run this analysis, Quantext will email your invitees with a unique code.
+            If they have already signed up to Quantext with the email entered, they will automatically have access to the analysis.
+            If they have not yet signed up, they will be invited to do so.
+        </div>
+        <div style="font-size:.9rem">
+            <textarea class="form-control list_of_users main-theme-border-menu" style="line-height:1.5;height:200px"></textarea>
+            <div class="mb-2 helper_text">Invite email addresses, one per line</div>
         </div>
     </div>
 </div>
 
-<ul class="notifications"></ul>
-
-<style type="text/css">
-
-    .axis path, .axis line { fill: none;stroke: #000;shape-rendering: crispEdges; }
-    .bar:hover { fill: #bcbcbc ; }
-    .x.axis path { display: none; }
-
-    .d3-tip {
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.8);
-        color: #efefef;
-        border-radius: 2px;
-        z-index: 2000;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after{ margin: -1px 0 0 0;top: 100%;left: 0; }
-
-    /* d3 wordtree */
-    .node circle { fill: #fff;stroke-width: 3px; }
-    .node text {font: 12px sans-serif; }
-    .link { fill: none;stroke: #ccc;stroke-width: 2px; }
-    g.node { cursor: pointer; }
-
-</style>
-
 <script type="text/javascript">
-    var $notifications = $(".notifications");
 
-    function notify(text, error) {
-        var $notification;
-        if(error)
-            $notification = $('<li style="background:#EF2828" />').html(text).css({left: 320});
-        else
-            $notification = $('<li />').html(text).css({left: 320});
-        $notifications.append($notification);
-        $notification.animate({left: 0}, 300,function(){});
-        return $notification;
-    }
+    let responses_loaded = [];
+    (async() => {
+        let container = document.querySelectorAll(".student_file_div")[0];
+        container.innerHTML = await request(`/studentFile_ajax/${_analysis_id}/${_file_id}`);
+        const choices = new Choices('select.changeFile',{itemSelectText:"",searchEnabled:false,shouldSort:false});
+        const choices_report = new Choices("select#report_keywords",{itemSelectText:"",searchEnabled:false,shouldSort:false});
 
-    function getPageInfo(self){
-        var id = self.data("id");
-        var analysis_id = "{{ analysis_id }}";
-        var question = self.data("question");
-        var parent = self.parents(".file_"+id).attr("id");
-        var $parent = $("#"+parent);
-        var left_or_right = $parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
-        var index = $parent.data("index");
-        var total = $parent.data("total");
-        return { id:id,analysis_id:analysis_id,question:question,parent:parent,left_or_right:left_or_right,index:index,total:total };
-    }
-
-    $(document).on("change", ".setting-control", function(){
-        var self = $(this);
-        var val = self.val();
-        if(self.is(":checkbox"))
-            val = self.is(":checked") ? "True" : "False";
-
-        var pageInfo = getPageInfo(self);
-        pageInfo['key'] = self.attr("name");
-        pageInfo['val'] = val;
-        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-
-        $.post("{{ url_for('settings') }}",pageInfo,function(response){
-            $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
-            $notification.animate({left: 320}, 300,function(){$notification.remove()});
+        exec_body_scripts(container);
+        document.querySelectorAll(".noUi-connect").forEach(div => {
+            div.classList.add("main-theme-fill-menu");
         });
-    });
+        document.querySelectorAll(".noUi-handle").forEach(div => {
+            div.classList.add("main-theme-fill-menu");
+        });
 
-    function repaintGauge(perc, perc2,indx2,indx1,selector,displayText)
-    {
-        var barWidth, chart, chartInset, degToRad,
-                height, padRad, percToDeg, percToRad,
-                radius, svg, totalPercent, width, margin;
+        const questions = `{{ columns|tojson }}`;
+        let json = JSON.parse(questions);
+        for(let i=0;i<json.length;i++){
+            (async(i) => {
+                responses_loaded[i] = [false,false]                
+                //labeller stuff                
+                    /*let parent = document.querySelectorAll(`.label_panel_${i}`)[0];
+                    let divstolabel = parent.querySelectorAll(".labeller_div:not(.labelled)");
+                    if (divstolabel && divstolabel.length > 0) {
+                        divstolabel[0].classList.add("selected");
+                        parent.querySelectorAll(".inner_text")[0].innerHTML = divstolabel[0].querySelectorAll(".text_div")[0].innerHTML;
+                    }*/
+                    //parent.querySelectorAll(".category_input")[0].value = "";
+                    //parent.querySelectorAll(".category_input")[0].focus();                    
+                    
+                let sortChoices = new Choices(`select#sort_responses_${i}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let sortLabels = new Choices(`select#sort_labels_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let nkey = new Choices(`select#settings_nkey_${_file_id}_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let measure = new Choices(`select#settings_measure_${_file_id}_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let win = new Choices(`select#settings_window_${_file_id}_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let kblack = new Choices(`select#settings_kblack_${_file_id}_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});
+                let lcase = new Choices(`select#settings_lcase_${_file_id}_${json[i]['number']}`,{itemSelectText:"",searchEnabled:false,shouldSort:false});                                
 
-        padRad = 0.025;
-        chartInset = 10;
-        totalPercent = .75;
-        margin = { top: 10, right: 10, bottom: 10, left: 10 };
+                //let search_message_box = document.getElementById("indices_message_box");
+                //add loading message box
+                //if(!search_message_box)
+                //    search_message_box = createMessageBox(`indices_message_box_${i}`,"Fetching indices");                
 
-        width = 200;
-        height = 80;
-        radius = (Math.min(width, height) / 2) + 20;
-        barWidth = 10;
+                /*fetch(`/indices/{{ analysis['id'] }}/{{ file['id'] }}/${json[i]["number"]}`).then(response => response.json()).then($data => {
+                    let PollState = function(task_id) {
+                        postData("{{ url_for('poll_indices') }}",{task_id:task_id}).then(response => response.json()).then($task => {
+                            if($task)
+                                if ($task.process_percent) {
+                                    search_message_box.querySelectorAll(".status_box")[0].innerHTML = `${Math.round($task.process_percent)}%`;
+                                } else {
+                                    search_message_box.parentNode.removeChild(search_message_box);
+                                    clearInterval(timeout);
+                                    document.querySelectorAll(`.indices_panel_${i}`)[0].innerHTML = $task;
+                                }
+                        });
+                    };
+                    let timeout = setInterval(function(){ PollState($data.job_id) },250);
+                });*/
+            })(i);
+        }
+    })();
 
-        percToDeg = function(perc) { return perc * 360; };
-        percToRad = function(perc) { return degToRad(percToDeg(perc)); };
-        degToRad = function(deg) { return deg * Math.PI / 180; };
+    function updateCounts(parent){
+        parent.querySelectorAll(".all_responses_count")[0].innerHTML = parent.querySelectorAll(".normal_response:not(.labeller_div):not(.word_hide):not(.sent_hide)").length;
 
-        var el = d3.select(selector);
-        svg = el.html(null).append('svg').attr('width', width).attr('height', height + margin.top + margin.bottom);
+        let kwic_count = 0;
+        let search_count = 0;
+        parent.querySelectorAll(".kwic_result:not(.word_hide):not(.sent_hide)").forEach(div => {
+            search_count += 1;
+            kwic_count += div.querySelectorAll(".middle_word").length;
+        });
 
-        chart = svg.append('g').attr('transform', "translate(100,75)");
-        chart.append('path').attr('class', "arc chart-filled-"+indx1);
-        chart.append('path').attr('class', "arc chart-empty");
-        chart.append('path').attr('class', "arc chart-empty2");
-        chart.append('path').attr('class', "arc chart-filled-"+indx2);
-
-        var arc2 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
-        var arc1 = d3.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth);
-        var arc4 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
-        var arc3 = d3.arc().outerRadius(radius +10 - chartInset).innerRadius(radius +10 - chartInset - barWidth);
-
-        var next_start = totalPercent;
-        var arcStartRad = percToRad(next_start);
-        var arcEndRad = arcStartRad + percToRad(perc / 2);
-        next_start += perc / 2;
-
-        arc1.startAngle(arcStartRad).endAngle(arcEndRad);
-
-        arcStartRad = percToRad(next_start);
-        arcEndRad = arcStartRad + percToRad((1 - perc) / 2);
-
-        arc2.startAngle(arcStartRad + padRad).endAngle(arcEndRad);
-
-        next_start = totalPercent;
-        arcStartRad = percToRad(next_start);
-        arcEndRad = arcStartRad + percToRad(perc2 / 2);
-        next_start += perc2 / 2;
-
-        arc3.startAngle(arcStartRad).endAngle(arcEndRad);
-
-        arcStartRad = percToRad(next_start);
-        arcEndRad = arcStartRad + percToRad((1 - perc2) / 2);
-
-        arc4.startAngle(arcStartRad + padRad).endAngle(arcEndRad);
-
-        var tip_arc = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d) {
-                    return "<span style='color:#fff'>" + d + "</span>";
-                });
-
-        chart.select(".chart-filled-"+indx1).attr('d', arc3)
-                .data([perc2])
-                .on('mouseover', tip_arc.show)
-                .on('mouseout', tip_arc.hide);
-        chart.select(".chart-empty").attr('d', arc4);
-        chart.select(".chart-filled-"+indx2).attr('d', arc1)
-                .data([perc])
-                .on('mouseover', tip_arc.show)
-                .on('mouseout', tip_arc.hide);
-        chart.select(".chart-empty2").attr('d', arc2);
-
-        svg.append("text")
-                .attr("dy", "5em")
-                .attr("transform", "translate(" + width/2 + ",0)")
-                .style("text-anchor", "middle")
-                .style("font-weight", "bold")
-                .attr("class", "inside")
-                .attr("fill", function (d, i) { return "#333"; })
-                .text(displayText);
-
-        svg.call(tip_arc);
+        parent.querySelectorAll(".kwic_matches")[0].innerHTML = kwic_count;
+        parent.querySelectorAll(".search_matches")[0].innerHTML = search_count;
     }
 
-    function iterateCategories(selectedRows, wrapper){
-        var optionList = [];
-        var catList = wrapper.find('.categories').data("categories");
-        catList = (catList) ? catList.split(",") : [];
-        $.each(catList, function(i,e){
-            var obj = {};
-            obj["name"] = e;
-            obj["value"] = e;
-            obj["special"] = false;
-            var found = 0;
-            selectedRows.every( function () {
-                var cats = this.data()["Category"];
-                if(cats)
-                    found += cats.split(",").indexOf(e) != -1 ? 1 : 0;
+    function updateHistogram_words(values,handle,unencoded,tap,positions){
+        let explore_panel = this.target.closest(".explore_panel");
+        let step = this.options.step;
+        let min = parseInt(values[0]);
+        let max = parseInt(values[1])+step;        
+        let array = [];
+        for(let i=min;i<=(max+step);i+=step) {
+            array.push(i);
+        }
+
+        let parent = this.target.closest('.histogramChart_edit');
+        parent.querySelectorAll(".histo_bar").forEach(div => {
+            let contains = false;
+            array.forEach(c => {
+                if(div.classList.contains(c))
+                    contains = true;
             });
-            if(found == 0)
-                obj["checked"] = false;
-            else if(found == selectedRows.count())
-                obj["checked"] = true;
-            else {
-                //do something here for special case
-                obj["checked"] = false;
-                obj["special"] = true;
+            if(!contains)
+                div.classList.add("faded");
+            else
+                div.classList.remove("faded");
+        });
+
+        explore_panel.querySelectorAll(".full_response_div").forEach(div => {
+            let words = parseFloat(div.dataset.words);
+            if(words < min || words > max)
+                div.classList.add("word_hide");
+            else
+                div.classList.remove("word_hide");
+        });
+        updateCounts(explore_panel);
+    }
+
+    function updateHistogram_sents(values,handle,unencoded,tap,positions){
+        let explore_panel = this.target.closest(".explore_panel");
+        let step = this.options.step;
+        let min = parseInt(values[0]);
+        let max = parseInt(values[1])+step;        
+        let array = [];
+        for(let i=min;i<=(max+step);i+=step) {
+            array.push(i);
+        }
+        let parent = this.target.closest('.histogramChart_edit');
+        parent.querySelectorAll(".histo_bar").forEach(div => {
+            let contains = false;
+            array.forEach(c => {
+                if(div.classList.contains(c))
+                    contains = true;
+            });
+            if(!contains)
+                div.classList.add("faded");
+            else
+                div.classList.remove("faded");
+        });
+
+        explore_panel.querySelectorAll(".full_response_div").forEach((div) => {
+            let words = parseFloat(div.dataset.sents);
+            if(words < min || words > max)
+                div.classList.add("sent_hide");
+            else
+                div.classList.remove("sent_hide");
+        });
+        updateCounts(explore_panel);
+    }
+
+    function notAvailable(){
+        let $notification = notify("Sorry, this feature is not available on your current plan...",true);
+        setTimeout(() => {
+            animate($notification,"left",0,320,320, ()=>{ $notification.parentNode.removeChild($notification); });
+        },5000);
+    }
+
+    let curr_search_term = "";
+    let curr_sort_order = "";        
+
+    function doCollocationSearch(text,question_number){
+        if(text !== "") {
+            let $wordList = document.getElementById(`word_list_${question_number}`);
+            $wordList.innerHTML = _getting_ducks;
+
+            let col_message_box = document.getElementById("col_message_box");
+            //add loading message box
+            if(!col_message_box) {
+                col_message_box = createMessageBox("col_message_box","Collocation search");
             }
-            optionList.push(obj);
-        });
-        wrapper.find('select[multiple]').multiselect('loadOptions',optionList);
-    }
 
-    function format (d, file_id, question_number) {
-        // `d` is the original data object for the row
-        var response = "";
-        if(Array.isArray(d.Response)){
-            var array = d.Response[0];
-            var word = array[1];
-            response = d.Full_response;
-            var span = "<span class='full-response-highlight'>" + word + "</span>";
-            response = response.replace(new RegExp(word, 'g'), span);
-        }
-        else
-            response = d.Full_response;
-
-        var children = "";
-        if(d["children"] && d["children"].length > 0) {
-            children += "<div class='col-md-12 p-0 mt-4'><h6>Replies</h6>";
-            for (var child in d["children"])
-                children += "<div data-question_number='" + question_number +"' data-file_id='" + file_id +"' data-id='" + d["children"][child].ID + "' class='reply_div'>" + d["children"][child].text + "</div>";
-            children += "</div>";
-        }
-
-        return '<div class="ws-card">'+
-                '<div class="row m-0">' +
-                '<div class="col-md-12 p-0">' +
-                '<h5 class="m-0" style="float:right">Card view (' +
-                d.StudentID +
-                ')</h5></div>' +
-                '<div class="col-md-12 p-0" style="box-sizing:border-box">' +
-                '<h6>Full response</h6>' +
-                response +
-                '</div>' +
-                children +
-                '<div class="col-md-12 p-0 mt-4" style="box-sizing:border-box">' +
-                '<div>' +
-                '<h6>Notes</h6>' +
-                '<textarea data-response="' + d.StudentID + '" data-id="' + file_id + '" data-question="' + question_number + '" class="notes w-100 form-control" style="border:none;resize:none;min-height:10rem">' + d.Notes + '</textarea>' +
-                '</div>' +
-                '</div>' +
-                '<div class="col-md-12 p-0 mt-4">' +
-                '<h6>Categories</h6>' +
-                d.Category +
-                '</div>' +
-                '<div class="col-md-12 p-0 mt-4">' +
-                '<button data-id="' + file_id + '" data-question="' + question_number + '" data-response="' + d.Full_response + '" type="button" class="saveRefAnswer btn btn-quantext dark centerFlex"><span class="quantext-star index-font mr-1"></span> Save as a reference answer</button>' +
-                '</div>' +
-                '</div>' +
-                '</div>';
-    }
-
-    function openHiddenRow(row, tr, file_id, question_number){
-        if (!row.child.isShown()) {
-            row.child(format(row.data(),file_id,question_number)).show();
-            tr.addClass('shown');
-            tr.next().find('td').addClass("card-cell");
-            row.select();
-        }
-    }
-
-    var timeout = null;
-
-    $(document).on('keyup','.notes', function(){
-        var self = $(this);
-        var id = self.data('id');
-        var question = self.data('question');
-        var notes = self.val();
-        var response = self.data('response');
-        if(timeout != null)
-            clearTimeout(timeout);
-        timeout = setTimeout(function(){
-            $.post("{{ url_for('save_notes') }}",{id:id,question:question,notes:notes,response:response}, function(){
-
-            });
-        },1000)
-    });
-
-    $(document).on("click",".saveRefAnswer", function(){
-        var self = $(this);
-        var pageInfo = getPageInfo(self);
-        var reference_answer = self.data("response");
-
-        $.post('/reference_answer/'+pageInfo['id']+"/"+pageInfo['question'],
-                { reference_answer:reference_answer }, function() {
-                    var opt = $("<option></option>");
-                    opt.text(reference_answer).attr("value",reference_answer);
-                    $("select#reference_answer_"+pageInfo['id']+"_"+pageInfo["question"]).append(opt);
-                });
-        return false;
-    });
-
-    $(document).on("change", ".changeQuestion", function(){
-        var self = $(this);
-        var url = $("option:selected",self).val();
-        if(url != 0)
-        {
-            var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-            window.location.href = url;
-        }
-    });
-
-    $(document).on("change", ".changeFile", function(){
-        var self = $(this);
-        var url = $("option:selected",self).val();
-        if(url != 0) {
-            var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-            window.location.href = url;
-        }
-    });
-
-    var height, svg, width;
-    var studentFilesForGet = [];
-
-    $(document).on("click",".reply_div", function(){
-        var self = $(this);
-        var id = "#"+self.data("id");
-        var file_id = self.data("file_id");
-        var question_number = self.data("question_number");
-        var tableId = "#"+self.parents("table").attr("id");
-        var currRow = $(tableId).DataTable().row(id);
-        var prevTr = $(tableId).find(".shown");
-        var prevRow = $(tableId).DataTable().row(prevTr);
-        var openLength = $(tableId).find(".shown").length;
-
-        var pos = currRow.index();
-        var page = Math.floor( pos / $(tableId).DataTable().page.info().length );
-        $(tableId).DataTable().page(page).draw(false);
-
-        openHiddenRow(currRow,$(currRow.node()), file_id, question_number);
-        if(openLength > 0){
-            prevRow.child.hide();
-            prevRow.deselect();
-            prevTr.removeClass('shown');
-        }
-    });
-
-    </script>
-
-    {% for student_file in student_files %}
-        <script type="text/javascript">
-            studentFilesForGet.push("{{ student_file['file']['id'] }}");
-        </script>
-    {% endfor %}
-
-<script type="text/javascript">
-
-    $(document).on('click', ".process_model_answer", function(e) {
-        e.preventDefault();
-        var self = $(this);
-        var pageInfo = getPageInfo(self);
-        var reference_answer = $('input[name="modelanswer"]',"#referenceAnswers_"+pageInfo['id']).val();
-        $("#referenceAnswers_"+pageInfo['id']).modal('hide');
-
-        $.post('/reference_answer/'+pageInfo['id']+"/"+pageInfo['question'],
-                { reference_answer:reference_answer }, function() {
-                    var opt = $("<option></option>");
-                    opt.text(reference_answer).attr("value",reference_answer);
-                    $("select#reference_answer_"+pageInfo['id']+"_"+pageInfo["question"]).append(opt);
-                });
-        return false;
-    });
-
-    $(document).on('click','.keyword', function(){
-        var self = $(this);
-        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-        var parent = self.parents('.parentContainer');
-        var left_or_right = parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
-        var id = parent.data("fileid");
-        var question = parent.data("question");
-        var $table = $("#table_" + id+"_"+left_or_right+"_"+question).DataTable();
-        var $corpora_panel = $(".corpora_panel");
-        if(self.hasClass("highlight")){
-            $corpora_panel.removeClass("shown");
-            self.removeClass("highlight");
-            $table.ajax.url("/datatables/" + id + "/" + question).load(function(data){
-                $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text("Responses (" + data.data.length + ")");
-                $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
-                Waypoint.refreshAll();
-                $notification.animate({left: 320}, 300,function(){$notification.remove()});
-            });
-            $("#wordtree_"+id+"_"+left_or_right).html('<span class="vis_text">Please select a word or phrase from the responses to see the visualisation.</span>');
-        }else{
-            parent.find(".highlight").removeClass("highlight");
-            self.addClass("highlight");
-            var word = self.text();
-            var refcorpus_length = "{{ an['refcorpus']|length }}";
-            $.post("{{ url_for('get_kwic') }}", {analysis_id:"{{ analysis_id }}",myword:word}, function(response){
-                if(left_or_right == "sLeft") {
-                    $.when($corpora_panel.removeClass("panel_left").addClass("panel_right")).then(function(){
-                        if(refcorpus_length > 0)
-                            $corpora_panel.addClass("shown");
+            fetch(`/collocation_search/${_analysis_id}/${_file_id}/${question_number}?format=view&search=${text}`).then(response => response.json()).then($data => {
+                let PollState = function(task_id) {
+                    postData("{{ url_for('poll_collocation_search') }}",{task_id:task_id}).then(response => response.json()).then($task => {
+                        if($task)
+                            if ($task.process_percent) {
+                                col_message_box.querySelectorAll(".status_box")[0].innerHTML = `${Math.round($task.process_percent)}%`;
+                            } else {
+                                clearInterval(timeout);
+                                col_message_box.parentNode.removeChild(col_message_box);                                
+                                $wordList.innerHTML = $task;
+                            }
                     });
-                }
-                else {
-                    $.when($corpora_panel.removeClass("panel_right").addClass("panel_left")).then(function(){
-                        if(refcorpus_length > 0)
-                            $corpora_panel.addClass("shown");
-                    });
+                };
+
+                let timeout = setInterval(function(){ PollState($data.job_id) },250);
+            });
+        }
+    }
+
+    let asc = false;
+
+    function bfs(end_array,state,total_levels){
+        let queue = [],
+            next = state;
+        let total = next["count"];
+        next["level"] = 0;
+        let c = 0;
+        next["parent"] = [c];
+        while (next && next["level"] <= total_levels) {
+            let curr_level = next["level"];
+            if (next["children"]) {
+                let max = next["count"];
+                let running = 0;
+                Object.keys(next["children"]).forEach(k => {
+                    running += next["children"][k]["count"];
+                });
+
+                let diff = max - running;
+
+                if(running < max){
+                    next["children"]["_*_"] = {"count":diff,"children":{},"level":curr_level+1};
                 }
 
-                $corpora_panel.find(".inner_corpora").empty().append(response).show();
-
-                $table.ajax.url("/datatables/" + id + "/" + question + "/" + word).load(function(data){
-                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text(word + " (" + data.data.length + ")");
-                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
-                    $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title").append("<div title='Reset filter' class='reset_filter index-font quantext-delete'></div>");
-                    $notification.animate({left: 320}, 300,function(){$notification.remove()});
-                    Waypoint.refreshAll();
+                Object.keys(next["children"]).forEach(k => {
+                    c++;
+                    let child = next["children"][k];
+                    let obj = {};
+                    obj[k] = {};
+                    obj[k]["count"] = child["count"];
+                    obj[k]["c"] = c;
+                    let p = next["parent"].slice(0);
+                    p.push(c);
+                    obj[k]["parents"] = p;
+                    child["parent"] = p;
+                    child["level"] = curr_level+1;
+                    end_array.push(obj);
+                    queue.push(child);
                 });
+            }
+            else
+            {
+                let count = next["count"];
+                let diff = total - count;
+                next["children"] = {"_*_":{"count":diff,"children":null,"level":curr_level+1}};
 
-                $.post("{{ url_for('get_wordtree') }}", {file_id:id, question_number:question,myword:word}, function(response){
-                    var $response = JSON.parse(response);
-                    var index = parseInt(parent.data("index")) + 1;
-                    createTree($response,"#wordtree_"+id+"_"+left_or_right,index);
-                    Waypoint.refreshAll();
+                Object.keys(next["children"]).forEach(k => {
+                    let child = next["children"][k];
+                    let obj = {};
+                    obj[k] = {};
+                    obj[k]["count"] = child["count"];
+                    end_array.push(obj);
+                    queue.push(child);
                 });
+            }
+            next = queue.shift();
+        }
+    }
+
+    function loadViz(originalText, question_number,parent, container){
+        fetch(`/viz/${_analysis_id}/${_file_id}/${question_number}?search=${originalText}`).then(response => response.json()).then(result => {
+            let end_array = [];
+            let obj ={};
+            let max = result[originalText]["count"];
+            obj[originalText] = {};
+            obj[originalText]["count"] = max;
+            end_array.push(obj);
+
+            bfs(end_array,result[originalText],result["total_levels"]);
+
+            container.innerHTML = "";
+            let viz_parent = document.createElement("div");
+            viz_parent.classList.add("new_viz_parent");
+
+            end_array.forEach(d => {
+                let keys = Object.keys(d);
+                let val = keys[0];
+                let count = d[val]["count"];
+                let parents = d[val]["parents"];
+
+                let c = d[val]["c"];
+                let box = document.createElement("div");
+
+                if(c)
+                    box.classList.add(`viz_box_${c}`);
+                else
+                    box.classList.add(`viz_box_00`);
+                box.dataset.parents = parents;
+
+                if (val !== "_*_") {
+                    box.classList.add("new_viz_box", "main-theme-fill-dark");
+                    box.innerHTML = val;
+                }
+                else
+                    box.style.background = "white";
+
+                let height = count/max*100;
+                box.style.flex = `${height}% 0 0`;
+                if(height < 2)
+                    box.classList.add("main-theme-color-dark");
+
+                if(height < 1)
+                    box.style.display = "none";
+
+                if(val === "")
+                    box.style.borderLeft = "0";
+                viz_parent.append(box);
             });
+
+            let full_sentence_box = document.createElement("div");
+            full_sentence_box.classList.add("full_sentence_box","main-theme-color-menu");
+            full_sentence_box.innerHTML = originalText;
+
+            let helper_box = document.createElement("div");
+            helper_box.classList.add("w-100","helper_text_white");
+            helper_box.style.setProperty('color', '#aaa', 'important');
+            helper_box.innerHTML = "Mouse over a word to see the sentence tree. Click on a word to perform a new search.";
+
+            container.append(full_sentence_box,helper_box,viz_parent);
+            if(!parent.querySelectorAll(`.visualise_button`)[0].classList.contains("main-theme-fill-dark"))
+                parent.querySelectorAll(`.visualise_button`)[0].classList.add("button_outline");
+        });
+    }
+
+    document.addEventListener("mouseover",event => {
+        if(event.target.closest(".new_viz_box")){
+            let target = event.target.matches(".new_viz_box") ? event.target : event.target.closest(".new_viz_box");
+            let container = target.closest(".viz_panel");
+            let parents = target.dataset.parents;
+            if(parents)
+                parents = parents.split(",");
+
+            let first_box = container.querySelectorAll(".viz_box_00")[0];
+            let full_sentence = [first_box.innerHTML];
+
+            container.querySelectorAll(".new_viz_box").forEach(d => {
+                d.style.opacity = 0.4;
+            });
+
+            parents.forEach(p => {
+                let b = container.querySelectorAll(`.viz_box_${p}`)[0];
+                if(b) {
+                    b.style.opacity = 1;
+                    full_sentence.push(b.innerHTML);
+                }
+            });
+            first_box.style.opacity = 1;
+            container.querySelectorAll(".full_sentence_box")[0].innerHTML = full_sentence.join(" ");
         }
     });
 
-    $(document).on("click",".reset_filter",function(){
-        var self = $(this);
-        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-        var parent = self.parents('.parentContainer');
-        var left_or_right = parent.hasClass('sLeft') ? 'sLeft' : 'sRight';
-        var question = parent.data("question");
-        var id = parent.data("fileid");
-        var $table = $("#table_" + id+"_"+left_or_right+"_"+question).DataTable();
-        $(".corpora_panel").removeClass("shown");
-        parent.find(".keyword.highlight").removeClass("highlight");
-        $table.ajax.url("/datatables/" + id + "/" + question).load(function(data){
-            $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title h5").text("Responses (" + data.data.length + ")");
-            $("#table_" + id+"_"+left_or_right+"_"+question + "_wrapper .worksheet-title .reset_filter").remove();
-            Waypoint.refreshAll();
-            $notification.animate({left: 320}, 300,function(){$notification.remove()});
-        });
-        $("#wordtree_"+id+"_"+left_or_right).html('<span class="vis_text">Please select a word or phrase from the responses to see the visualisation.</span>');
-    });
+    function perform_searches(target,parent, text){
+        parent.querySelectorAll(".kwic_bar.question_list")[0].value = text;
+        curr_search_term = text;
+        let question_number = parent.dataset.question;
+        doSearch(target,parent,true,false);
+        doCollocationSearch(text,question_number);
+        loadViz(text, question_number,parent, parent.querySelectorAll(".viz_panel")[0]);
 
-    function createTree(data,div,index) {
-        var rights = [];
-        $.each(data, function(i,e){
-            var arr = e[2].split(" ");
-            arr.splice(arr.indexOf(""),1);
-            rights.push(arr);
-        });
+        let search_icon = parent.querySelectorAll(".perform_search.quantext-search")[0];
+        search_icon.classList.remove("quantext-search","perform_search");
+        search_icon.classList.add("quantext-delete","reset_search");
 
-        var context = data[0][1];
-        makeWordTree(rights, context, 100, div, index);
+        let search_text = parent.querySelectorAll(".perform_search.helper_text_white")[0];
+        search_text.classList.remove("perform_search");
+        search_text.classList.add("reset_search");
+        search_text.innerHTML = "Reset search";
     }
 
-    $("input[name='modelanswer']").on('keyup',function(e){
-        if(e.keyCode == 13)
-            $(".process_model_answer").click();
-    });
+    function rgb2hex(rgb){
+        rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+        return (rgb && rgb.length === 4) ? "#" +
+            ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+    }
 
-    $(document).on("click",".addBList", function(){
-        var self = $(this);
-        var pageInfo = getPageInfo(self);
-        pageInfo['word'] = $("#bListText_"+pageInfo['id']).val();
-        $.post("{{ url_for('add_blist') }}",pageInfo,function(response){
-            $(".emptyBList").remove();
-            $("#blist_"+pageInfo['id']+"_"+pageInfo['left_or_right']).append(response);
-            $("#bListText_"+pageInfo['id']).val("");
-        });
-    });
+    document.addEventListener("click", event => {
+        if (event.target)
+            if (event.target.closest(".notAvailable")) {
+                notAvailable();
+            }
+            else if (event.target.closest(".keyword")) {
+                let text = event.target.innerText;
+                let parent = event.target.closest(".parentContainer");
+                perform_searches(event.target, parent, text);
+            }
+            else if (event.target.closest(".perform_search")) {
+                let parent = event.target.closest(".parentContainer");
+                let text = parent.querySelectorAll(".kwic_bar.question_list")[0].value;
+                perform_searches(event.target, parent, text);
+            }
+            else if (event.target.closest(".reset_search")) {
+                let parent = event.target.closest(".parentContainer");
+                parent.querySelectorAll(".kwic_bar.question_list")[0].value = "";
+                let question_number = parent.dataset.question;
+                let $wordList = document.getElementById(`word_list_${question_number}`);
+                $wordList.innerHTML = _getting_ducks;
 
-    $(document).on("click",".saveBList", function(){
-        var self = $(this);
-        var pageInfo = getPageInfo(self);
-        var $notification = notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
-        $.post("{{ url_for('settings') }}",pageInfo,function(response){
-            $(".word_list","."+pageInfo['left_or_right']).empty().append(response);
-            $notification.animate({left: 320}, 300,function(){$notification.remove()});
-        });
-    });
+                (async () => {
+                    $wordList.innerHTML = await request(`/reset_collocation/${_analysis_id}/${_file_id}/${question_number}`);
+                    parent.querySelectorAll(".all_responses")[0].click();
+                })();
 
-    $(document).on("click", ".deleteBlistWord", function(){
-        var self = $(this);
-        var pageInfo = getPageInfo(self);
-        pageInfo['word'] = self.data('word');
-        $.post("{{ url_for('delete_blist') }}",pageInfo,function(){
-            self.parents('.blist_col').remove();
-        });
-    });
+                parent.querySelectorAll(`.explore_button`)[0].classList.remove("button_outline");
+                parent.querySelectorAll(`.visualise_button`)[0].classList.remove("button_outline");
 
-    $(".panelTag, .close_panel").on("click", function(){
-        var panel = $(".hiddenPanel");
-        if(panel.hasClass("showme"))
-            panel.removeClass("showme");
-        else
-            panel.addClass("showme");
-    });
+                parent.querySelectorAll(".viz_panel")[0].innerHTML = `{% include 'partials/no_visual.html' %}`;
+                parent.querySelectorAll(".kwic_results_div")[0].innerHTML = `{% include 'partials/no_responses.html' %}`;
 
-    $(document).on("click",".quantext-settings", function(){
-        $(this).removeClass("quantext-settings").addClass("quantext-chevron-up");
-    }).on("click",".quantext-chevron-up", function(){
-        $(this).removeClass("quantext-chevron-up").addClass("quantext-settings");
-    });
+                let search_icon = parent.querySelectorAll(".reset_search.quantext-delete")[0];
+                search_icon.classList.remove("quantext-delete", "reset_search");
+                search_icon.classList.add("quantext-search", "perform_search");
 
-    $(".theme_item").on("click", function(){
-        var self = $(this);
-        var theme = self.data("theme");
-        $.post("{{ url_for('save_theme') }}", {theme:theme}, function(){
-            $('#themeDiv').append('<link rel="stylesheet" href="/static/css/themes/' + theme + '.css" type="text/css" />');
-        });
-    });
+                let search_text = parent.querySelectorAll(".reset_search.helper_text_white")[0];
+                search_text.classList.remove("reset_search");
+                search_text.classList.add("perform_search");
+                search_text.innerHTML = "Search for a keyword";
+                curr_search_term = "";
+                updateCounts(parent);
+            } else if(event.target.closest(".blacklist_word")){
+                let target = event.target.matches(".blacklist_word") ? event.target : event.target.closest(".blacklist_word");
+                let word = target.dataset.word;
+                let question_number = target.dataset.question_number;
+                let data = {
+                    analysis_id:_analysis_id,
+                    file_id:_file_id,
+                    question_number:question_number,
+                    word:word
+                };
 
-    $(".close_corpora_panel").on("click", function(){
-        $(".corpora_panel").removeClass("shown");
-    });
+                let container = target.closest(".parentContainer");
+                let parent = container.querySelectorAll(".settings_panel")[0];
+                let $wordList = document.getElementById(`word_list_${question_number}`);
+                parent.innerHTML = _getting_ducks;
+                $wordList.innerHTML = _getting_ducks;
 
-    $(".generate_report").on("click",function(){
-        var self = $(this);
-        var date = new Date();
-        var datestring = date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
-        var url = self.data("url");
-        $.get(url, function(response){
-            var $response = JSON.parse(response);
-            var content = [{text:'Quantext report {{ an.name }}',color:'#0c1f22',fontSize:16},{text:datestring,margin: [ 0, 0, 0, 20 ], color: 'gray'}];
-            content.push({text:"Question " + $response["question_title"],bold:true,color:'#0c1f22'});
-            content.push({color:'#193e45',text:$response["question_text"],margin: [ 0, 0, 0, 20 ]});
+                postData("/exclude_word",data).then(response => response.json()).then(result => {
+                    parent.innerHTML = result.question_settings;
+                    $wordList.innerHTML = result.keywords;
+                });
+            }
+            else if (event.target.closest(".setting-switch")) {
+                let settingSwitch, settings;
+                if (event.target.matches(".setting-switch")) {
+                    settingSwitch = event.target;
+                    settings = event.target.querySelectorAll(".inner-icon")[0];
+                } else if (event.target.matches(".inner-icon")) {
+                    settingSwitch = event.target.closest(".setting-switch");
+                    settings = event.target;
+                }
+                let tgt = settingSwitch.dataset.target;
+                if (settingSwitch.classList.contains("clicked")) {
+                    settingSwitch.classList.remove("clicked");
+                    settings.classList.remove("quantext-chevron-up");
+                    settings.classList.add("quantext-settings");
+                    document.getElementById(tgt).style.display = "none";
+                } else {
+                    settingSwitch.classList.add("clicked");
+                    settings.classList.remove("quantext-settings");
+                    settings.classList.add("quantext-chevron-up");
+                    document.getElementById(tgt).style.display = "block";
+                }
+            }
+            else if (event.target.closest(".pos_control")) {
+                let pos = event.target.dataset.pos;
+                if (!event.target.classList.contains("pos_disabled")) {
+                    document.querySelectorAll(`.${pos}`).forEach(div => {
+                        div.classList.add("pos_disabled");
+                    });
+                } else {
+                    document.querySelectorAll(`.${pos}`).forEach(div => {
+                        div.classList.remove("pos_disabled");
+                    });
+                }
+            }
+            else if (event.target.closest(".kwic_container_div")) {
+                let parent = event.target.closest(".full_response_div");
+                parent.querySelectorAll(".kwic_full_div")[0].style.display = "block";
+                parent.querySelectorAll(".kwic_container_div")[0].style.display = "none";
+            }
+            else if (event.target.closest(".kwic_full_div")) {
+                let parent = event.target.closest(".full_response_div");
+                parent.querySelectorAll(".kwic_container_div")[0].style.display = "block";
+                parent.querySelectorAll(".kwic_full_div")[0].style.display = "none";
+            }
+            else if (event.target.closest(".search_button")) {
+                let parent = event.target.closest(".search_button_group");
+                parent.querySelectorAll(".search_button").forEach(div => {
+                    div.classList.remove("search_selected");
+                });
 
-            for(var k in $response["categories"]){
-                var obj = $response["categories"][k];
-                for(var n in Object.keys(obj)){
-                    var key = Object.keys(obj)[n];
-                    var header = [{color:'#193e45',text: key+':', style: 'tableHeader',italics: true,bold:true}];
-                    var body = [header];
-                    for(var item in obj[key])
-                        body.push([obj[key][item]]);
+                let el = (event.target.matches(".search_button")) ? event.target : event.target.closest(".search_button");
+                el.classList.add("search_selected");
 
-                    content.push({
-                        margin:[0,0,0,20],
-                        style: 'tableExample',
-                            table: {
-                            widths:['*'],
-                            headerRows: 1,
-                            body: body
+                let explore_panel = event.target.closest(".explore_panel");
+
+                if (el.matches(".all_responses")) {
+                    explore_panel.querySelectorAll(".kwic_results_div")[0].classList.add("hiddenNotHidden");
+                    explore_panel.querySelectorAll(".kwic_info")[0].classList.add("hiddenNotHidden");
+                    explore_panel.querySelectorAll(".all_responses_div")[0].classList.remove("hiddenNotHidden");
+                } else if (el.matches(".kwic_results")) {
+                    explore_panel.querySelectorAll(".kwic_results_div")[0].classList.remove("hiddenNotHidden");
+                    explore_panel.querySelectorAll(".kwic_info")[0].classList.remove("hiddenNotHidden");
+                    explore_panel.querySelectorAll(".all_responses_div")[0].classList.add("hiddenNotHidden");
+                }
+            } else if (event.target.closest(".main_buttons")) {
+                let target = event.target.matches(".main_buttons") ? event.target : event.target.closest(".main_buttons");
+                let number = target.dataset.number;
+                let parent = target.closest(".button_group");
+                parent.querySelectorAll(".main_buttons").forEach(div => {
+                    div.classList.remove("btn-quantext", "main-theme-fill-dark");
+                });
+                target.classList.add("btn-quantext", "main-theme-fill-dark");
+                target.classList.remove("button_outline");
+                if (target.matches(".overview_button")) {
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.remove("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`label_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                } else if (target.matches(".explore_button")) {
+                    let explore_panel = document.getElementsByClassName(`explore_panel_${number}`)[0];
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    explore_panel.classList.remove("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`label_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.add("hiddenNotHidden");
+
+                    if(!responses_loaded[number][0])
+                    {
+                        let parent = explore_panel.closest(".parentContainer");
+                        let question_number = parent.dataset.question;
+                        fetch(`/responses_only/{{ analysis['id'] }}/{{ file['id'] }}/${question_number}/pos`).then(response => response.text()).then($data => {                                        
+                            let container = parent.querySelectorAll(".explore_panel")[0].querySelectorAll(".all_responses_div")[0];
+                            container.innerHTML = $data;
+                            responses_loaded[number][0] = true;
+                            parent.querySelectorAll(".all_responses_count")[0].innerHTML = container.querySelectorAll(".normal_response").length;                            
+                        });
+                    }
+                } else if (target.matches(".visualise_button")) {
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.remove("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`label_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                } else if (target.matches(".indices_button")) {
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.remove("hiddenNotHidden");
+                    document.getElementsByClassName(`label_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                } else if (target.matches(".label_button")) {
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    let label_panel = document.getElementsByClassName(`label_panel_${number}`)[0];
+                    label_panel.classList.remove("hiddenNotHidden");
+                    let first_response = label_panel.querySelectorAll(".labeller_div")[0];
+                    if(first_response)
+                        first_response.click();
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    
+                    if(!responses_loaded[number][1])
+                    {
+                        let parent = label_panel.closest(".parentContainer");
+                        let question_number = parent.dataset.question;
+                        fetch(`/responses_only/{{ analysis['id'] }}/{{ file['id'] }}/${question_number}/labeller`).then(response => response.text()).then($data => {                                        
+                            parent.querySelectorAll(".label_panel")[0].querySelectorAll(".all_responses_div")[0].innerHTML = $data;
+                            responses_loaded[number][1] = true;
+                            
+                            let marked_up = parent.querySelectorAll(".labelled").length;
+                            parent.querySelectorAll(".marked_up_count")[0].innerHTML = marked_up;
+                            parent.querySelectorAll(".marked_up_percent")[0].innerHTML = Math.round((marked_up/parent.querySelectorAll(".labeller_div").length)*100);
+
+                            let first_response = label_panel.querySelectorAll(".labeller_div")[0];
+                            if(first_response)
+                                first_response.click();
+                        });
+                    }
+                } else if (target.matches(".settings_button")) {
+                    document.getElementsByClassName(`overview_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`explore_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`viz_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`indices_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`label_panel_${number}`)[0].classList.add("hiddenNotHidden");
+                    document.getElementsByClassName(`settings_panel_${number}`)[0].classList.remove("hiddenNotHidden");
+                }
+            } else if (event.target.closest(".reply_div")) {
+                let parent = event.target.closest(".full_response_div");
+                let el = parent.querySelectorAll(".reply_responses")[0];
+                if (el)
+                    el.style.display = el.style.display === "none" ? "block" : "none";
+            } else if (event.target.closest(".labeller_div")) {
+                labeller.select_div(event.target);
+            }
+            else if (event.target.closest(".label_category")) {
+                labeller.label_category(event.target, "1");
+            } else if (event.target.closest(".label_bars")) {
+                labeller.trigger_bars(event.target);
+            } else if (event.target.matches("#exportXLSX")) {
+                let include_labels = document.querySelectorAll("input[name=include_labels]")[0].checked ? "true" : "false";
+                postData("{{ url_for('export_xlsx') }}",
+                    {
+                        analysis_id: _analysis_id,
+                        file_id: _file_id,
+                        include_labels:include_labels
+                    }
+                ).then(response => response.blob()).then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${_analysis_id}_export.xlsx`;
+                    const clickHandler = () => {
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                            this.removeEventListener('click', clickHandler);
+                        }, 150);
+                    };
+                    a.addEventListener('click', clickHandler, false);
+                    a.click();
+                });
+            } else if(event.target.matches(".close_help")) {
+                postData("{{ url_for('close_help') }}",{"help":"console_help"}).then(response => {
+                    event.target.closest(".help_box").remove();
+                });
+            } else if (event.target.matches(".reprocess_blacklist")) {
+                let container = event.target.closest(".parentContainer");
+                let parent = event.target.closest(".settings_panel");
+                let question_number = parent.dataset.question;
+                let custom = parent.querySelectorAll(".custom_blacklist")[0].value;
+                let custom_list = custom.split(/\n/).join(",");
+                let data = {"custom": custom_list,analysis_id:_analysis_id, file_id:_file_id, question_number: question_number};
+                let $wordList = document.getElementById(`word_list_${question_number}`);
+                parent.innerHTML = _getting_ducks;
+                $wordList.innerHTML = _getting_ducks;
+                postData("{{ url_for('save_blist') }}", data).then(response => response.json()).then(result => {
+                    parent.innerHTML = result.question_settings;
+                    $wordList.innerHTML = result.keywords;
+                    let overview_button = container.querySelectorAll(".overview_button")[0];
+                    overview_button.classList.add("button_outline");
+                });
+            } else if (event.target.matches(".reprocess_whitelist")) {
+                let container = event.target.closest(".parentContainer");
+                let parent = event.target.closest(".settings_panel");
+                let question_number = parent.dataset.question;
+                let custom = parent.querySelectorAll(".custom_whitelist")[0].value;
+                let custom_list = custom.split(/\n/).join(",");
+                let data = {"custom": custom_list,analysis_id:_analysis_id, file_id:_file_id, question_number: question_number};
+                let $wordList = document.getElementById(`word_list_${question_number}`);
+                parent.innerHTML = _getting_ducks;
+                $wordList.innerHTML = _getting_ducks;
+                postData("{{ url_for('save_wlist') }}", data).then(response => response.json()).then(result => {
+                    parent.innerHTML = result.question_settings;
+                    $wordList.innerHTML = result.keywords;
+                    let overview_button = container.querySelectorAll(".overview_button")[0];
+                    overview_button.classList.add("button_outline");
+                });
+            } else if(event.target.matches(".blacklist_question")){
+                let container = event.target.closest(".parentContainer");
+                let parent = event.target.closest(".settings_panel");
+                let question_number = parent.dataset.question;
+                let $wordList = document.getElementById(`word_list_${question_number}`);
+                parent.innerHTML = _getting_ducks;
+                $wordList.innerHTML = _getting_ducks;                
+                postData("{{ url_for('blacklist_question') }}",{analysis_id:_analysis_id,file_id:_file_id,question_number:question_number,black_or_white:"blacklist"}).then(response => response.json()).then(result => {                    
+                    parent.innerHTML = result.question_settings;
+                    $wordList.innerHTML = result.keywords;
+                    let overview_button = container.querySelectorAll(".overview_button")[0];
+                    overview_button.classList.add("button_outline");
+                });
+            } else if(event.target.matches(".whitelist_question")) {
+                let container = event.target.closest(".parentContainer");
+                let parent = event.target.closest(".settings_panel");
+                let question_number = parent.dataset.question;
+                parent.innerHTML = _getting_ducks;
+                postData("{{ url_for('blacklist_question') }}",{analysis_id:_analysis_id,file_id:_file_id,question_number:question_number,black_or_white:"whitelist"}).then(response => response.json()).then(result => {                    
+                    parent.innerHTML = result.question_settings;
+                    document.getElementById(`word_list_${question_number}`).innerHTML = result.keywords;
+                    let overview_button = container.querySelectorAll(".overview_button")[0];
+                    overview_button.classList.add("button_outline");
+                });
+            } else if (event.target.matches("#generate_report")) {
+                let date = new Date();
+                let datestring = `${date.getDate()}.${(date.getMonth() + 1)}.${date.getFullYear()}`;
+                let questions = [];
+
+                //get all selected options here
+                document.querySelectorAll(".question_report").forEach(div => {
+                    let add = false;
+                    let q_obj = {"question_number":div.dataset.question_number};
+                    div.querySelectorAll("input").forEach(inp => {
+                        if(inp.checked) {
+                            add = true;
+                            q_obj[inp.getAttribute("name")] = true;
+                        }
+                    });
+                    if (add)
+                        questions.push(q_obj);
+                });
+
+                let nkey_report = document.querySelectorAll("select[name=nkey_report]")[0].value;
+
+                let data = {
+                    analysis_id: _analysis_id,
+                    file_id: _file_id,
+                    questions: JSON.stringify(questions),
+                    nkey_report:nkey_report
+                };
+
+                postData("{{ url_for('report') }}", data).then(response => response.json()).then(result => {
+                    console.log(result);
+                    let light = document.querySelectorAll(".main-theme-fill-1")[0];
+                    let secondary = document.querySelectorAll(".main-theme-fill-2")[0];
+                    let tertiary = document.querySelectorAll(".main-theme-fill-3")[0];
+                    let mid = document.querySelectorAll(".main-theme-fill-menu")[0];
+                    let dark = document.querySelectorAll(".main-theme-fill-dark")[0];
+
+                    light = rgb2hex(getComputedStyle(light).backgroundColor);
+                    secondary = rgb2hex(getComputedStyle(secondary).backgroundColor);
+                    tertiary = rgb2hex(getComputedStyle(tertiary).backgroundColor);
+                    mid = rgb2hex(getComputedStyle(mid).backgroundColor);
+                    dark = rgb2hex(getComputedStyle(dark).backgroundColor);
+
+                    let include_date = document.getElementById("include_date").checked;
+
+                    let layouts = {
+                        noLines: {
+                            hLineWidth: function() { return 0; },
+                            vLineWidth: function() { return 0; }
                         },
-                        layout: 'lightHorizontalLines'
-                    });
-                }
-            }
+                        noLinesNoPadding: {
+                            hLineWidth: function() { return 0; },
+                            vLineWidth: function() { return 0; },
+                            paddingTop: function() { return 0; },
+                            paddingLeft:function() { return 0; },
+                            paddingRight:function() { return 0; }
+                        }
+                    };
 
-            var docDefinition = {
-                footer: function(currentPage, pageCount) {
-                    return {text:currentPage.toString() + ' of ' + pageCount,margin:[20,0,0,0],fontSize:8};
-                },
-                content: content
-            };
-            pdfMake.createPdf(docDefinition).download("Quantext report " + datestring + " - {{ an.name }}.pdf");
-        });
+                    let report_title = document.getElementById("report_title").value;
+                    let report_author = document.getElementById("report_author").value;
+                    let quantext_image = "data:image/jpeg;base64,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cmJvb2wAAAAAAFJnc01ib29sAAAAAABDcm5DYm9vbAAAAAAAQ250Q2Jvb2wAAAAAAExibHNib29sAAAAAABOZ3R2Ym9vbAAAAAAARW1sRGJvb2wAAAAAAEludHJib29sAAAAAABCY2tnT2JqYwAAAAEAAAAAAABSR0JDAAAAAwAAAABSZCAgZG91YkBv4AAAAAAAAAAAAEdybiBkb3ViQG/gAAAAAAAAAAAAQmwgIGRvdWJAb+AAAAAAAAAAAABCcmRUVW50RiNSbHQAAAAAAAAAAAAAAABCbGQgVW50RiNSbHQAAAAAAAAAAAAAAABSc2x0VW50RiNQeGxAcsAAAAAAAAAAAAp2ZWN0b3JEYXRhYm9vbAEAAAAAUGdQc2VudW0AAAAAUGdQcwAAAABQZ1BDAAAAAExlZnRVbnRGI1JsdAAAAAAAAAAAAAAAAFRvcCBVbnRGI1JsdAAAAAAAAAAAAAAAAFNjbCBVbnRGI1ByY0BZAAAAAAAAAAAAEGNyb3BXaGVuUHJpbnRpbmdib29sAAAAAA5jcm9wUmVjdEJvdHRvbWxvbmcAAAAAAAAADGNyb3BSZWN0TGVmdGxvbmcAAAAAAAAADWNyb3BSZWN0UmlnaHRsb25nAAAAAAAAAAtjcm9wUmVjdFRvcGxvbmcAAAAAADhCSU0D7QAAAAAAEAEsAAAAAQACASwAAAABAAI4QklNBCYAAAAAAA4AAAAAAAAAAAAAP4AAADhCSU0EDQAAAAAABAAAAB44QklNBBkAAAAAAAQAAAAeOEJJTQPzAAAAAAAJAAAAAAAAAAABADhCSU0nEAAAAAAACgABAAAAAAAAAAI4QklNA/UAAAAAAEgAL2ZmAAEAbGZmAAYAAAAAAAEAL2ZmAAEAoZmaAAYAAAAAAAEAMgAAAAEAWgAAAAYAAAAAAAEANQAAAAEALQAAAAYAAAAAAAE4QklNA/gAAAAAAHAAAP////////////////////////////8D6AAAAAD/////////////////////////////A+gAAAAA/////////////////////////////wPoAAAAAP////////////////////////////8D6AAAOEJJTQQIAAAAAAAQAAAAAQAAAkAAAAJAAAAAADhCSU0EHgAAAAAABAAAAAA4QklNBBoAAAAAA08AAAAG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MjAxNSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDE4LTA3LTE3VDA5OjE2OjM5KzEyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAxOS0wNy0xMVQwOTo0Mjo0MysxMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOS0wNy0xMVQwOTo0Mjo0MysxMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9qcGVnIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjRkY2VkNjgzLWNlOGMtMzc0OC05OTAyLTdhZjAyMTRjOWE1OSIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjlmMzYwMGE5LWEzNWItMTFlOS1iNjU2LWJiNWMyMGVmZWU4YiIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmY3ZTc4YjJlLTZmMmMtMTk0Yy05MzMwLWEzMGJjYzdjNWE4YiI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZjdlNzhiMmUtNmYyYy0xOTRjLTkzMzAtYTMwYmNjN2M1YThiIiBzdEV2dDp3aGVuPSIyMDE4LTA3LTE3VDA5OjE2OjM5KzEyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBpbWFnZS9wbmcgdG8gaW1hZ2UvanBlZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NGRjZWQ2ODMtY2U4Yy0zNzQ4LTk5MDItN2FmMDIxNGM5YTU5IiBzdEV2dDp3aGVuPSIyMDE5LTA3LTExVDA5OjQyOjQzKzEyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDw/eHBhY2tldCBlbmQ9InciPz7/7gAOQWRvYmUAZEAAAAAB/9sAhAABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAgICAgICAgICAgIDAwMDAwMDAwMDAQEBAQEBAQEBAQECAgECAgMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwP/wAARCABFAMgDAREAAhEBAxEB/90ABAAZ/8QBogAAAAYCAwEAAAAAAAAAAAAABwgGBQQJAwoCAQALAQAABgMBAQEAAAAAAAAAAAAGBQQDBwIIAQkACgsQAAIBAwQBAwMCAwMDAgYJdQECAwQRBRIGIQcTIgAIMRRBMiMVCVFCFmEkMxdScYEYYpElQ6Gx8CY0cgoZwdE1J+FTNoLxkqJEVHNFRjdHYyhVVlcassLS4vJkg3SThGWjs8PT4yk4ZvN1Kjk6SElKWFlaZ2hpanZ3eHl6hYaHiImKlJWWl5iZmqSlpqeoqaq0tba3uLm6xMXGx8jJytTV1tfY2drk5ebn6Onq9PX29/j5+hEAAgEDAgQEAwUEBAQGBgVtAQIDEQQhEgUxBgAiE0FRBzJhFHEIQoEjkRVSoWIWMwmxJMHRQ3LwF+GCNCWSUxhjRPGisiY1GVQ2RWQnCnODk0Z0wtLi8lVldVY3hIWjs8PT4/MpGpSktMTU5PSVpbXF1eX1KEdXZjh2hpamtsbW5vZnd4eXp7fH1+f3SFhoeIiYqLjI2Oj4OUlZaXmJmam5ydnp+So6SlpqeoqaqrrK2ur6/9oADAMBAAIRAxEAPwDf49+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691//0N/j37r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3Xvfuvde9+691737r3X//R37a+vocVQ1uUylbSY3G42kqK/I5GvqIaOhoKGjheoq62tq6h46elpKWnjZ5JHZURFLMQAT72ASQAM9aZgoLMQFAqSfLrRM/mS/8AClPvntPsTOdP/wAuLJxdbdO02c/uXhu+qfaMW8u5u9c3PVtikren9r5fHZXH7R2lm65jHgpGxmS3DmI1SqjjoVlSH2KrDZIljE17k0rSuAPn60/Z9ooTGO/c5XRufodnwdWnVTuJqABnhXIIoGXFWDakUo0PT/8AwptyOC/0sRVP8zfxGE1yRzd10WN3a1OV8oMfUc+/KPMrdD/wDOFWX+z4L+n2q8XYhWKkFf8ASj/DSn8+if6XnlmFyHvAhFaa2FPPTorq+XD8/Pox/wDL/wD+FJHyk+PXY1D1P/MTlyfcPTlBnjs3fHYmZ2QNm/JDoLI0lStJXZXfe3MVicJHv/B7elcvmqGoxVFuSlpAamCStMYpZk95skEqGWyIVqVpWqn8/Kvrw+VMgy2fnS+t50tN4jZgWpXTR1qSOFATpOKGrHOajS2+jt/P4PdeBwm6dsZfG7g21uXEY3P7ez+GrafJYfOYPM0cORxOXxWRpJJaWvxuSoKmOaCaJmjlidWUkEH2E2UqSrCjA0I6lNHSREkjYNGwBBGQQcgg+hHTv711br3v3Xuve/de697917r3v3Xuve/de697917r3v3Xuve/de6T27tyUmztp7n3fkIKmpoNq7ezW5K2moljesqKTB42pydTBSLNJDE1TLDSssYZ1UsRcgc+7KpZlUcSadUkcRRySEYVSf2CvVCH8tj/AIUG9SfzIfkjhvjf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";
+
+                    let report_content = [
+                        {
+                            table: {
+                                headerRows: 0,
+                                heights: [30,270,0,25,250,200],
+                                widths:[40,600],
+                                body: [
+                                    [{text:"",fontSize:32,fillColor:light},
+                                        {
+                                            table:{
+                                                heights:[30],
+                                                widths:[30,15,30,15,30,30],
+                                                body:[
+                                                    [
+                                                        {text:"",fillColor:light},
+                                                        {text:"",fillColor:"#fff"},
+                                                        {text:"",fillColor:secondary},
+                                                        {text:"",fillColor:"#fff"},
+                                                        {text:"",fillColor:tertiary}
+                                                    ]
+                                                ]
+                                            },
+                                            layout:layouts.noLines,
+                                            marginTop:10,
+                                            marginLeft:360
+                                        }
+                                    ],
+                                    [{text:"",fontSize:32,fillColor:light},
+                                        {
+                                            image:quantext_image,
+                                            width:100,
+                                            alignment: 'right',
+                                            marginRight:40
+                                        }
+                                    ],
+                                    [{text:"",fontSize:32,fillColor:light},{italics:true,text:report_title,marginLeft:30,marginBottom:10,fontSize:30,fillColor:"white"}],
+                                    [{text:"",fontSize:32,fillColor:dark},{text:"",fontSize:32,fillColor:dark}],
+                                    [{text:"",fontSize:32,fillColor:light},
+                                        {
+                                            table: {
+                                                body:[
+                                                    [{text:"OVERVIEW",bold:true,marginTop:20,fontSize:10}],
+                                                    [{text:`${result.length} questions analysed`,fontSize:10,italics:true}],
+                                                    [{text:`{{ "{:,}".format(statistics[1]|int) }} total words`,fontSize:10,italics:true}],
+                                                    [{text:`{{ "{:,}".format(statistics[2]|int) }} total sentences`,fontSize:10,italics:true}]
+                                                ]
+                                            },
+                                            layout: {
+                                                hLineWidth: function() { return 0; },
+                                                vLineWidth: function() { return 0; },
+                                                paddingTop: function() { return 0; },
+                                                paddingLeft:function() { return 30; },
+                                                paddingRight:function() { return 0; }
+                                            }
+                                        }
+                                    ],
+                                    [{text:"",fontSize:32,fillColor:light},
+                                        {
+                                            table: {
+                                                body:[
+                                                    [ "", {text:report_author !== "" ? `Prepared by ${report_author}` : ""} ],
+                                                    [ "", {text:include_date ? datestring : "",bold:true} ],
+                                                ]
+                                            },
+                                            layout: {
+                                                hLineWidth: function() { return 0; },
+                                                vLineWidth: function() { return 0; },
+                                                paddingTop: function() { return 0; },
+                                                paddingLeft:function() { return 15; },
+                                                paddingRight:function(){ return 0; }
+                                            }
+                                        }
+                                    ]
+
+                                ]
+                            },
+                            layout: {
+                                hLineWidth: function() { return 0; },
+                                vLineWidth: function() { return 0; },
+                                paddingTop: function() { return 20; },
+                                paddingLeft:function() { return 0; },
+                                paddingRight:function() { return 0; }
+                            },
+                            pageBreak: 'after',
+                            pageOrientation: 'landscape'
+                        }
+                    ];
+
+                    //each question
+                    for (let i = 0; i < result.length; i++) {
+                        let question_body = [
+                           /* [
+                                { text:`Q${result[i]['question_number']} ${result[i]['question_title']}`,fontSize:9,bold:true,marginTop:30,marginLeft:20 }
+                            ],*/
+                            [
+                                { text:`${result[i]['question_text']}`, fontSize:16, marginLeft:20, marginTop:30 }
+                            ]
+                        ];
+                        console.log(result[i]);
+                        if(result[i]['statistics']['Words']){
+                           /* let row = [];
+                            console.log(result[i]["histograms"]);
+                            let vals = result[i]["histograms"]["Words"][0][0];
+                            let hist_max = result[i]["histograms"]["Words"][1];
+
+                            for(let v=0;v<vals.length;v++){
+                                let h = (vals[v] === 0 || vals[v] > 1) ? vals[v]/hist_max * 20 : 1;
+                                let bar = {
+                                    table:{
+                                        body:[
+                                            [{text:"-",color:"white",marginTop:20-h,fillColor:"white"}],
+                                            [{text:"-",color:dark,marginTop:h,fillColor:dark}]
+                                        ]
+                                    },
+                                    layout:layouts.noLinesNoPadding
+                                };
+                                row.push(bar);
+                            }*/
+
+                            question_body.push([
+                                {text:"SUMMARY STATISTICS", bold:true,marginLeft:20,marginTop:10,marginBottom:10,fontSize:10}
+                            ]);
+                            question_body.push([
+                                {
+                                    table:{
+                                        widths:["33%","33%","34%"],
+                                        body:[
+                                            [
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['responses']}`,alignment:'center',fontSize:10,bold:true,fillColor:light,color:"#fff", marginTop:5, marginBottom:3, marginRight:5, marginLeft:5 },
+                                                                {text:"responses",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10 }
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['statistics']['Words']}`,alignment:'center',fontSize:10,bold:true,fillColor:secondary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5 },
+                                                                {text:"mean response length in words",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['statistics']['Sentences']}`,alignment:'center',fontSize:10,bold:true,fillColor:secondary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5},
+                                                                {text:"mean sentences per response",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                }
+                                            ],
+                                           /* [
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            row
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                }
+                                            ]*/
+                                        ]
+                                    },
+                                    layout: layouts.noLinesNoPadding
+                                }
+                            ]);
+                        }
+
+                        if(result[i]['indices']['TTR']){
+                            question_body.push([
+                                {text:"INDICES", bold:true,marginLeft:20,marginTop:15,marginBottom:10,fontSize:10}
+                            ]);
+                            question_body.push([
+                                {
+                                    table:{
+                                        widths:["33%","33%","34%"],
+                                        body:[
+                                            [
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['LD']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff", marginTop:5, marginBottom:3, marginRight:5, marginLeft:5 },
+                                                                {text:"LD",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10 }
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['TTR']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5 },
+                                                                {text:"TTR",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['SMOG']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5},
+                                                                {text:"SMOG",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['Gunning']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff", marginTop:5, marginBottom:3, marginRight:5, marginLeft:5 },
+                                                                {text:"Gunning Fog",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10 }
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['Flesch']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5 },
+                                                                {text:"Flesch reading ease",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['FK']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5},
+                                                                {text:"Flesch-Kincaid",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['MTLD']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff", marginTop:5, marginBottom:3, marginRight:5, marginLeft:5 },
+                                                                {text:"MTLD",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10 }
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+                                                    table:{
+                                                        body:[
+                                                            [
+                                                                {marginLeft:20,text:""},
+                                                                {text:`${result[i]['indices']['HDD']}`,alignment:'center',fontSize:10,bold:true,fillColor:tertiary,color:"#fff",marginTop:5,marginBottom:3,marginRight:5,marginLeft:5 },
+                                                                {text:"HD-D",fontSize:10,marginTop:5,marginBottom:3,marginLeft:10}
+                                                            ]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLinesNoPadding
+                                                },
+                                                {
+
+                                                }
+                                            ]
+                                        ]
+                                    },
+                                    layout: layouts.noLinesNoPadding
+                                }
+                            ]);
+                        }
+
+                        if(result[i]['top_features']['top_words']){
+                            question_body.push([
+                                {text:"MOST FREQUENT WORDS, BIGRAMS & TRIGRAMS", bold:true,marginLeft:20,marginTop:30,marginBottom:10,fontSize:10}
+                            ]);
+
+                            let word_max = parseInt(result[i]['top_features']['top_words'][0][1]);
+                            let words_table = []; //is a body
+
+                            for(let k in result[i]['top_features']['top_words']){
+                                let curr = parseInt(result[i]['top_features']['top_words'][k][1]);
+                                words_table.push([
+                                    {text:result[i]['top_features']['top_words'][k][0],fontSize:8.5,marginLeft:20, marginRight:10,alignment:'right'},
+                                    {
+                                        table:{
+                                            body:[
+                                                [{text:"",fillColor:dark,marginRight:curr/word_max*100,marginTop:5}]
+                                            ]
+                                        },
+                                        layout: layouts.noLines
+                                    },
+                                    {text:curr,fontSize:8.5,marginLeft:20, marginLeft:10,alignment:'right',bold:true}
+                                ]);
+                            }
+
+                            let bigram_max = parseInt(result[i]['top_features']['top_bigrams'][0][0][1]);
+                            let bigram_table = []; //is a body
+
+                            for(let k in result[i]['top_features']['top_bigrams'][0]){
+                                let curr = parseInt(result[i]['top_features']['top_bigrams'][0][k][1]);
+                                bigram_table.push([
+                                    {text:`${result[i]['top_features']['top_bigrams'][0][k][0][0]} ${result[i]['top_features']['top_bigrams'][0][k][0][1]}`,fontSize:8.5,marginLeft:20, marginRight:10,alignment:'right'},
+                                    {
+                                        table:{
+                                            body:[
+                                                [{text:"",fillColor:dark,marginRight:curr/bigram_max*100,marginTop:5}]
+                                            ]
+                                        },
+                                        layout: layouts.noLines
+                                    },
+                                    {text:curr,fontSize:8.5,marginLeft:20, marginLeft:10,alignment:'right',bold:true}
+                                ]);
+                            }
+
+                            let trigram_max = parseInt(result[i]['top_features']['top_trigrams'][0][0][1]);
+                            let trigram_table = []; //is a body
+
+                            for(let k in result[i]['top_features']['top_trigrams'][0]){
+                                let curr = parseInt(result[i]['top_features']['top_trigrams'][0][k][1]);
+                                trigram_table.push([
+                                    {text:`${result[i]['top_features']['top_trigrams'][0][k][0][0]} ${result[i]['top_features']['top_trigrams'][0][k][0][1]} ${result[i]['top_features']['top_trigrams'][0][k][0][2]}`,fontSize:8.5,marginLeft:20, marginRight:10,alignment:'right'},
+                                    {
+                                        table:{
+                                            body:[
+                                                [{text:"",fillColor:dark,marginRight:curr/trigram_max*100,marginTop:5}]
+                                            ]
+                                        },
+                                        layout: layouts.noLines
+                                    },
+                                    {text:curr,fontSize:8.5,marginLeft:20, marginLeft:10,alignment:'right',bold:true}
+                                ]);
+                            }
+
+                            let frequent_table = [
+                                [
+                                    {
+                                        table:{
+                                            body:words_table
+                                        },
+                                        layout: layouts.noLinesNoPadding
+                                    },
+                                    {
+                                        table:{
+                                            body:bigram_table
+                                        },
+                                        layout: layouts.noLinesNoPadding
+                                    },
+                                    {
+                                        table:{
+                                            body:trigram_table
+                                        },
+                                        layout: layouts.noLinesNoPadding
+                                    }
+                                ]
+                            ];
+
+                            let label_distributions = document.getElementById("label_distributions").checked;
+                            let label_examples = document.getElementById("label_examples").checked;
+
+                            question_body.push([
+                                {
+                                    table:{
+                                        widths:["33%","33%","34%"],
+                                        body:frequent_table
+                                    },
+                                    layout: layouts.noLinesNoPadding,
+                                    pageBreak: (label_distributions || label_examples) ? 'after' : ''
+                                }
+                            ]);
+
+                            if(label_distributions) {
+                                let cats = result[i]['categories']; //is an array of categories
+                                let cat_max = result[i]['cat_max'];
+                                let category_table = []; //is a body
+
+                                if (cats.length > 0) {
+                                    for (let c in cats) {
+                                        let curr = cats[c];
+                                        if(curr.length > 0) {
+                                            category_table.push([
+                                                {
+                                                    text: `${curr[0]}`,
+                                                    fontSize: 8.5,
+                                                    marginLeft: 20,
+                                                    marginRight: 10,
+                                                    alignment: 'right'
+                                                },
+                                                {
+                                                    table: {
+                                                        body: [
+                                                            [{
+                                                                text: "",
+                                                                fillColor: dark,
+                                                                marginRight: curr[1] / cat_max * 100,
+                                                                marginTop: 5
+                                                            }]
+                                                        ]
+                                                    },
+                                                    layout: layouts.noLines
+                                                },
+                                                {
+                                                    text: curr[1],
+                                                    fontSize: 8.5,
+                                                    marginLeft: 20,
+                                                    marginLeft: 10,
+                                                    alignment: 'right',
+                                                    bold: true
+                                                }
+                                            ]);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    category_table = [[]];
+                                }
+                                question_body.push(
+                                    [{text:"LABELS", bold:true,marginLeft:20,marginTop:30,marginBottom:10,fontSize:10,layout: layouts.noLinesNoPadding}],
+                                    [
+                                        {
+                                            table:{
+                                                body:category_table
+                                            },
+                                            layout: layouts.noLinesNoPadding
+                                        }
+                                    ]);
+                            }
+
+                            if(label_examples){
+                                let examples = result[i]['examples']; //is an array of categories
+                                let example_table = []; //is a body
+
+                                if(examples.length > 0) {
+                                    for (let c in examples) {
+                                        let curr = examples[c];
+                                        if(curr.length > 0) {
+                                            example_table.push([
+                                                {
+                                                    text: `${curr[0]}`,
+                                                    fontSize: 8.5,
+                                                    marginLeft: 20,
+                                                    marginRight: 10,
+                                                    bold: true,
+                                                    marginTop: 10
+                                                }
+                                            ]);
+
+                                            let iter = curr[1].length > 5 ? 5 : curr[1].length;
+
+                                            for (let x = 0; x < iter; x++) {
+                                                let resp = curr[1][x];
+                                                example_table.push([
+                                                    {
+                                                        text: resp,
+                                                        fontSize: 8.5,
+                                                        marginLeft: 20,
+                                                        marginRight: 10
+                                                    }
+                                                ]);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    example_table = [[]];
+                                }
+
+                                question_body.push(
+                                    [{text:"EXAMPLE RESPONSES", bold:true,marginLeft:20,marginTop:20,fontSize:10}],
+                                    [
+                                        {
+                                            table:{
+                                                body:example_table
+                                            },
+                                            layout: layouts.noLinesNoPadding
+                                        }
+                                    ]);
+                            }
+                        }
+
+                        let questionObject = {
+                            table:{
+                                widths:["100%"],
+                                margins:[0,0,0,0],
+                                heights:[30,30],
+                                body:question_body
+                            },
+                            layout: {
+                                hLineWidth: function() { return 0; },
+                                vLineWidth: function() { return 0; },
+                                paddingTop: function() { return 0; },
+                                paddingLeft:function() { return 25; },
+                                paddingRight:function() { return 25; }
+                            },
+                            pageBreak: (i !== result.length-1) ? 'after' : ''
+                        };
+                        report_content.push(questionObject);
+                    }
+
+                    let dd = {
+                        pageSize: 'A4',
+                        pageMargins: [ 0, 0, 0, 40 ],
+                        content: report_content,
+                        footer: function(currentPage, pageCount, pageSize) {
+                            if(currentPage === 1)
+                                return [
+                                    { text: `${report_title} | ${pageCount} pages`,fontSize:9,marginRight:20,alignment:'right' }
+                                ];
+                            else
+                                return [
+                                    {
+                                        columns: [
+                                            {
+                                                image:quantext_image,
+                                                width:80,
+                                                alignment: 'left',
+                                                marginLeft:30,
+                                                marginBottom:20
+                                            },
+                                            {
+                                                text: `Page ${currentPage} / ${pageCount}`,
+                                                fontSize: 9,
+                                                marginRight: 30,
+                                                alignment: 'right',
+                                                marginTop:10
+                                            }
+                                        ]
+                                    }
+                                ];
+                        }
+                    };
+
+                    pdfMake.createPdf(dd).download(`Quantext report ${datestring} - {{ analysis['name'] }}.pdf`);
+                });
+            } else if(event.target.closest(".title_edit_icon")) {
+                let target = event.target.matches(".title_edit_icon") ? event.target : event.target.closest(".title_edit_icon");
+                let parent = target.closest(".main_question_title");
+                let input = parent.querySelectorAll(".main_title_text_input")[0];
+                input.style.display = "block";
+                input.focus();
+                parent.querySelectorAll(".title_success_icon")[0].style.display = "block";
+                target.style.display = "none";
+                parent.querySelectorAll(".main_title_text")[0].style.display = "none";
+            } else if(event.target.closest(".title_success_icon")) {
+                let target = event.target.matches(".title_success_icon") ? event.target : event.target.closest(".title_success_icon");
+                let parent = target.closest(".main_question_title");
+                let input = parent.querySelectorAll(".main_title_text_input")[0];
+                let text = input.value;
+                let question_number = input.dataset.question_number;
+                let data = {file_id:_file_id,"question_number":question_number,"new_text":text};
+
+                postData("{{ url_for('save_question_text') }}",data).then(response => response.text()).then(result => {
+                    let textDiv = parent.querySelectorAll(".main_title_text")[0];
+                    textDiv.innerHTML = text;
+                    textDiv.style.display = "block";
+                    event.target.style.display = "none";
+                    input.style.display = "none";
+                    parent.querySelectorAll(".title_edit_icon")[0].style.display = "block";
+                });
+            } else if(event.target.closest(".new_viz_box")) {
+                let text = event.target.innerHTML;
+                let parent = event.target.closest(".parentContainer");
+                perform_searches(event.target,parent, text);
+            }
+    });    
+
+    document.addEventListener("keypress", event => {
+        if(event.target.matches(".kwic_bar")){
+            if (event.keyCode === 13) {
+                let text = event.target.value;
+                let parent = event.target.closest(".parentContainer");
+                perform_searches(event.target,parent, text);
+            }
+        } else if (event.target.matches(".category_input")){
+            if (event.keyCode === 13) {
+                labeller.new_category(event.target, document.querySelectorAll(".label_categories>div")[0],true);
+            }
+        } else if(event.target.matches(".main_title_text_input")){
+            if(event.keyCode === 13) {
+                let text = event.target.value;
+                let question_number = event.target.dataset.question_number;
+                let data = {file_id:_file_id,"question_number":question_number,"new_text":text};
+                postData("{{ url_for('save_question_text') }}",data).then(response => response.text()).then(result => {
+                    let parent = event.target.closest(".main_question_title");
+                    let textDiv = parent.querySelectorAll(".main_title_text")[0];
+                    textDiv.innerHTML = text;
+                    textDiv.style.display = "block";
+                    parent.querySelectorAll(".title_success_icon")[0].style.display = "none";
+                    parent.querySelectorAll(".title_edit_icon")[0].style.display = "block";
+                    event.target.style.display = "none";
+                });
+            }
+        }
+    });
+
+    document.addEventListener("change", event => {
+        if(event.target.matches(".setting-control")){
+            let val = event.target.value;
+            if(event.target.getAttribute("type") === "checkbox")
+                val = event.target.checked;
+
+            let question_number = event.target.dataset.question_number;
+            let data = {file_id:_file_id,analysis_id:_analysis_id,question_number:question_number};
+            data['key'] = event.target.getAttribute("name");
+            data['val'] = val;
+            let $wordList = document.getElementById(`word_list_${question_number}`);
+            $wordList.innerHTML = _getting_ducks;
+            postData("{{ url_for('settings') }}",data).then(response => response.text()).then(result => {
+                $wordList.innerHTML = result;
+            });
+        } else if(event.target.matches(".changeFile")){
+            let url = event.target.value;
+            if(url !== 0 && url !== "0") {
+                notify("<span class='quantext-chunky-duck'></span> Getting your ducks in a row...");
+                window.location.href = url;
+            }
+        } else if(event.target.matches(".label_control")){
+            labeller.toggle_label_control(event.target);
+        } else if(event.target.matches(".question_report_input")){
+            let c = 0;
+            document.querySelectorAll(".question_report").forEach(div => {
+                let input_count = div.querySelectorAll("input:checked").length;
+                if(input_count > 0)
+                    c++;
+            });
+            document.getElementById("num_questions_to_report").innerHTML = c;
+        } else if(event.target.matches(".sort-control")) {
+            let val = event.target.value;
+            let panel = event.target.closest(`.explore_panel`);
+            let parent = event.target.closest(".parentContainer");
+            parent.querySelectorAll(".all_responses_div")[0].innerHTML = _getting_ducks;
+            parent.querySelectorAll(".kwic_results_div")[0].innerHTML = _getting_ducks;
+            curr_sort_order = val;
+            doSearch(event.target,parent,false,false);
+        } else if(event.target.matches(".sort-label")) {
+            let val = event.target.value;
+            if(val === "random"){
+                labeller.randomise_labels(event.target);
+            } else {
+                let panel = event.target.closest(`.label_panel`);
+                let $wordList = panel.querySelectorAll(`.all_responses_div`)[0];
+                $wordList.innerHTML = _getting_ducks;
+                curr_sort_order = val;
+                let parent = event.target.closest(".parentContainer");
+                doSearch(event.target,parent,false,true);
+            }
+        }
     });
 
 </script>

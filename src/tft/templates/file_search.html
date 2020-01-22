@@ -1,0 +1,51 @@
+{% for f in files %}
+    {% if f['text'] %}
+        <div class="full_response_div main-theme-color-dark">
+            <div class="top_div" style="font-size:.8rem">
+                <span class="main-theme-color-dark" style="font-weight:600;text-transform:uppercase">{{ f['filename'] }}</span>
+            </div>
+            <div
+                    {% if loop.last %}
+                    class="text_div main-theme-color-menu centerFlex kwic_div last_kwic"
+                    {% else %}
+                    class="text_div main-theme-color-menu centerFlex kwic_div"
+                    {% endif %}
+            >
+                {% if f['text'] is string %}
+                    {{ f['text'] }}
+                {% else %}
+                    <div class="left_word">{{ f['text'][0][0] }}</div>
+                    <div class="middle_word">{{ f['text'][0][1] }}</div>
+                    <div class="right_word">{{ f['text'][0][2] }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {% for q in f['responses'] %}
+            {% if q['responses']|length > 0 %}
+                <div class="full_response_div main-theme-color-dark">
+                    <div class="top_div" style="font-size:.8rem">
+                        <span class="main-theme-color-dark" style="font-weight:600;text-transform:uppercase">{{ f['filename'] }}</span>&nbsp;•&nbsp;<span style="color:#888;font-weight:400">Q{{ q['number'] }}</span>
+                    </div>
+                    {% for r in q['responses'] %}
+                        <div
+                                {% if loop.last %}
+                                class="text_div main-theme-color-menu centerFlex kwic_div last_kwic"
+                                {% else %}
+                                class="text_div main-theme-color-menu centerFlex kwic_div"
+                                {% endif %}
+                        >
+                            {% if r['text'] is string %}
+                                {{ r['text'] }}
+                            {% else %}
+                                <div class="left_word">{{ r['text'][0][0] }}</div>
+                                <div class="middle_word">{{ r['text'][0][1] }}</div>
+                                <div class="right_word">{{ r['text'][0][2] }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}

@@ -1,21 +1,257 @@
-<!-- extend from base layout -->
 {% extends "base.html" %}
-
 {% block content %}
-  <h1>Sign In</h1>
-  <form action="" method="post" name="login">
-      {{ form.hidden_tag() }}
-      <p>
-          Please enter your OpenID:<br>
-          {{ form.openid(size=80) }}<br>
-            {% for error in form.openid.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}<br>
-           |{% for pr in providers %}
-          <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">{{ pr.name }}</a> |
-        {% endfor %}
-      </p>
-      <p>{{ form.remember_me }} Remember Me</p>
-      <p><input type="submit" value="Sign In"></p>
-  </form>
+
+<meta name="google-signin-client_id" content="361087200465-8mlufddta1so0aoosktih0c7cfqda5q8.apps.googleusercontent.com">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/brands.css" integrity="sha384-VGCZwiSnlHXYDojsRqeMn3IVvdzTx5JEuHgqZ3bYLCLUBV8rvihHApoA1Aso2TZA" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/fontawesome.css" integrity="sha384-GVa9GOgVQgOk+TNYXu7S/InPTfSDTtBalSgkgqQ7sCik56N9ztlkoTr2f/T44oKV" crossorigin="anonymous">
+
+<script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback" async defer></script>
+<script>
+    function onRecaptchaLoadCallback() {
+        let clientId = grecaptcha.render('inline-badge', {
+            'sitekey': '6Lf4OJoUAAAAAI3VwfIu5JOXgVplnNUYTvomermq',
+            'badge': 'inline',
+            'size': 'invisible'
+        });
+
+        grecaptcha.ready(_ => {
+            grecaptcha.execute(clientId, {
+                action: 'login'
+            }).then(token => {
+                document.getElementById("captcha").value = token;
+            });
+        });
+    }
+</script>
+
+<style>
+    .container-fluid{ padding:0!important }
+    a{ color:#57b0c2 }
+
+    .btn-remove-style{-webkit-border-radius:inherit!important;border-radius:inherit!important;box-shadow:none!important}
+    .btn-twitter{color: #fff!important;background-color: #55acee;font-weight: 500;text-align:left;cursor:pointer}
+    .btn-google{color: #aaa!important;background-color: #fff!important;font-weight: 500;text-align:left;cursor:pointer}
+</style>
+
+<div class="pt-4">
+        <div class="col-md-12 login-logo m-0 pl-4">
+            <a href="{{ url_for('control_panel') }}">
+                <img src="{{ url_for('static', filename='img/quantext_title.svg') }}" style="height:80px;max-width:100%" />
+                <img src="{{ url_for('static', filename='img/quantext_duck_4_solo.svg') }}" style="margin-left:.5rem;height:60px;max-width:100%;">
+            </a>
+        </div>
+    <div class="row m-0" style="text-align:left">
+        <div class="col-md-5 p-0 mt-3">
+            <div class="p-4" style="font-size:.9rem">
+                Log in to Quantext with your username and password, or jump straight in with a Google account (no sign up required!)
+                <h1 class="small_text-9 mt-4 mb-2">Why signup?</h1>
+                If you don't have a Google account, you can sign up directly to Quantext - just fill in a few details, choose a username and password, and you're ready to go.<br/><br/>
+                <div id="inline-badge"></div>
+            </div>
+        </div>
+        <div class="col-md-1 p-0 mt-3"></div>
+        <div class="col-md-6 login-parent p-0 mt-3">
+            <div style="width:700px;margin:0;display:flex" class="login_tab_div">
+                <div id="login_tab" class="p-3 login_tab chosen" data-type="login">Log in</div>
+                <div id="signup_tab" class="p-3 ml-3 login_tab" data-type="signup">Sign up</div>
+            </div>
+            <form class="p-4 pb-5 login-box login-screen" action="{{ url_for('log_me_in') }}" method="POST">
+                <input type="hidden" id="captcha" name="captcha" />
+                Log in to Quantext<br/><br/>
+                {% if error %}
+                    <div class="warning_message mb-2 mt-2" style="display: block;">{{ error }}</div>
+                {% endif %}
+                <div class="mb-1 small_text-8">Username</div>
+                <input name="username" type="text" class="form-control kwic_bar response_list main-theme-fill-dark mt-0"/>
+                <div class="mb-2 helper_text">Enter your username</div>
+
+                <div class="mt-4 mb-1 small_text-8">Password</div>
+                <input name="password" type="password" class="form-control kwic_bar response_list main-theme-fill-dark mt-0"/>
+                <div class="mb-2 helper_text">Enter your password (minimum 8 characters)</div>
+
+                <div class="mt-4" style="display:flex;justify-content: flex-end">
+                    <button type="submit" class="btn btn-quantext login-button" style="font-size: .9rem;font-weight: 400;color: white;">Log in</button>
+                </div>
+                <div class="mt-4">
+                    Or you can always:<br/>
+                    <div class="g-signin2 btn btn-google p-0 mt-3 mb-3" data-onsuccess="onSignIn"></div>
+                    <a class="btn btn-block btn-social btn-twitter" href="{{ url_for('oauth_authorize', provider='twitter') }}" style="display:none">
+                        <span class="fab fa-twitter mr-2"></span> Log in with Twitter
+                    </a>
+                </div>
+            </form>
+
+            <form class="p-4 pb-5 login-box signup-screen" action="{{ url_for('complete_signup') }}" method="POST" style="display:none">
+                Sign up to Quantext<br/><br/>
+                <div class="mb-1 small_text-8">Username<span style="color:#57b0c2" title="required"> (required)</span></div>
+                <input name="username" type="text" class="new_user form-control kwic_bar response_list main-theme-fill-dark mt-0" required/>
+                <div class="mb-2 helper_text">Choose a username</div>
+                <div class="warning_message username_warning mb-2 mt-2">Username already taken!</div>
+
+                <div class="mt-4 mb-1 small_text-8">Password<span style="color:#57b0c2" title="required"> (required)</span></div>
+                <input minlength="8" id="password" name="password" type="password" class="form-control kwic_bar response_list main-theme-fill-dark mt-0" required/>
+                <div class="mb-2 helper_text">Enter a password (minimum 8 characters)</div>
+
+                <div class="mt-3 mb-1 small_text-8">Confirm Password<span style="color:#57b0c2" title="required"> (required)</span></div>
+                <input minlength="8" id="confirm_password" type="password" class="form-control kwic_bar response_list main-theme-fill-dark mt-0" required/>
+                <div class="mb-2 helper_text">Confirm your password (minimum 8 characters)</div>
+
+                <div class="mt-4 mb-1 small_text-8">Display name<span style="color:#57b0c2" title="required"> (required)</span></div>
+                <input name="display_name" type="text" class="form-control kwic_bar response_list main-theme-fill-dark mt-0" required/>
+                <div class="mb-2 helper_text">Enter a display name</div>
+
+                <div class="mb-1 mt-3 small_text-8">Primary Email<span style="color:#57b0c2" title="required"> (required)</span></div>
+                <input name="email" type="text" class="new_user form-control kwic_bar response_list main-theme-fill-dark mt-0" required/>
+                <div class="mb-2 helper_text">Enter an email address</div>
+                <div class="warning_message email_warning mb-2 mt-2">Email already registered!</div>
+
+                <div class="linked_account mb-1 mt-4 small_text-8">Link a Google account</div>
+                <div class="g-signin2 btn btn-google btn-link-account p-0 mb-3" data-onsuccess="linkAccount"></div>
+                <input name="google_id" type="hidden" class="form-control kwic_bar response_list main-theme-fill-dark mt-0" value="" style="display:none" />
+                <input name="google_id_display" type="text" class="form-control kwic_bar response_list main-theme-fill-dark mt-0" disabled="disabled" style="display:none" />
+                <div class="unlink_account unlink_google mt-2" style="display:none">Unlink Google account</div>
+
+                <div class="mt-4" style="display:flex;justify-content: flex-end">
+                    <button id="complete_signup" type="button" class="btn btn-quantext login-button" style="font-size:.9rem;font-weight:400;color: white;">Complete signup</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+<script>
+
+    function changeStyle() {
+        document.querySelectorAll(".g-signin2")[0].style.border = "1px solid #ccc";
+        let div = document.querySelectorAll(".g-signin2>div")[0];
+        div.classList.add("btn","btn-block","btn-social","btn-remove-style");
+        div.style.height = "";
+        div.style.width = "";
+        div.style.border = "none";
+        div.style.fontSize = "1rem";
+
+        document.querySelectorAll(".g-signin2>div>div")[0].classList.add("centerFlex");
+        let divdiv = document.querySelectorAll(".g-signin2>div>div>div")[0];
+        divdiv.classList.add("mr-2");
+        divdiv.style.padding = 0;
+
+        let divspan = document.querySelectorAll(".g-signin2>div>div>span")[0];
+        divspan.style.lineHeight = "";
+        divspan.style.fontSize = "1rem";
+        divspan.style.fontFamily = "inherit";
+
+        document.querySelectorAll(".g-signin2>div>div>span>span")[0].innerHTML = "Log in with Google";
+    }
+
+    function onSignIn(googleUser) {
+        let id_token = googleUser.getAuthResponse().id_token;
+        googleUser.disconnect();
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/authorize');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = response => {
+            window.location.href = response.currentTarget.responseURL;
+        };
+        xhr.send('idtoken=' + id_token);
+    }
+
+    function linkAccount(googleUser) {
+        let id_token = googleUser.getAuthResponse().id_token;
+        googleUser.disconnect();
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/link_account');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = response => {
+            document.querySelectorAll(".btn-link-account")[0].style.display = "none";
+            document.querySelectorAll(".unlink_google")[0].style.display = "block";
+            let input = document.querySelectorAll("input[name=google_id_display]")[0];
+            input.value = response.currentTarget.responseText;
+            input.style.display = "block";
+            document.querySelectorAll("input[name=google_id]")[0].value = response.currentTarget.responseText;
+            document.querySelectorAll(".linked_account")[0].innerHTML = "Linked Google account";
+        };
+        xhr.send('idtoken=' + id_token);
+    }
+
+    document.addEventListener("click", event => {
+        if (event.target)
+            if (event.target.closest(".login_tab")) {
+                document.querySelectorAll(".login_tab").forEach(div => {
+                    div.classList.remove("chosen");
+                });
+                event.target.classList.add("chosen");
+                let type = event.target.dataset.type;
+                if(type === "login") {
+                    document.querySelectorAll(".login-screen")[0].style.display = "block";
+                    document.querySelectorAll(".signup-screen")[0].style.display = "none";
+                }
+                else {
+                    document.querySelectorAll(".login-screen")[0].style.display = "none";
+                    document.querySelectorAll(".signup-screen")[0].style.display = "block";
+                }
+            } else if (event.target.closest(".unlink_google")){
+                event.target.style.display = "none";
+                document.querySelectorAll(".btn-google")[0].style.display = "block";
+                document.querySelectorAll("input[name=google_id]")[0].value = "";
+                let display_input = document.querySelectorAll("input[name=google_id_display]")[0];
+                display_input.value = "";
+                display_input.style.display = "none";
+                document.querySelectorAll(".linked_account")[0].innerHTML = "Link a Google account";
+            } else if(event.target.closest("#complete_signup")){
+                let canSubmit = true;
+                document.querySelectorAll(".warning_message").forEach(div => {
+                    if(div.offsetWidth > 0 || div.offsetHeight > 0)
+                        canSubmit = false;
+                });
+                if(!canSubmit)
+                    alert("Cannot submit");
+                else
+                    document.querySelectorAll(".signup-screen")[0].submit();
+            }
+    });
+
+    if(window.location.hash && window.location.hash === "#signup") {
+        document.getElementById("signup_tab").click();
+    }
+
+    document.querySelectorAll("input[name=username].new_user")[0].addEventListener("blur", event => {
+        let username = event.target.value;
+        (async() => {
+            let response = await request(`/check_username/${username}`);
+            if(response === "User exists")
+                document.querySelectorAll(".username_warning")[0].style.display = "block";
+            else
+                document.querySelectorAll(".username_warning")[0].style.display = "none";
+        })();
+    });
+
+    document.querySelectorAll("input[name=email].new_user")[0].addEventListener("blur", event => {
+        let email = event.target.value;
+        (async() => {
+            let response = await request(`/check_username/${email}`);
+            if(response === "User exists")
+                document.querySelectorAll(".email_warning")[0].style.display = "block";
+            else
+                document.querySelectorAll(".email_warning")[0].style.display = "none";
+        })();
+    });
+
+    let password = document.getElementById("password"), confirm_password = document.getElementById("confirm_password");
+
+    function validatePassword(){
+        if(password.value !== confirm_password.value) {
+            confirm_password.setCustomValidity("Passwords do not match");
+        } else {
+            confirm_password.setCustomValidity('');
+        }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
+
+</script>
+<script src="https://apis.google.com/js/platform.js?onload=changeStyle" async defer></script>
+
 {% endblock %}

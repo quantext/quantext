@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/themes/original.css">
+<style>
+    .container-fluid{ padding:0!important }
+    a{ color:#57b0c2; }
+</style>
+{% include 'nav.html' %}
+<div style="position:relative;width:100%;height:500px;background:url('/static/img/pink.jpg');background-size: cover;background-position: bottom;">
+    <div class="centerFlex p-4 main_duck">
+        <img src="/static/img/quantext_title_white.svg" style="height: 60px;max-width:100%;"><div class="quantext-chunky-duck" style="color: white;font-size: 3rem;margin-bottom:-.5rem;margin-left: .5rem;"></div>
+    </div>
+    <div style="position:absolute;top:0;bottom:0;right:0;left:0;display:flex;align-items:center;flex-direction:column">
+        <div id="big_index_title" style="margin-top:auto;margin-bottom:auto">Quantext Research</div>
+    <!--<div style="text-align: center;color: white;font-size: 1.6rem;font-weight: 300;padding-top:0;text-shadow: 1px 1px #333;">Analyse student responses in context</div>-->
+    </div>
+</div>
+<div class="pt-4">
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/duckling.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#c52d05;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-chunky-duck" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Quantext pilot</h2>
+                </div>
+                <div style="border-bottom:10px solid #c52d05;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight:300">
+                    Quantext is currently being piloted by teachers around New Zealand and Australia. We are proud to acknowledge funding support for our pilot projects from Ako Aotearoa, New Zealand's national centre for tertiary teaching excellence.
+                    <br><br>
+                    <div style="text-align:center">
+                        <img src="/static/img/Ako Logo_white.png" style="max-width: 100%;width: 300px;"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" style="background: #300b01;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/ducks.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-6 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#c52d05;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-share" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Pilot partners</h2>
+                </div>
+                <div style="border-bottom:10px solid #c52d05;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight:300">
+                    Quantext is currently being piloted by teachers at the following institutions.
+                    <br><br>
+                    <div style="justify-content:space-between;display:flex">
+                        <img src="/static/img/UOA-NT-VC-RGB.png" style="height:150px"/>
+                        <img src="/static/img/victoria.jpg" style="height:150px"/>
+                        <img src="/static/img/OPlogo.png" style="height:150px"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" style="background: #300b01;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    <div class="main-theme-fill-menu index_box">
+        <div class="pt-0 pb-0" style="background: url('/static/img/books.jpg');color:white;position: relative;opacity: 1;background-size: cover;background-position: top right;">
+            <div class="col-md-12 pl-5 pr-5 pb-5" style="margin-top: 0;margin-bottom: 3rem;padding-top: 3rem;z-index: 4;">
+                <div class="centerFlex">
+                    <div style="background:#c52d05;padding: 1rem .8rem;border-radius: 10rem;margin-right: .5rem;margin-bottom: .5rem;">
+                        <div class="inner-icon quantext-book" style="margin-bottom: -1rem;font-size: 2rem;margin-top: -.5rem;"></div>
+                    </div>
+                    <h2 style="font-weight:300">Publications</h2>
+                </div>
+                <div style="border-bottom:10px solid #c52d05;margin-bottom:2rem"></div>
+                <div style="font-size: 1.2rem;font-weight:300">
+                    <ul class="research_list">
+                        <li>McDonald, J., Moskal, A. C. M., Gunn, C., & Donald, C. (2018). Text analytic tools to illuminate student learning. In J. Lodge, J.C. Horvath, & L. Corrin (Eds.), <i>Learning analytics in the classroom: Translating learning analytics research for teachers</i>. Routledge.</li>
+                        <li>Elgort, I., Lundqvist, K., McDonald, J., & Moskal, A. C. M. (2018). Analysis of student discussion posts in a MOOC: Proof of concept. In <i>Companion Proceedings 8th International Conference on Learning Analytics & Knowledge (LAK18).</i></li>
+                        <li>McDonald, J., Moskal, A. C. M., Elgort, I., & Gunn, C. (2018). Analysing student responses: early lessons from a pilot study. In <i>Companion Proceedings 8th International Conference on Learning Analytics & Knowledge (LAK18).</i></li>
+                        <li>McDonald, J., & Moskal, A. C. M. (2017). Quantext: analysing student responses to short-answer questions. In H. Partridge (Ed.), <i>Me, Us, IT! Proceedings ASCILITE2017: 34th International Conference on Innovation, Practice and Research in the Use of Educational Technologies in Tertiary Education</i>. Retrieved from <a style="color:#fff;text-decoration:underline!important" href="http://2017conference.ascilite.org/wp-content/uploads/2017/11/Concise-MCDONALD.pdf">http://2017conference.ascilite.org/wp-content/uploads/2017/11/Concise-MCDONALD.pdf</a></li>
+                        <li>McDonald, J., Bird, R. J., Zouaq, A., & Moskal, A. C. M. (2017). Short answers to deep questions: supporting teachers in large‐class settings. <i>Journal of Computer Assisted Learning 33</i>(4), 306–319. <a href="http://doi.org/10.1111/jcal.12178" target="_blank" style="color:#fff;text-decoration:underline!important">http://doi.org/10.1111/jcal.12178</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-12" style="background: #300b01;position: absolute;top: 0;bottom: 0;left: 0;opacity: .95;z-index: 0;"></div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</div>
+{% endblock %}

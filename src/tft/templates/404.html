@@ -1,7 +1,11 @@
-<!-- extend base layout -->
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/original.css') }}">
+<style>
+  .container-fluid{ padding:0!important }
+  a{ color:#57b0c2; }
+</style>
 
   {% include 'nav.html' %}
   <div class="pt-4">
@@ -9,7 +13,7 @@
     <div style="text-align:center">
       <div class="p-4">Whatever you were looking for, it isn't here...</div>
       <img class="mb-4" src="/static/img/dead_duck.svg" style="height:200px;max-width:100%" /><br/>
-      <a href="{{ url_for('index') }}">Take me home</a>
+      <a href="{{ url_for('control_panel') }}">Take me home</a>
     </div>
   </div>
 {% endblock %}

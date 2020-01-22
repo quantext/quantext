@@ -1,0 +1,38 @@
+{% if tuples|length > 0 %}
+    {% for r in tuples %}
+        <div class="labeller_div full_response_div normal_response main-theme-color-dark main-theme-border-1
+                {% if r[6]|length > 0 %}
+                    labelled
+                {% endif %}
+                {% if analysis['files'][file['id']|string]['columns'][question['number']]['label_settings'][cat_col]['hide_labels'] == True or analysis['files'][file['id']|string]['columns'][question['number']]['label_settings'][cat_col]['hide_labels'] == 'True' %}
+                    hide_labels_control
+                {% endif %}
+            "
+             data-id="{{ r[0] }}"
+             data-categories='{{ r[6]|tojson }}'
+             style="display:flex;position:relative;flex-direction: column;padding:2rem 0 0;border: 1px solid;margin-top: 1rem;"
+        >            
+            <div class="text_div main-theme-color-dark w-100" style="margin-top:0!important;font-size:1rem;font-weight: 400;flex-flow: wrap;padding-bottom: 1.5rem;justify-content:center;color:#666!important;align-self:center;margin-top:0;padding: 0 2rem 2rem;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">{{ r[1] }}</div>
+            <div style="text-transform:uppercase;font-size:.8rem;font-weight:600;display:flex;align-items: center;line-height: 1;position: relative;padding:1rem;border-top:1px solid #eee;background:#fbfbfb">
+                <div class="words_info_box">{{ "{0:.0f}".format(r[3]) }} WORDS</div>
+                <div class="words_info_box">{{ "{0:.0f}".format(r[4]) }} SENTENCES</div>                  
+
+                <div class="response_labels" style="display:flex;margin-left:auto">
+                    {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'].keys() %}
+                        <span data-key="{{ key }}" style="width:5px;height:16px;margin-left:1px;
+                        {% if key in r[6] %}
+                            display:block;
+                        {% else %}
+                            display:none;
+                        {% endif %}
+                        " class="label_bar_{{ loop.index0%15 }} little_bar_{{ loop.index0 }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="pl-0 pr-0 main-theme-color-menu w-100 mt-4" style="opacity:.75;font-size: 2rem!important;text-align: center!important;font-weight: 300!important;">
+        No responses found.
+    </div>
+{% endif %}

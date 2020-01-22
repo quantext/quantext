@@ -1,0 +1,23 @@
+<div class="col-md-6 p-0 centerFlex label_bars">
+    {% set cnt = [0] %}
+    {% set t = [0] %}
+    {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'] %}
+        {% if analysis['files'][file['id']|string]['columns'][question['number']]['categories'][cat_col][key] %}
+            {% if t.append(t.pop() + analysis['files'][file['id']|string]['columns'][question['number']]['categories'][cat_col][key]) %}{% endif %}
+        {% endif %}
+    {% endfor %}
+    {% for key in analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'] %}
+        {% if analysis['files'][file['id']|string]['columns'][question['number']]['categories'][cat_col][key] %}
+            {% set value = analysis['files'][file['id']|string]['columns'][question['number']]['categories'][cat_col][key] %}
+            {% set width = value/t[0]*100 %}
+        {% else %}
+            {% set value = 0 %}
+            {% set width = 0 %}
+        {% endif %}
+            <div title="{{ analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'][key]['label'] }} : {{ value }}" data-key="{{ key }}" data-value="{{ value }}" style="width:{{ width }}%" class="label_bar label_bar_{{ loop.index0%15 }}"></div>
+            <div class="labels">{{ analysis['files'][file['id']|string]['columns'][question['number']]['categories']['all'][key]['label'] }} :&nbsp;<span class="label_bar_label_span">{{ value }}</span></div>
+            <div class="labels w-100"></div>
+        {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+    {% endfor %}
+</div>
+<div class="w-100 helper_text_white" style="color: #aaa!important;"><span class="label_total">{{ t[0] }}</span>&nbsp;labels assigned</div>

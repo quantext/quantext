@@ -4,33 +4,234 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkbox.css') }}" />
 
-    <link rel="stylesheet" href="/static/css/custom.css">
-    <link rel="stylesheet" href="/static/css/index.css">
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>-->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>-->
 
-    <link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/font-awesome-4.7.0/css/font-awesome.css" />
-    <link rel="stylesheet" href="/static/css/quantext-font/styles.css" />
+    <script src="{{ url_for('static', filename='js/popper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper-tooltip.js') }}"></script>
 
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="/static/js/d3-tip.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/brands.css" integrity="sha384-n9+6/aSqa9lBidZMRCQHTHKJscPq6NW4pCQBiMmHdUCvPN8ZOg2zJJTkC7WIezWv" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/fontawesome.css" integrity="sha384-vd1e11sR28tEK9YANUtpIOdjGW14pS87bUBuOIoBILVWLFnS+MCX9T6MMf0VdPGq" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="/static/js/jQuery-MultiSelect-master/jquery.multiselect.css" />
-    <script src="/static/js/jQuery-MultiSelect-master/jquery.multiselect.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quantext-font/styles.css') }}" />
 
-    <link rel="stylesheet" href="/static/js/simplebar/simplebar.css" />
-    <script src="/static/js/simplebar/simplebar.js"></script>
+   <!-- <link rel="stylesheet" href="{{ url_for('static', filename='js/jQuery-MultiSelect-master/jquery.multiselect.css') }}" />
+    <script src="{{ url_for('static', filename='js/jQuery-MultiSelect-master/jquery.multiselect.js') }}"></script>-->
+    <div class="notifications"></div>
+    <script>
+        const URL_FOR_SAVE_THEME = "{{ url_for('save_theme') }}";
+        const _getting_ducks = `{% include 'partials/getting_ducks.html' %}`;
 
-    <title>Quantext</title>
+        const shuffleArray = array => {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                let temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
+        }
+
+        const createMessageBox = (id,text) => {
+            let search_message_box = document.createElement("div");
+            search_message_box.setAttribute("id", id);
+
+            let bg = document.createElement("div");
+            bg.classList.add("main-theme-fill-dark","background_box");
+
+            let task = document.createElement("div");
+            task.classList.add("task_box");
+            task.innerHTML = text;
+            let status = document.createElement("div");
+            status.classList.add("status_box");
+            status.innerHTML = "0%";
+
+            let info_box = document.createElement("div");
+            info_box.classList.add("loading_message_box");
+            info_box.append(task, status);
+
+            search_message_box.append(bg, info_box);
+
+            document.getElementById("loading_messages").append(search_message_box);
+            return search_message_box
+        }
+
+        const doSearch = (target,parent,kwic,labeller) => {
+            let question_number = parent.dataset.question;
+            let sendText = "";
+            if(typeof curr_search_term !== "undefined" && curr_search_term !== "")
+                sendText = encodeURIComponent(curr_search_term);
+
+            let search_message_box = document.getElementById("search_message_box");
+            //add loading message box
+            if(!search_message_box)
+                search_message_box = createMessageBox("search_message_box","Search");            
+
+            let l = labeller ? "True" : "False";
+            let cat_col = labeller ? target.dataset.cat_col : "Categories_1";
+
+            fetch(`/search/${_analysis_id}/${_file_id}/${question_number}?search_term=${sendText}&sort=${curr_sort_order}&labeller=${l}&cat_col=${cat_col}`).then(response => response.json()).then($data => {
+                let PollState = function(task_id) {
+                    postData("{{ url_for('poll_search') }}",{task_id:task_id}).then(response => response.json()).then($task => {
+                        if($task)
+                            if ($task.process_percent) {
+                                search_message_box.querySelectorAll(".status_box")[0].innerHTML = `${Math.round($task.process_percent)}%`;
+                            } else {
+                                clearInterval(timeout_base);
+                                search_message_box.parentNode.removeChild(search_message_box);
+                                let sort_info;
+                                let sort_val;
+                                if(labeller){       
+                                    let labeller_div = parent.querySelectorAll(".label_panel")[0];                             
+                                    labeller_div.querySelectorAll(".all_responses_div")[0].innerHTML = $task.responses_labeller;
+
+                                    if(labeller_div.querySelectorAll(".hide_labels")[0].checked)
+                                        labeller_div.querySelectorAll('.labeller_div:not(.labelled)')[0].click();
+                                    else
+                                        labeller_div.querySelectorAll('.labeller_div')[0].click();   
+
+                                    sort_info = parent.querySelectorAll(".label_panel")[0].querySelectorAll(".sorting_info")[0];
+                                    let sort_control = parent.querySelectorAll(".sort-label")[0];
+                                    sort_val = sort_control.options[sort_control.selectedIndex].text;
+                                    parent.querySelectorAll(".label_panel")[0].querySelectorAll(".sort_value")[0].innerHTML = sort_val;
+                                }
+                                else{
+                                    let kwic_results_div = parent.querySelectorAll(".kwic_results_div")[0];
+                                    parent.querySelectorAll(".all_responses_div")[0].innerHTML = $task.responses_pos;
+                                    kwic_results_div.innerHTML = $task.responses_kwic;
+                                    const markInstance = new Mark(kwic_results_div.querySelectorAll(".kwic_result .text_div"));
+                                    markInstance.mark(curr_search_term, {"className": "main-theme-fill-dark", "separateWordSearch": false, "accuracy":"partially",ignorePunctuation:punct});
+                                    updateCounts(parent);
+                                    if(!parent.querySelectorAll(`.explore_button`)[0].classList.contains("main-theme-fill-dark"))
+                                        parent.querySelectorAll(`.explore_button`)[0].classList.add("button_outline");
+                                    if (kwic_results_div.offsetParent === null && kwic)
+                                        parent.querySelectorAll(".kwic_results")[0].click();
+                                    
+                                    sort_info = parent.querySelectorAll(".sorting_info")[0];
+                                    let sort_control = parent.querySelectorAll(".sort-control")[0];
+                                    sort_val = sort_control.options[sort_control.selectedIndex].text;
+                                    parent.querySelectorAll(".sort_value")[0].innerHTML = sort_val;
+                                }                                
+                                sort_info.style.display = sort_val === "(Default order)" ? "none" : "block";
+                            }
+                    });
+                };
+
+                let timeout_base = setInterval(function(){ PollState($data.job_id) },250);
+            });
+        }
+
+        const exec_body_scripts = body_el => {
+            function nodeName(elem, name) {
+                return elem.nodeName && elem.nodeName.toUpperCase() ===
+                    name.toUpperCase();
+            }
+
+            function evalScript(elem) {
+                let data = (elem.text || elem.textContent || elem.innerHTML || "" ),
+                    head = document.getElementsByTagName("head")[0] ||
+                        document.documentElement,
+                    script = document.createElement("script");
+
+                script.type = "text/javascript";
+                try {
+                    // doesn't work on ie...
+                    script.appendChild(document.createTextNode(data));
+                } catch(e) {
+                    // IE has funky script nodes
+                    script.text = data;
+                }
+
+                head.insertBefore(script, head.firstChild);
+                head.removeChild(script);
+            }
+
+            // main section of function
+            let scripts = [],
+                script,
+                children_nodes = body_el.childNodes,
+                child,
+                i;
+
+            for (i = 0; children_nodes[i]; i++) {
+                child = children_nodes[i];
+                if (nodeName(child, "script" ) && (!child.type || child.type.toLowerCase() === "text/javascript")) { scripts.push(child); } else { exec_body_scripts(child); }
+            }
+
+            for (i = 0; scripts[i]; i++) {
+                script = scripts[i];
+                if (script.parentNode) {script.parentNode.removeChild(script);}
+                evalScript(scripts[i]);
+            }
+        };
+
+        const $notifications = document.querySelectorAll(".notifications")[0];
+
+        let slider_configs = {};
+
+        const punct = ":;.,-–—‒_(){}[]!'\"+=".split("");
+        const request = async (url) => {
+            const response = await fetch(url);
+            return response.text();
+        };
+
+        function postData(url = '', data = {}) {
+            // Default options are marked with *
+            return fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, cors, *same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrer: 'no-referrer', // no-referrer, *client
+                body: JSON.stringify(data), // body data type must match "Content-Type" header
+            });
+        }
+
+        function notify(text, error) {
+            let $notification = document.createElement("li");
+            $notification.innerHTML = text;
+            $notification.style.left = "320px";
+            if(error)
+                $notification.style.background = "#EF2828";
+
+            $notifications.append($notification);
+            animate($notification,"left",320,0,320);
+            return $notification;
+        }
+
+        function animate(element, dir, start, end, time, callback){
+            let plus = start < end;
+            let interval = plus ? (end - start)/time : (start - end)/time;
+            function frame(){
+                if(plus)
+                    start+= 2;
+                else
+                    start-= 2;
+                element.style[dir] = `${start}px`;
+                if(start === end) {
+                    clearInterval(id);
+                    if(callback)
+                        callback();
+                }
+            }
+            let id = setInterval(frame,interval);
+        }
+    </script>
+
+    <title>{{ title }}</title>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-108505400-1"></script>
@@ -38,28 +239,23 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'UA-108505400-1');
     </script>
 
   </head>
 
-  <body>
+  <style>
+    .main-theme-fill-dark:disabled { color:#aaa!important }
+    .pretty.p-default.p-thick .state label:after, .pretty.p-default.p-thick .state label:before{ margin-top:-.1rem }
+  </style>
 
-      <div class="container-fluid" style="background:white!important">
+  <body>
+      <ul class="notifications"></ul>
+      <div class="container-fluid">
         {% block content %}{% endblock %}
       </div><!-- /.container-fluid -->
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <span class="help-block">
-        {% for message in messages %}
-            {{ message }}
-        {% endfor %}
-        </span>
-      {% endif %}
-    {% endwith %}
-
   </body>
 
+  <script src="{{ url_for('static', filename='js/global.js') }}"></script>
 </html>

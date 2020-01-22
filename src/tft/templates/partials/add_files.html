@@ -1,0 +1,30 @@
+<div class="add_files_{{ file['id'] }} w-100 add_files">
+    <div class="main-theme-color-dark mt-0 pt-4 mb-0 small_text-9" style="font-weight:500;">{{ file['filename'] }}</div>
+
+    <div style="width: 100%;overflow: auto;">
+        <div class="w-100 row m-0 mt-4" style="flex-wrap:nowrap">
+        {% for col in spreadsheet['columns'] %}
+            <div title="{{ col }}" data-file_id="{{ file['id'] }}" data-index="{{ loop.index0 }}" class="p-0 col-md header_cell add_cell add_cell_{{ loop.index0 }}" style="min-width:20%;background: white;font-weight: 500;border: 1px solid #ddd;padding: .5rem!important;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;
+            {% if not loop.last %}
+                border-right: none
+            {% endif %}
+            ">
+                {{ col }}
+            </div>                
+        {% endfor %}
+        </div>
+        {% for d in spreadsheet['data'] %}
+        <div class="w-100 row m-0" style="flex-wrap: nowrap">
+            {% for dd in d %}
+            <div data-index="{{ loop.index0 }}" class="p-0 col-md add_cell add_cell_{{ loop.index0 }}" style="min-width:20%;background: white;font-weight: 300;text-transform: none;border: 1px solid #ddd;padding: .5rem!important;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;
+            {% if not loop.last %}
+                border-right: none
+            {% endif %}
+            ">                
+                {{ dd }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}    
+    </div> 
+</div>
